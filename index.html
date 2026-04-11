@@ -179,7 +179,7 @@ footer { background:#080E16; padding:3rem 4rem; border-top:1px solid rgba(46,117
       <p class="hero-desc">비정형·반정형·정형 데이터를 자동으로 구조화하고<br>품질을 평가하여 AX(AI Transformation) 시스템을 완성합니다.<br>고객 데이터가 외부로 나가지 않는 <strong>완전 온디바이스</strong> AI 솔루션.</p>
       <div class="hero-buttons">
         <a href="tel:010-5234-3535" class="btn-outline">📞 기술지도사 상담</a>
-        <a href="#contact" class="btn-outline">📋 연구개발 신청</a>
+        <a href="/cdn-cgi/l/email-protection#214043426143484645550f424e0f4a531e5254434b4442551ccdb691cb948dcb91bdca91bd01cdaa81cd938c07434e45581ccdbc95ca87a51b041160cdb691cabc9ccd93b91b041160cda7adcda7ac1b041160cdaa81cd938ccaa395cdbb881b" class="btn-outline">📋 연구개발 신청</a>
         <a href="https://huggingface.co/spaces/aiphd/axdata-uds" target="_blank" class="btn-primary">🚀 솔루션 체험하기</a>
       </div>
     </div>
@@ -248,13 +248,47 @@ footer { background:#080E16; padding:3rem 4rem; border-top:1px solid rgba(46,117
 
 <section class="book" id="book">
   <div class="book-inner">
-    <div style="transform:rotate(-2deg);transition:transform 0.3s;border-radius:12px;overflow:hidden;box-shadow:20px 20px 60px rgba(0,0,0,0.4);">
-      <img src="https://drive.google.com/uc?export=view&id=1xRFGAfo1A0Gfm8TIF5aHEyWIDb6W4azF" alt="ai랑 AX 시스템 실무" style="width:100%;max-width:400px;height:auto;display:block;border-radius:12px;">
+    <div style="transform:rotate(-2deg);transition:transform 0.3s;border-radius:12px;overflow:hidden;box-shadow:20px 20px 60px rgba(0,0,0,0.4);max-width:380px;">
+      <!-- 실제 이미지가 있으면 표시, 없으면 CSS 커버 표시 -->
+      <img src="book_cover.png" alt="ai랑 AX 시스템 실무"
+           style="width:100%;height:auto;display:block;border-radius:12px;"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div style="display:none;flex-direction:column;align-items:center;justify-content:center;
+                  background:linear-gradient(160deg,#0a1628 0%,#1F4E79 40%,#0D1B2A 100%);
+                  border-radius:12px;padding:3rem 2rem;min-height:420px;text-align:center;
+                  border:2px solid rgba(46,117,182,0.5);position:relative;overflow:hidden;">
+        <!-- 배경 회로 패턴 -->
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.15;background:
+          repeating-linear-gradient(90deg,#2E75B6 0px,#2E75B6 1px,transparent 1px,transparent 40px),
+          repeating-linear-gradient(0deg,#2E75B6 0px,#2E75B6 1px,transparent 1px,transparent 40px);"></div>
+        <!-- AI 아이콘 -->
+        <div style="width:70px;height:70px;background:linear-gradient(135deg,#2E75B6,#C9A02A);
+                    border-radius:16px;display:flex;align-items:center;justify-content:center;
+                    font-size:2rem;margin-bottom:1.5rem;box-shadow:0 0 30px rgba(46,117,182,0.6);
+                    position:relative;z-index:1;">🤖</div>
+        <!-- 제목 -->
+        <div style="font-size:1.1rem;color:rgba(255,255,255,0.8);margin-bottom:0.5rem;
+                    font-family:'Space Mono',monospace;letter-spacing:0.1em;position:relative;z-index:1;">ai랑</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#ffffff;line-height:1.2;
+                    margin-bottom:1rem;position:relative;z-index:1;">AX 시스템 실무</div>
+        <!-- 5W1H 아이콘들 -->
+        <div style="display:flex;gap:0.8rem;margin:1rem 0;position:relative;z-index:1;">
+          <div style="width:36px;height:36px;background:rgba(46,117,182,0.4);border:1px solid rgba(46,117,182,0.6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;">👤</div>
+          <div style="width:36px;height:36px;background:rgba(46,117,182,0.4);border:1px solid rgba(46,117,182,0.6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;">📄</div>
+          <div style="width:36px;height:36px;background:rgba(46,117,182,0.4);border:1px solid rgba(46,117,182,0.6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;">🕐</div>
+          <div style="width:36px;height:36px;background:rgba(46,117,182,0.4);border:1px solid rgba(46,117,182,0.6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;">📍</div>
+          <div style="width:36px;height:36px;background:rgba(46,117,182,0.4);border:1px solid rgba(46,117,182,0.6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;">🎯</div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--gold);font-family:'Space Mono',monospace;
+                    position:relative;z-index:1;">5W1H 질의 응답 기반</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:1rem;
+                    position:relative;z-index:1;">배종옥 공학박사 · NCS200107</div>
+      </div>
     </div>
     <div class="book-info">
       <div class="section-tag">Book</div>
       <h2 class="section-title">AI랑 AX 시스템 실무</h2>
-      <p class="section-desc">데이터 수집부터 저장, 파일 데이터 입력, 입력 데이터 구조화, 품질 검증, AX 시스템 구축, 실무 활용까지 전체 과정을 AI랑 AX 시스템 실무입니다.</p>
+      <p class="section-desc">데이터 수집부터 저장, 파일 데이터 입력, 입력 데이터 구조화, 품질 검증, AX 시스템 구축, 실무 활용까지 전체 과정을 AI랑 함께하는 AX 실무 교과서입니다.</p>
       <div class="book-meta">
         <div class="book-meta-item"><div class="book-meta-label">출판사</div><div class="book-meta-value">부크크</div></div>
         <div class="book-meta-item"><div class="book-meta-label">정가</div><div class="book-meta-value">35,000원</div></div>
@@ -269,9 +303,10 @@ footer { background:#080E16; padding:3rem 4rem; border-top:1px solid rgba(46,117
   <div class="cta-inner">
     <div class="section-tag">Contact</div>
     <h2 class="section-title">기술지도사 상담 · 연구개발 신청</h2>
-    <p class="section-desc">AI바우처 도입, AX 시스템 구축, R&D 과제 — 기술지도사가 직접 상담해 드립니다.</p>
+    <p class="section-desc">AI바우처 활용, AX 시스템 구축, R&D 과제 — 기술지도사가 직접 상담해 드립니다.</p>
     <div class="cta-buttons">
       <a href="tel:010-5234-3535" class="btn-outline">📞 기술지도사 상담</a>
+      <a href="/cdn-cgi/l/email-protection#8aebe8e9cae8e3edeefea4e9e5a4e1f8b5f9ffe8e0efe9feb7661d3a603f26603a16613a16aa66012a663827ace8e5eef3b766173e612c0eb0afbacb661d3a611737663812b0afbacb660c06660c07b0afbacb66012a66382761083e661023b0" class="btn-outline">📋 연구개발 신청</a>
       <a href="https://huggingface.co/spaces/aiphd/axdata-uds" target="_blank" class="btn-primary">🚀 솔루션 체험하기</a>
     </div>
 
@@ -322,7 +357,7 @@ footer { background:#080E16; padding:3rem 4rem; border-top:1px solid rgba(46,117
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 async function submitForm() {
   const name    = document.getElementById('f-name').value.trim();
   const phone   = document.getElementById('f-phone').value.trim();
@@ -359,13 +394,4 @@ async function submitForm() {
       result.className = 'form-msg-ok';
       result.textContent = '✅ 상담 신청이 완료되었습니다. 빠른 시일 내에 연락드리겠습니다.';
       document.getElementById('f-name').value = '';
-      document.getElementById('f-phone').value = '';
-      document.getElementById('f-company').value = '';
-      document.getElementById('f-email').value = '';
-      document.getElementById('f-message').value = '';
-    } else {
-      throw new Error(data.error || '발송 실패');
-    }
-  } catch(e) {
-    result.style.display = 'block';
-    result.className = 'for
+      document.getEleme
