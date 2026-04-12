@@ -145,6 +145,61 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
   footer{padding:2rem 1.5rem;} .footer-inner{flex-direction:column;text-align:center;} .footer-info{text-align:center;}
   .intro-card{padding:2rem 1.5rem;} .intro-num{font-size:1.5rem;}
 }
+
+
+/* 중앙 회사명 */
+.intro-center {
+  position: relative; z-index: 10;
+  text-align: center;
+  animation: fadeInUp 1.5s ease 0.5s both;
+}
+.intro-company {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 1rem;
+  animation: companyRise 2s cubic-bezier(0.25,0.46,0.45,0.94) 0.3s both;
+  text-shadow: 0 0 60px rgba(201,160,42,0.5), 0 0 120px rgba(46,117,182,0.3);
+}
+@keyframes companyRise {
+  0%   { opacity:0; transform: translateY(60px); filter: blur(10px); }
+  60%  { opacity:0.8; filter: blur(2px); }
+  100% { opacity:1; transform: translateY(0); filter: blur(0); }
+}
+.intro-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 2.5rem;
+  animation: fadeInUp 1.5s ease 1s both;
+}
+
+/* 우측 하단 카드 */
+.intro-card-br {
+  position: absolute;
+  bottom: 3rem; right: 3rem;
+  z-index: 20;
+  background: rgba(19,35,56,0.88);
+  border: 1px solid rgba(46,117,182,0.5);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 40px rgba(46,117,182,0.2);
+  text-align: center;
+  min-width: 220px;
+  animation: fadeInUp 1.5s ease 1.5s both;
+}
+.intro-icon-sm { font-size:2.5rem; display:block; margin-bottom:0.8rem; animation:float 3s ease-in-out infinite; }
+.intro-num-sm { font-size:1.2rem; font-weight:900; margin-bottom:0.3rem; }
+.intro-email-sm { font-family:'Space Mono',monospace; color:var(--gold); font-size:0.82rem; margin-bottom:1rem; }
+.intro-tags-sm { display:flex; gap:0.4rem; justify-content:center; flex-wrap:wrap; }
+
+@media(max-width:900px) {
+  .intro-card-br { position:relative; bottom:auto; right:auto; margin:2rem auto 0; }
+  .intro-company { font-size:2rem; }
+}
 </style>
 </head>
 <body>
@@ -167,22 +222,26 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
   <div class="horizon"></div>
   <div class="circuit"></div>
 
-  <div class="intro-content">
-    <span class="intro-icon">🤖</span>
-    <div class="intro-card">
-      <div class="intro-badge">AXData · 빅데이터기술연구원㈜</div>
-      <div class="intro-num">010-5234-3535</div>
-      <div class="intro-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cdacafae8dafa4aaa9b9e3aea2e3a6bf">[email&#160;protected]</a></div>
-      <div class="intro-tags">
-        <span class="intro-tag">연구개발</span>
-        <span class="intro-tag">기술지도</span>
-        <span class="intro-tag">시스템구축</span>
-        <span class="intro-tag">교육</span>
-      </div>
-    </div>
+  <!-- 중앙: 빅데이터기술연구원㈜ 태양처럼 떠오름 -->
+  <div class="intro-center">
+    <div class="intro-company">빅데이터기술연구원㈜</div>
+    <div class="intro-sub">AX · AI Transformation System</div>
     <a href="https://huggingface.co/spaces/aiphd/axdata-uds" target="_blank" class="btn-hero">
       🚀 솔루션 체험하기
     </a>
+  </div>
+
+  <!-- 우측 하단: 연락처 카드 -->
+  <div class="intro-card-br">
+    <span class="intro-icon-sm">🤖</span>
+    <div class="intro-num-sm">010-5234-3535</div>
+    <div class="intro-email-sm">abc<!---->@<!---->bigdt.co.kr</div>
+    <div class="intro-tags-sm">
+      <span class="intro-tag">연구개발</span>
+      <span class="intro-tag">기술지도</span>
+      <span class="intro-tag">시스템구축</span>
+      <span class="intro-tag">교육</span>
+    </div>
   </div>
 
   <div class="scroll-hint">▼<br>스크롤</div>
