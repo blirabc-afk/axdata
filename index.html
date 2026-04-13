@@ -472,31 +472,52 @@ function handleUpload(e, type) {
   ok.classList.add('show');
 
   let done = 0;
-  for (const file of files) {
+  const total = files.length;
+
+  function uploadFile(file) {
     const reader = new FileReader();
     reader.onload = function(ev) {
       const base64 = ev.target.result.split(',')[1];
-      const form = new FormData();
-      form.append('filename', file.name);
-      form.append('mimeType', file.type || 'application/octet-stream');
-      form.append('file', base64);
+      const params = new URLSearchParams();
+      params.append('filename', file.name);
+      params.append('mimeType', file.type || 'application/octet-stream');
+      params.append('file', base64);
 
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: form
-      }).then(() => {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = SCRIPT_URL;
+      form.target = iframe.name = 'upload_' + Date.now();
+
+      ['filename','mimeType','file'].forEach(key => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = key === 'filename' ? file.name : key === 'mimeType' ? (file.type || 'application/octet-stream') : base64;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
         done++;
-        if (done === files.length) {
-          ok.textContent = '✅ ' + done + '개 업로드 완료!';
+        if (done === total) {
+          ok.textContent = '✅ ' + total + '개 업로드 완료!';
           setTimeout(() => ok.classList.remove('show'), 4000);
         }
-      }).catch(() => {
-        ok.textContent = '✅ ' + files.length + '개 업로드 요청 완료!';
-        setTimeout(() => ok.classList.remove('show'), 4000);
-      });
+      }, 3000);
     };
     reader.readAsDataURL(file);
+  }
+
+  for (const file of files) {
+    uploadFile(file);
   }
 }
 </script>
