@@ -332,7 +332,7 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
       </div>
     </div>
 
-    <!-- 솔루션 자료 -->
+    <!-- 공통 패널 템플릿 -->
     <div class="prac-panel active" id="panel-solution">
       <div class="prac-panel-title">☁️ 솔루션 자료</div>
       <div class="upload-zone" onclick="document.getElementById('up-solution').click()">
@@ -343,13 +343,10 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
         <button class="upload-btn-sm">파일 선택</button>
       </div>
       <div class="upload-ok" id="ok-solution"></div>
-      <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">📥 다운로드 파일</p>
-      <ul class="file-list">
-        <li class="file-item"><div class="file-info"><span class="file-icon">📄</span><div><div class="file-name">한빛테크_생산일지.txt 외</div><div class="file-size">UDS 비정형 실습 · 정상+CH1~CH6 오류 7개 버전</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-        <li class="file-item"><div class="file-info"><span class="file-icon">🔢</span><div><div class="file-name">한빛테크_주문데이터.json 외</div><div class="file-size">SDS 반정형 실습 · 7개 버전</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-        <li class="file-item"><div class="file-info"><span class="file-icon">📊</span><div><div class="file-name">한빛테크_생산실적.csv 외</div><div class="file-size">RDS 정형 실습 · 7개 버전</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-        <li class="file-item"><div class="file-info"><span class="file-icon">🔄</span><div><div class="file-name">한빛테크_이종혼합데이터</div><div class="file-size">HDS 이종 실습 · 이진+수치+텍스트+시계열</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-      </ul>
+      <div style="text-align:center;margin-top:1rem;">
+        <button class="dl-btn" style="margin:0 auto;padding:0.8rem 2rem;font-size:1rem;" onclick="loadFiles('file-list-solution')">⬇ 실습자료 다운로드</button>
+      </div>
+      <ul class="file-list" id="file-list-solution" style="margin-top:1rem;"></ul>
     </div>
 
     <!-- 온디바이스 자료 -->
@@ -363,11 +360,10 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
         <button class="upload-btn-sm">파일 선택</button>
       </div>
       <div class="upload-ok" id="ok-ondevice"></div>
-      <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">📥 다운로드 파일</p>
-      <ul class="file-list">
-        <li class="file-item"><div class="file-info"><span class="file-icon">⚙️</span><div><div class="file-name">AX_설치.bat</div><div class="file-size">Ollama 자동 설치 스크립트 · Windows 전용</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-        <li class="file-item"><div class="file-info"><span class="file-icon">📦</span><div><div class="file-name">온디바이스_실습데이터_전체.zip</div><div class="file-size">UDS·SDS·RDS·HDS 전체 실습 파일</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-      </ul>
+      <div style="text-align:center;margin-top:1rem;">
+        <button class="dl-btn" style="margin:0 auto;padding:0.8rem 2rem;font-size:1rem;" onclick="loadFiles('file-list-ondevice')">⬇ 실습자료 다운로드</button>
+      </div>
+      <ul class="file-list" id="file-list-ondevice" style="margin-top:1rem;"></ul>
     </div>
 
     <!-- 클라우드 자료 -->
@@ -381,11 +377,10 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
         <button class="upload-btn-sm">파일 선택</button>
       </div>
       <div class="upload-ok" id="ok-cloud"></div>
-      <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">📥 다운로드 파일</p>
-      <ul class="file-list">
-        <li class="file-item"><div class="file-info"><span class="file-icon">🐍</span><div><div class="file-name">AX_Ollama_코랩.ipynb</div><div class="file-size">구글 코랩 Ollama 연동 노트북</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-        <li class="file-item"><div class="file-info"><span class="file-icon">📋</span><div><div class="file-name">GCP_구축_가이드.pdf</div><div class="file-size">GCP App Engine + Ollama 설정 가이드</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-      </ul>
+      <div style="text-align:center;margin-top:1rem;">
+        <button class="dl-btn" style="margin:0 auto;padding:0.8rem 2rem;font-size:1rem;" onclick="loadFiles('file-list-cloud')">⬇ 실습자료 다운로드</button>
+      </div>
+      <ul class="file-list" id="file-list-cloud" style="margin-top:1rem;"></ul>
     </div>
 
     <!-- 활용 자료 -->
@@ -399,11 +394,10 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
         <button class="upload-btn-sm">파일 선택</button>
       </div>
       <div class="upload-ok" id="ok-usage"></div>
-      <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">📥 다운로드 파일</p>
-      <ul class="file-list">
-        <li class="file-item"><div class="file-info"><span class="file-icon">📈</span><div><div class="file-name">AX_대시보드_템플릿.xlsx</div><div class="file-size">경영진·부서별 대시보드 양식</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-        <li class="file-item"><div class="file-info"><span class="file-icon">🔒</span><div><div class="file-name">보안_체크리스트.pdf</div><div class="file-size">시스템·개인정보·데이터 보안 점검표</div></div></div><button class="dl-btn">⬇ 다운로드</button></li>
-      </ul>
+      <div style="text-align:center;margin-top:1rem;">
+        <button class="dl-btn" style="margin:0 auto;padding:0.8rem 2rem;font-size:1rem;" onclick="loadFiles('file-list-usage')">⬇ 실습자료 다운로드</button>
+      </div>
+      <ul class="file-list" id="file-list-usage" style="margin-top:1rem;"></ul>
     </div>
 
   </div>
@@ -463,6 +457,33 @@ function showPanel(type, el){
 }
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2IorZ2fBiOSwKIg2laNPtPqneUNtnVRabkbBmmiT9i50U_nqrMsz85FwMF44iln4K/exec';
+
+function loadFiles(listId) {
+  const list = document.getElementById(listId);
+  list.innerHTML = '<li style="color:var(--gray);padding:1rem;">⏳ 파일 목록 불러오는 중...</li>';
+  fetch(SCRIPT_URL + '?action=list')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.files || data.files.length === 0) {
+        list.innerHTML = '<li style="color:var(--gray);padding:1rem;">등록된 파일이 없습니다.</li>';
+        return;
+      }
+      list.innerHTML = data.files.map(f => `
+        <li class="file-item">
+          <div class="file-info">
+            <span class="file-icon">📄</span>
+            <div>
+              <div class="file-name">${f.name}</div>
+              <div class="file-size">${Math.round(f.size/1024)}KB</div>
+            </div>
+          </div>
+          <a href="${f.url}" target="_blank" class="dl-btn">⬇ 다운로드</a>
+        </li>`).join('');
+    })
+    .catch(() => {
+      list.innerHTML = '<li style="color:var(--gray);padding:1rem;">파일 목록을 불러올 수 없습니다.</li>';
+    });
+}
 
 function handleUpload(e, type) {
   const files = e.target.files;
