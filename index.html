@@ -94,7 +94,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .book-meta-label{font-size:0.75rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;font-family:'Space Mono',monospace;}
 .book-meta-value{font-size:1rem;font-weight:700;color:var(--gold);margin-top:0.2rem;}
 
-/* ── 실습자료 섹션 ── */
 .practice-section{padding:6rem 4rem;background:var(--card);}
 .practice-inner{max-width:1100px;margin:0 auto;}
 .practice-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:3rem;}
@@ -300,7 +299,6 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
   </div>
 </section>
 
-<!-- ══ 실습자료 섹션 (신규) ══ -->
 <section class="practice-section" id="practice">
   <div class="practice-inner">
     <div class="section-header">
@@ -332,7 +330,6 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
       </div>
     </div>
 
-    <!-- 공통 패널 템플릿 -->
     <div class="prac-panel active" id="panel-solution">
       <div class="prac-panel-title">☁️ 솔루션 자료</div>
       <div class="upload-zone" onclick="document.getElementById('up-solution').click()">
@@ -349,7 +346,6 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
       <ul class="file-list" id="file-list-solution" style="margin-top:1rem;"></ul>
     </div>
 
-    <!-- 온디바이스 자료 -->
     <div class="prac-panel" id="panel-ondevice">
       <div class="prac-panel-title">💻 온디바이스 자료</div>
       <div class="upload-zone" onclick="document.getElementById('up-ondevice').click()">
@@ -366,7 +362,6 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
       <ul class="file-list" id="file-list-ondevice" style="margin-top:1rem;"></ul>
     </div>
 
-    <!-- 클라우드 자료 -->
     <div class="prac-panel" id="panel-cloud">
       <div class="prac-panel-title">🌐 클라우드 자료</div>
       <div class="upload-zone" onclick="document.getElementById('up-cloud').click()">
@@ -383,7 +378,6 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
       <ul class="file-list" id="file-list-cloud" style="margin-top:1rem;"></ul>
     </div>
 
-    <!-- 활용 자료 -->
     <div class="prac-panel" id="panel-usage">
       <div class="prac-panel-title">📊 활용 자료</div>
       <div class="upload-zone" onclick="document.getElementById('up-usage').click()">
@@ -406,7 +400,7 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
 <section class="contact-section" id="contact">
   <div class="contact-inner">
     <div class="section-tag">Contact</div>
-    <h2 class="section-title">실습자료</h2>
+    <h2 class="section-title">문의하기</h2>
     <div class="contact-card">
       <span class="contact-robot">🤖</span>
       <div class="contact-num">010-5234-3535</div>
@@ -438,7 +432,6 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
 </footer>
 
 <script>
-// 별 생성
 const starsEl = document.getElementById('stars');
 for(let i=0;i<80;i++){
   const s=document.createElement('div');
@@ -448,7 +441,6 @@ for(let i=0;i<80;i++){
   starsEl.appendChild(s);
 }
 
-// 패널 전환
 function showPanel(type, el){
   document.querySelectorAll('.prac-card').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
@@ -456,12 +448,13 @@ function showPanel(type, el){
   document.getElementById('panel-'+type).classList.add('active');
 }
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2IorZ2fBiOSwKIg2laNPtPqneUNtnVRabkbBmmiT9i50U_nqrMsz85FwMF44iln4K/exec';
+// ✅ 새 SCRIPT_URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhWIA2BXpqKsiZQFiJd9bZb2wkK0mkQecCUUh39M9gc--NmXBIUECYmqJ9B0sZlbXr/exec';
 
 function loadFiles(listId) {
   const list = document.getElementById(listId);
   list.innerHTML = '<li style="color:var(--gray);padding:1rem;">⏳ 파일 목록 불러오는 중...</li>';
-  fetch(SCRIPT_URL + '?action=list')
+  fetch(SCRIPT_URL)
     .then(r => r.json())
     .then(data => {
       if (!data.files || data.files.length === 0) {
@@ -477,7 +470,7 @@ function loadFiles(listId) {
               <div class="file-size">${Math.round(f.size/1024)}KB</div>
             </div>
           </div>
-          <a href="${f.url}" target="_blank" class="dl-btn">⬇ 다운로드</a>
+          <a href="${f.url}" target="_blank" download class="dl-btn">⬇ 다운로드</a>
         </li>`).join('');
     })
     .catch(() => {
@@ -499,10 +492,6 @@ function handleUpload(e, type) {
     const reader = new FileReader();
     reader.onload = function(ev) {
       const base64 = ev.target.result.split(',')[1];
-      const params = new URLSearchParams();
-      params.append('filename', file.name);
-      params.append('mimeType', file.type || 'application/octet-stream');
-      params.append('file', base64);
 
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
@@ -517,7 +506,9 @@ function handleUpload(e, type) {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = key;
-        input.value = key === 'filename' ? file.name : key === 'mimeType' ? (file.type || 'application/octet-stream') : base64;
+        input.value = key === 'filename' ? file.name
+                    : key === 'mimeType'  ? (file.type || 'application/octet-stream')
+                    : base64;
         form.appendChild(input);
       });
 
@@ -537,9 +528,7 @@ function handleUpload(e, type) {
     reader.readAsDataURL(file);
   }
 
-  for (const file of files) {
-    uploadFile(file);
-  }
+  for (const file of files) uploadFile(file);
 }
 </script>
 </body>
