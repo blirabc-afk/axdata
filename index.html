@@ -192,7 +192,7 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
   <div class="intro-card-br">
     <span class="intro-icon-sm">🤖</span>
     <div class="intro-num-sm">010-5234-3535</div>
-    <div class="intro-email-sm">abc@bigdt.co.kr</div>
+    <div class="intro-email-sm"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1f7e7d7c5f7d76787b6b317c7031746d">[email&#160;protected]</a></div>
     <div class="intro-tags-sm">
       <span class="intro-tag">연구개발</span>
       <span class="intro-tag">기술지도</span>
@@ -404,7 +404,7 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
     <div class="contact-card">
       <span class="contact-robot">🤖</span>
       <div class="contact-num">010-5234-3535</div>
-      <div class="contact-email">abc@bigdt.co.kr</div>
+      <div class="contact-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5d3c3f3e1d3f343a3929733e3273362f">[email&#160;protected]</a></div>
       <div class="contact-tags">
         <span class="contact-tag">연구개발</span>
         <span class="contact-tag">기술지도</span>
@@ -424,14 +424,14 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
     </div>
     <div class="footer-info">
       대전광역시 유성구 가정북로 96<br>
-      abc@bigdt.co.kr | www.axdata.co.kr<br>
+      <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2f4e4d4c6f4d46484b5b014c4001445d">[email&#160;protected]</a> | www.axdata.co.kr<br>
       사업자번호 271-88-01540 | 특허출원 제10-2026-0048020호<br>
       © 2026 빅데이터기술연구원㈜ All rights reserved.
     </div>
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const starsEl = document.getElementById('stars');
 for(let i=0;i<80;i++){
   const s=document.createElement('div');
@@ -449,7 +449,7 @@ function showPanel(type, el){
 }
 
 // ✅ 새 SCRIPT_URL
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhWIA2BXpqKsiZQFiJd9bZb2wkK0mkQecCUUh39M9gc--NmXBIUECYmqJ9B0sZlbXr/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyASbf1LCpCa354OqYhfingloNSLcXX2HCuwLHAil86hvYPRgoHaE6uatoXXxGTXdxd/exec';
 
 function loadFiles(listId) {
   const list = document.getElementById(listId);
@@ -470,7 +470,7 @@ function loadFiles(listId) {
               <div class="file-size">${Math.round(f.size/1024)}KB</div>
             </div>
           </div>
-          <a href="${f.url}" target="_blank" download class="dl-btn">⬇ 다운로드</a>
+          <a href="${f.url || 'https://drive.google.com/uc?export=download&id='+f.id}" target="_blank" class="dl-btn">⬇ 다운로드</a>
         </li>`).join('');
     })
     .catch(() => {
@@ -512,24 +512,4 @@ function handleUpload(e, type) {
         form.appendChild(input);
       });
 
-      document.body.appendChild(form);
-      form.submit();
-
-      setTimeout(() => {
-        document.body.removeChild(form);
-        document.body.removeChild(iframe);
-        done++;
-        if (done === total) {
-          ok.textContent = '✅ ' + total + '개 업로드 완료!';
-          setTimeout(() => ok.classList.remove('show'), 4000);
-        }
-      }, 3000);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  for (const file of files) uploadFile(file);
-}
-</script>
-</body>
-</html>
+      document.body.appendChil
