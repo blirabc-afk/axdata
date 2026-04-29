@@ -39,6 +39,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .intro-tags-sm{display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;}
 .intro-tag{background:rgba(46,117,182,0.2);border:1px solid rgba(46,117,182,0.4);color:var(--white);padding:0.3rem 0.8rem;border-radius:100px;font-size:0.82rem;}
 .btn-hero{display:inline-flex;align-items:center;gap:0.6rem;background:var(--accent);color:var(--white);padding:1rem 2.5rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem;transition:all 0.3s;border:2px solid var(--accent);}
+
+/* ⭐ 기업용 AX 시스템 박스 - 네이비 블루 */
+.enterprise-box{margin-top:2rem;background:rgba(31,78,121,0.35);border:2px solid var(--accent);border-radius:16px;padding:1.5rem 2rem;display:inline-block;backdrop-filter:blur(10px);animation:fadeInUp 1.5s ease 1s both;box-shadow:0 8px 24px rgba(46,117,182,0.2);}
+.enterprise-title{font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:1rem;letter-spacing:0.05em;}
+.enterprise-buttons{display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;}
+.enterprise-btn{display:inline-flex;align-items:center;justify-content:center;background:rgba(31,78,121,0.6);color:var(--white);padding:0.7rem 1.6rem;border-radius:100px;text-decoration:none;font-weight:700;font-size:0.92rem;transition:all 0.25s;border:2px solid var(--accent);min-width:110px;}
+.enterprise-btn:hover{background:var(--accent);transform:translateY(-2px);box-shadow:0 6px 16px rgba(46,117,182,0.5);}
+.enterprise-btn .ico{margin-right:0.4rem;font-size:1rem;}
+
 .scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:10;color:var(--gray);font-size:0.8rem;text-align:center;animation:scrollBounce 2s ease-in-out infinite;}
 @keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
 .section-tag{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:1rem;}
@@ -118,7 +127,7 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
 .footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
 .footer-logo{font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--gold);}
 .footer-info{font-size:0.82rem;color:var(--gray);line-height:1.7;text-align:right;}
-@media(max-width:900px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.stats-grid{grid-template-columns:repeat(2,1fr);}.solutions-grid{grid-template-columns:1fr;}.features-grid{grid-template-columns:1fr;}.book-inner{grid-template-columns:1fr;}.practice-cards{grid-template-columns:repeat(2,1fr);}.intro-card-br{position:relative;bottom:auto;right:auto;margin:2rem auto 0;}.intro-company{font-size:2rem;}}
+@media(max-width:900px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.stats-grid{grid-template-columns:repeat(2,1fr);}.solutions-grid{grid-template-columns:1fr;}.features-grid{grid-template-columns:1fr;}.book-inner{grid-template-columns:1fr;}.practice-cards{grid-template-columns:repeat(2,1fr);}.intro-card-br{position:relative;bottom:auto;right:auto;margin:2rem auto 0;}.intro-company{font-size:2rem;}.enterprise-buttons{flex-direction:column;}.enterprise-btn{width:100%;}}
 </style>
 </head>
 <body>
@@ -137,9 +146,25 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
   <div class="stars" id="stars"></div>
   <div class="sun"></div><div class="horizon"></div><div class="circuit"></div>
   <div class="intro-center">
-    <div class="intro-company">빅데이터기술연구원㈜</div>
+    <div class="intro-company">에이엑스데이터(주)</div>
     <div class="intro-sub">AX · AI Transformation System</div>
     <a href="https://huggingface.co/spaces/aiphd/axdata-uds" target="_blank" class="btn-hero">🚀 솔루션 체험하기</a>
+
+    <!-- ⭐ 기업용 AX 시스템 박스 (신규 추가) -->
+    <div class="enterprise-box">
+      <div class="enterprise-title">기업용 AX 시스템</div>
+      <div class="enterprise-buttons">
+        <a href="https://huggingface.co/spaces/aiphd/axdata-uds" target="_blank" class="enterprise-btn">
+          <span class="ico">☁️</span>SaaS
+        </a>
+        <a href="#ondevice" class="enterprise-btn">
+          <span class="ico">💻</span>Ondevice
+        </a>
+        <a href="#cloud" class="enterprise-btn">
+          <span class="ico">🌐</span>Cloud
+        </a>
+      </div>
+    </div>
   </div>
   <div class="intro-card-br">
     <span class="intro-icon-sm">🤖</span>
@@ -318,8 +343,8 @@ footer{background:#080E16;padding:3rem 4rem;border-top:1px solid rgba(46,117,182
 
 <footer>
   <div class="footer-inner">
-    <div><div class="footer-logo">AXData</div><div style="font-size:0.8rem;color:var(--gray);margin-top:0.5rem;">빅데이터기술연구원㈜</div></div>
-    <div class="footer-info">대전광역시 유성구 가정북로 96<br>abc@bigdt.co.kr | www.axdata.co.kr<br>사업자번호 271-88-01540 | 특허출원 제10-2026-0048020호<br>© 2026 빅데이터기술연구원㈜ All rights reserved.</div>
+    <div><div class="footer-logo">AXData</div><div style="font-size:0.8rem;color:var(--gray);margin-top:0.5rem;">에이엑스데이터(주)</div></div>
+    <div class="footer-info">대전광역시 유성구 가정북로 96<br>abc@bigdt.co.kr | www.axdata.co.kr<br>사업자번호 271-88-01540 | 특허출원 제10-2026-0048020호<br>© 2026 에이엑스데이터(주) All rights reserved.</div>
   </div>
 </footer>
 
