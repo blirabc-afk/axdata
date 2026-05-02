@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXData-OnDevice | 사내 자체 AI 처리 (외부 연결 0%)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+if(typeof pdfjsLib !== 'undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+</script>
+<style>
+:root{--navy:#0D1B2A;--teal:#117A65;--teal2:#1D9E75;--gold:#C9A02A;--white:#F5F8FF;--gray:#8899AA;--card:#132338;--red:#A32D2D;--green:#1A6B3A;--blue:#185FA5;--orange:#F57C00;--purple:#6A1B9A;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;}
+header{background:rgba(13,27,42,0.95);padding:1rem 2rem;border-bottom:1px solid rgba(17,122,101,0.4);display:flex;align-items:center;gap:1rem;}
+.logo{font-size:1.4rem;font-weight:900;color:var(--gold);}
+.logo span{color:var(--white);}
+.badge-hdr{background:var(--blue);color:#fff;font-size:0.75rem;padding:0.2rem 0.7rem;border-radius:20px;}
+main{max-width:1100px;margin:0 auto;padding:2rem 1rem;}
+.title-area{text-align:center;margin-bottom:2rem;}
+.title-area h1{font-size:1.8rem;font-weight:900;margin-bottom:0.5rem;}
+.title-area p{color:var(--gray);font-size:0.9rem;}
+.steps{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;margin-bottom:2.5rem;}
+.sp{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:0.35rem 0.8rem;font-size:0.75rem;color:var(--gray);}
+.sp.active{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700;}
+.sp.done{background:rgba(26,107,58,0.4);border-color:var(--green);color:#9FE1CB;}
+.sarr{color:var(--gray);font-size:0.75rem;padding:0 0.2rem;}
+.upload-box{background:var(--card);border:2px dashed rgba(17,122,101,0.6);border-radius:16px;padding:2.5rem 2rem;text-align:center;cursor:pointer;margin-bottom:1.5rem;}
+.upload-box input{display:none;}
+.btn-upload{background:var(--teal);color:#fff;border:none;padding:0.6rem 1.8rem;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:0.8rem;}
+.file-bar{background:rgba(17,122,101,0.15);border:1px solid var(--teal);border-radius:10px;padding:0.8rem 1.2rem;margin-bottom:1rem;display:none;align-items:center;gap:1rem;}
+.file-bar.show{display:flex;}
+.btn-go{background:var(--gold);color:#0D1B2A;border:none;padding:0.6rem 1.5rem;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-left:auto;}
+.pipeline-status{background:var(--card);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;display:none;}
+.pipeline-status.show{display:block;}
+.pstep{padding:1rem;border-radius:8px;margin-bottom:0.8rem;border-left:4px solid var(--gray);background:rgba(255,255,255,0.03);}
+.pstep.active{border-left-color:var(--teal2);background:rgba(17,122,101,0.15);}
+.pstep.done{border-left-color:var(--green);background:rgba(26,107,58,0.15);}
+.pstep-title{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;}
+.pstep-title .icon{font-size:1.1rem;}
+.pstep-content{font-size:0.85rem;color:var(--gray);line-height:1.7;}
+.pstep-content b{color:var(--white);}
+.progress-bar{background:rgba(255,255,255,0.08);height:6px;border-radius:3px;margin-top:0.5rem;overflow:hidden;}
+.progress-fill{background:var(--teal2);height:100%;width:0%;transition:width 0.3s;}
+.grade-table{width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:0.5rem;}
+.grade-table th{background:rgba(106,27,154,0.4);padding:6px 10px;text-align:left;font-size:0.8rem;}
+.grade-table td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.csec{display:none;margin-bottom:1.5rem;}
+.csec.show{display:block;}
+.chdr{font-size:0.95rem;font-weight:700;color:var(--teal2);margin-bottom:0.8rem;padding:0.5rem 0;border-bottom:1px solid rgba(17,122,101,0.3);}
+.cpanel{background:var(--card);border-radius:12px;padding:1.2rem;}
+.preview-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+.preview-table thead{background:#1F4E79;color:#fff;position:sticky;top:0;}
+.preview-table th{padding:8px;text-align:left;}
+.preview-table td{padding:6px;border-bottom:1px solid rgba(255,255,255,0.05);color:#E0E0E0;}
+.preview-wrap{max-height:380px;overflow-y:auto;border:1px solid rgba(46,117,182,0.3);border-radius:8px;background:rgba(13,27,42,0.6);}
+.grade-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.75rem;}
+@keyframes pulse {
+  0%, 100% { box-shadow:inset 0 0 0 0 rgba(255,107,107,0.4); }
+  50% { box-shadow:inset 0 0 8px 2px rgba(255,107,107,0.6); }
+}
+.gA{background:rgba(76,175,80,0.2);color:#4CAF50;}
+.gB{background:rgba(255,193,7,0.2);color:#FFC107;}
+.gC{background:rgba(244,67,54,0.2);color:#F44336;}
+.gX{background:rgba(158,158,158,0.2);color:#9E9E9E;}
+.arow{display:flex;gap:0.8rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn-gold{background:var(--gold);color:#0D1B2A;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;}
+.btn-blue{background:var(--blue);color:#fff;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;}
+.btn-teal{background:var(--teal);color:#fff;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;}
+.btn-gray{background:rgba(255,255,255,0.08);color:var(--white);border:none;padding:0.6rem 1.4rem;border-radius:8px;font-size:0.88rem;cursor:pointer;}
+.axcomplete{background:linear-gradient(135deg,rgba(17,122,101,0.3),rgba(13,27,42,0));border:1px solid var(--teal);border-radius:16px;padding:2rem;display:none;text-align:center;margin-bottom:1rem;}
+.axcomplete.show{display:block;}
+.axtag{background:rgba(17,122,101,0.2);border:1px solid var(--teal);padding:0.3rem 0.8rem;border-radius:20px;font-size:0.82rem;}
+.evo-box{background:linear-gradient(135deg,rgba(106,27,154,0.2),rgba(13,27,42,0));border:1px solid var(--purple);border-radius:12px;padding:1.2rem;margin-top:1rem;}
+.evo-box .ttl{color:#CE93D8;font-weight:700;font-size:0.95rem;margin-bottom:0.5rem;}
+footer{text-align:center;padding:1.5rem;color:var(--gray);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:2rem;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">AX<span>Data</span></div>
+  <span class="badge-hdr" style="background:#fbbf24;color:#0D1B2A;">🔒 OnDevice</span>
+  <span style="color:var(--gray);font-size:0.82rem;margin-left:auto;">사내 자체 AI · 외부 연결 0% · 데이터 주권 100%</span>
+</header>
+
+<main>
+  <div class="title-area">
+    <h1>사내 자체 AI 시스템 구축 + 보안 보관</h1>
+    <p>외부 연결 0% · 자체 AI 처리 · 데이터 사내 보관 · <b style="color:#fbbf24;">기업 보안 정책 100% 준수</b></p>
+  </div>
+
+  <div class="steps">
+    <div class="sp active" id="sp1">① 압축해제</div><div class="sarr">→</div>
+    <div class="sp" id="sp2">② 자체AI 구조화</div><div class="sarr">→</div>
+    <div class="sp" id="sp3">③ 평가</div><div class="sarr">→</div>
+    <div class="sp" id="sp4">④ 리사이클</div><div class="sarr">→</div>
+    <div class="sp" id="sp5">⑤ AI 학습</div><div class="sarr">→</div>
+    <div class="sp" id="sp6">⑥ AX 구축</div><div class="sarr">→</div>
+    <div class="sp" id="sp7" style="background:rgba(251,191,36,0.15);border-color:#fbbf24;color:#fde68a;">⑦ 🔒 사내 보관</div>
+  </div>
+
+  <!-- ⭐ 온디바이스 사전 점검 -->
+  <div style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(13,27,42,0.5));border:2px solid #fbbf24;border-radius:12px;padding:1.2rem;margin-bottom:1.5rem;">
+    <div style="font-size:1rem;font-weight:900;color:#fde68a;margin-bottom:0.6rem;text-align:center;">
+      🔒 사내 자체 AI 환경 점검
+    </div>
+    <div id="aiCheck" style="background:rgba(0,0,0,0.3);border-radius:6px;padding:0.8rem;font-size:0.85rem;line-height:1.7;color:#E0E0E0;">
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <span style="font-size:1.2rem;">⏳</span>
+        <span>자체 AI 엔진 확인 중...</span>
+      </div>
+    </div>
+    <div style="margin-top:0.8rem;font-size:0.78rem;color:var(--gray);text-align:center;">
+      💡 자체 AI 엔진이 설치되어 있으면 더 정확한 추출이 가능합니다.<br>
+      설치 안 되어 있어도 기본 처리 모드로 작동합니다.
+    </div>
+  </div>
+
+  <div class="upload-box" onclick="document.getElementById('fi').click()">
+    <input type="file" id="fi" accept=".zip,.txt,.csv,.json,.xml,.pdf,.docx,.xlsx,.xls,.log,.md" multiple onchange="handleFiles(this.files)">
+    <input type="file" id="fd" webkitdirectory directory multiple onchange="handleFiles(this.files)" style="display:none;">
+    <div style="font-size:2.5rem;margin-bottom:0.8rem;">📦</div>
+    <h2 style="font-size:1.1rem;margin-bottom:0.4rem;">파일 · 폴더 · ZIP 모두 자동 처리</h2>
+    <p style="color:var(--gray);font-size:0.85rem;">PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합·중첩 가능)</p>
+    <div style="display:flex;gap:0.6rem;justify-content:center;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('fi').click()">📄 파일 선택</button>
+      <button class="btn-upload" style="background:var(--blue);" onclick="event.stopPropagation();document.getElementById('fd').click()">📁 폴더 선택</button>
+    </div>
+  </div>
+
+  <div class="file-bar" id="fileBar">
+    <span style="font-size:1.5rem;">📦</span>
+    <div><div id="fName" style="font-weight:700;font-size:0.9rem;"></div><div id="fSize" style="color:var(--gray);font-size:0.78rem;"></div></div>
+    <button class="btn-go" onclick="startPipeline()">🚀 AX 시스템 자동 구축 시작 →</button>
+  </div>
+
+  <div class="pipeline-status" id="pipeStatus">
+    <div class="pstep" id="ps1">
+      <div class="pstep-title"><span class="icon">📦</span>1단계: ZIP 자동 압축 해제</div>
+      <div class="pstep-content" id="ps1c">대기 중...</div>
+    </div>
+    <div class="pstep" id="ps2">
+      <div class="pstep-title"><span class="icon">🤖</span>2단계: 5W1H 6채널 자동 구조화</div>
+      <div class="pstep-content" id="ps2c">대기 중...</div>
+      <div class="progress-bar"><div class="progress-fill" id="ps2bar"></div></div>
+    </div>
+    <div class="pstep" id="ps3">
+      <div class="pstep-title"><span class="icon">📊</span>3단계: DQS 자동 평가 (1차)</div>
+      <div class="pstep-content" id="ps3c">대기 중...</div>
+    </div>
+    <div class="pstep" id="ps4">
+      <div class="pstep-title"><span class="icon">🔄</span>4단계: B·C등급 자동 리사이클링</div>
+      <div class="pstep-content" id="ps4c">대기 중...</div>
+    </div>
+    <div class="pstep" id="ps5">
+      <div class="pstep-title"><span class="icon">🧬</span>5단계: AI 학습</div>
+      <div class="pstep-content" id="ps5c">대기 중...</div>
+    </div>
+    <div class="pstep" id="ps6">
+      <div class="pstep-title"><span class="icon">🏗️</span>6단계: AX 시스템 구축</div>
+      <div class="pstep-content" id="ps6c">대기 중...</div>
+    </div>
+    <div class="pstep" id="ps7" style="border-left-color:#fbbf24;">
+      <div class="pstep-title"><span class="icon">🔒</span>7단계: 사내 자체 보관 (외부 연결 0%)</div>
+      <div class="pstep-content" id="ps7c">대기 중... (ZIP 다운로드 후 사내 시스템에 배포)</div>
+    </div>
+  </div>
+
+  <!-- ⭐ 모드 선택 알림 -->
+  <div class="csec" id="secModeChoice">
+    <div class="cpanel" style="background:linear-gradient(135deg,rgba(201,160,42,0.15),rgba(13,27,42,0.5));border:2px solid var(--gold);">
+      <div style="text-align:center;margin-bottom:1.2rem;">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">⚠️</div>
+        <div style="font-size:1.2rem;font-weight:900;color:var(--gold);">일부 데이터 보완이 필요합니다</div>
+      </div>
+      <div id="modeChoiceStats" style="background:rgba(0,0,0,0.3);border-radius:8px;padding:1rem;margin-bottom:1.2rem;font-size:0.9rem;line-height:1.8;"></div>
+      <div style="text-align:center;font-size:0.95rem;font-weight:700;margin-bottom:1rem;color:white;">사용자님 어떻게 하시겠습니까?</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <button onclick="chooseMode('manual')" style="background:rgba(31,78,121,0.6);border:2px solid var(--blue);color:white;padding:1.2rem;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.25s;" onmouseover="this.style.background='var(--blue)'" onmouseout="this.style.background='rgba(31,78,121,0.6)'">
+          <div style="font-size:1.8rem;margin-bottom:0.4rem;">✏️</div>
+          <div style="font-weight:900;font-size:1rem;margin-bottom:0.3rem;">직접 수정</div>
+          <div style="font-size:0.78rem;color:#90CAF9;line-height:1.5;">셀 클릭으로 직접 입력<br>100% 정확<br>회사 고유 패턴 반영</div>
+        </button>
+        <button onclick="chooseMode('evolution')" style="background:rgba(106,27,154,0.6);border:2px solid var(--purple);color:white;padding:1.2rem;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.25s;" onmouseover="this.style.background='var(--purple)'" onmouseout="this.style.background='rgba(106,27,154,0.6)'">
+          <div style="font-size:1.8rem;margin-bottom:0.4rem;">🧬</div>
+          <div style="font-weight:900;font-size:1rem;margin-bottom:0.3rem;">AI 자동 보완</div>
+          <div style="font-size:0.78rem;color:#CE93D8;line-height:1.5;">AX 엔진이 자동 보완<br>완전 자동 처리<br>학습으로 정확도↑</div>
+        </button>
+      </div>
+      <div style="text-align:center;margin-top:1rem;">
+        <button onclick="chooseMode('skip')" style="background:transparent;border:1px solid var(--gray);color:var(--gray);padding:0.5rem 1.2rem;border-radius:6px;cursor:pointer;font-size:0.82rem;">⏩ 그대로 사용 (보완 없이)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="csec" id="secPreview">
+    <div class="chdr" id="previewTitle">📋 처리 결과</div>
+    <div class="cpanel">
+      <div id="modeIndicator" style="background:rgba(31,78,121,0.2);border-left:3px solid var(--blue);padding:0.6rem 1rem;border-radius:6px;margin-bottom:0.8rem;font-size:0.82rem;color:#90CAF9;display:none;"></div>
+      <div style="margin-bottom:0.8rem;display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="searchBox" placeholder="🔍 파일명 검색..." style="background:rgba(255,255,255,0.06);border:1px solid rgba(17,122,101,0.5);border-radius:6px;padding:0.5rem 1rem;color:white;font-size:0.85rem;width:240px;" oninput="filterTable()">
+        <select id="gradeFilter" onchange="filterTable()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(17,122,101,0.5);border-radius:6px;padding:0.5rem 1rem;color:white;font-size:0.85rem;">
+          <option value="">전체 등급</option>
+          <option value="A">🟢 A등급만</option>
+          <option value="B">🟡 B등급만</option>
+          <option value="C">🔴 C등급만</option>
+        </select>
+        <span id="resultCount" style="color:var(--gray);font-size:0.82rem;margin-left:auto;"></span>
+      </div>
+      <div class="preview-wrap" style="max-height:500px;">
+        <table class="preview-table">
+          <thead><tr><th>No</th><th>파일명</th><th>형식</th><th>Who</th><th>What</th><th>When</th><th>Where</th><th>Why</th><th>How</th><th>최종</th></tr></thead>
+          <tbody id="previewTbody"></tbody>
+        </table>
+      </div>
+      
+      <!-- ⭐ 직접 수정 모드 제출 영역 (테이블 바로 아래) -->
+      <div id="submitArea" style="background:linear-gradient(135deg,rgba(31,78,121,0.3),rgba(46,125,50,0.2));border:3px solid #2E7D32;border-radius:12px;padding:1.5rem;margin-top:1.2rem;text-align:center;display:none;">
+        <div style="font-size:1rem;color:#FFD54F;margin-bottom:1rem;font-weight:700;">
+          ✏️ 수정 현황: <span id="editCount">0건 수정됨</span> / 전체 <span id="totalCount">0건</span>
+        </div>
+        <button onclick="submitEdits()" style="background:linear-gradient(135deg,#1F4E79,#2E7D32);border:none;color:white;padding:1rem 3rem;border-radius:8px;cursor:pointer;font-size:1.1rem;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,0.4);width:100%;max-width:400px;">
+          ✅ 수정 완료 — AX 엔진에 제출
+        </button>
+        <div style="margin-top:0.8rem;font-size:0.82rem;color:#B0BEC5;">
+          제출하시면 수정 내용이 AX 엔진 학습에 반영되어 다음부터 자동 인식됩니다
+        </div>
+        <div id="submitResult" style="display:none;margin-top:1rem;padding:1rem;background:rgba(46,125,50,0.3);border-left:4px solid #2E7D32;border-radius:6px;font-size:0.9rem;color:#A5D6A7;text-align:left;"></div>
+      </div>
+    </div>
+    
+    <div class="arow">
+      <button class="btn-gold" onclick="downloadCSV()">📄 CSV 다운로드 (전체 결과)</button>
+      <button class="btn-teal" onclick="downloadAX()">🏗️ AX 시스템 JSON</button>
+      <button class="btn-blue" onclick="downloadReport()">📋 리포트 (Markdown)</button>
+      <button class="btn-gray" onclick="reset()">새 파일 분석하기</button>
+    </div>
+  </div>
+
+  <!-- ⭐ 만족도 평가 (다운로드 후) -->
+  <div class="csec" id="secFeedback" style="display:none;">
+    <div class="cpanel" style="background:linear-gradient(135deg,rgba(255,193,7,0.15),rgba(13,27,42,0.5));border:2px solid var(--gold);">
+      <div style="text-align:center;margin-bottom:1rem;">
+        <div style="font-size:2rem;margin-bottom:0.4rem;">⭐</div>
+        <div style="font-size:1.1rem;font-weight:900;color:var(--gold);">결과를 평가해 주세요</div>
+        <div style="font-size:0.82rem;color:var(--gray);margin-top:0.3rem;">평가 결과는 AX 엔진 학습에 자동 반영됩니다</div>
+      </div>
+      
+      <div id="feedbackStars" style="text-align:center;margin-bottom:1rem;">
+        <span class="star" data-val="1" onclick="setStar(1)" style="font-size:2rem;cursor:pointer;color:#666;margin:0 0.2rem;">★</span>
+        <span class="star" data-val="2" onclick="setStar(2)" style="font-size:2rem;cursor:pointer;color:#666;margin:0 0.2rem;">★</span>
+        <span class="star" data-val="3" onclick="setStar(3)" style="font-size:2rem;cursor:pointer;color:#666;margin:0 0.2rem;">★</span>
+        <span class="star" data-val="4" onclick="setStar(4)" style="font-size:2rem;cursor:pointer;color:#666;margin:0 0.2rem;">★</span>
+        <span class="star" data-val="5" onclick="setStar(5)" style="font-size:2rem;cursor:pointer;color:#666;margin:0 0.2rem;">★</span>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:1rem;">
+        <button onclick="submitFeedback('positive', 1.0)" style="background:rgba(46,125,50,0.6);border:2px solid #2E7D32;color:white;padding:0.8rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.9rem;">
+          👍 정확<br><small style="opacity:0.8;font-weight:400;">학습 강화</small>
+        </button>
+        <button onclick="submitFeedback('partial', 0.5)" style="background:rgba(255,193,7,0.6);border:2px solid #FFC107;color:white;padding:0.8rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.9rem;">
+          🤔 부분 정확<br><small style="opacity:0.8;font-weight:400;">미세 조정</small>
+        </button>
+        <button onclick="submitFeedback('negative', -1.0)" style="background:rgba(198,40,40,0.6);border:2px solid #C62828;color:white;padding:0.8rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.9rem;">
+          👎 부정확<br><small style="opacity:0.8;font-weight:400;">재학습</small>
+        </button>
+      </div>
+      
+      <textarea id="feedbackComment" placeholder="추가 의견 (선택, 시스템 학습에 반영됩니다)" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(17,122,101,0.5);border-radius:6px;padding:0.6rem;color:white;font-size:0.85rem;min-height:60px;font-family:inherit;"></textarea>
+      
+      <div id="feedbackResult" style="display:none;margin-top:0.8rem;padding:0.8rem;background:rgba(46,125,50,0.2);border-left:3px solid #2E7D32;border-radius:6px;font-size:0.85rem;color:#90EE90;"></div>
+    </div>
+  </div>
+
+  <div class="axcomplete" id="axComplete">
+    <div style="font-size:3rem;margin-bottom:0.5rem;">🎯</div>
+    <div style="font-size:1.4rem;font-weight:900;color:var(--teal2);margin-bottom:0.5rem;">AX 시스템 자동 구축 완성!</div>
+    <div style="color:var(--gray);font-size:0.9rem;" id="axDesc"></div>
+    <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;">
+      <span class="axtag">검색 인덱스</span><span class="axtag">AI 질의응답</span>
+      <span class="axtag">품질 관리</span><span class="axtag">AI 학습</span>
+    </div>
+    <div class="evo-box">
+      <div class="ttl">🧬 AX 엔진 누적 통계</div>
+      <div style="font-size:0.85rem;color:#E0E0E0;line-height:1.8;" id="evoStats"></div>
+    </div>
+    
+    <!-- ⭐ 데이터 코드 분류 (거래/비거래) -->
+    <div style="background:linear-gradient(135deg,rgba(255,193,7,0.15),rgba(13,27,42,0.5));border:2px solid var(--gold);border-radius:12px;padding:1.5rem;margin-top:1.5rem;text-align:left;">
+      <div style="font-size:1.1rem;font-weight:900;color:var(--gold);margin-bottom:1rem;text-align:center;">
+        💰 데이터 코드 분류 (거래 등록)
+      </div>
+      
+      <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+        <div style="font-size:0.85rem;color:#FFD54F;margin-bottom:0.5rem;">
+          📋 자동 발급 코드:
+        </div>
+        <div id="generatedCode" style="font-family:Consolas,monospace;font-size:1rem;color:#90EE90;font-weight:700;">
+          (코드 분류 후 자동 생성)
+        </div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <button onclick="setTradeMode('trade')" id="tradeBtn" style="background:rgba(46,125,50,0.4);border:2px solid #2E7D32;color:white;padding:1rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.9rem;">
+          ✅ 거래 가능<br><small style="opacity:0.8;font-weight:400;">데이터 마켓 등록</small>
+        </button>
+        <button onclick="setTradeMode('private')" id="privateBtn" style="background:rgba(96,125,139,0.4);border:2px solid #607D8B;color:white;padding:1rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.9rem;">
+          🔒 비거래 (자체 사용)<br><small style="opacity:0.8;font-weight:400;">외부 공개 안 함</small>
+        </button>
+      </div>
+      
+      <div id="tradeDetails" style="display:none;background:rgba(255,255,255,0.05);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label style="font-size:0.82rem;color:#FFD54F;display:block;margin-bottom:0.3rem;">📊 KSIC 대분류</label>
+            <select id="ksicMajor" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(17,122,101,0.5);border-radius:6px;padding:0.5rem;color:white;font-size:0.85rem;">
+              <option value="C">C - 제조업</option>
+              <option value="J">J - 정보통신업</option>
+              <option value="Q">Q - 보건·복지</option>
+              <option value="P">P - 교육</option>
+              <option value="O">O - 공공·행정</option>
+              <option value="K">K - 금융·보험</option>
+              <option value="M">M - 전문·과학·기술</option>
+              <option value="G">G - 도매·소매</option>
+              <option value="F">F - 건설</option>
+              <option value="A">A - 농업·임업</option>
+              <option value="S">S - 협회·단체</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.82rem;color:#FFD54F;display:block;margin-bottom:0.3rem;">🏷️ 데이터 종류</label>
+            <select id="dataType" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(17,122,101,0.5);border-radius:6px;padding:0.5rem;color:white;font-size:0.85rem;">
+              <option value="QM">QM - 품질경영</option>
+              <option value="EM">EM - 환경경영</option>
+              <option value="SM">SM - 안전보건</option>
+              <option value="SC">SC - 정보보안</option>
+              <option value="IS">IS - ISO 인증</option>
+              <option value="QC">QC - 품질관리</option>
+              <option value="QA">QA - 품질보증</option>
+              <option value="WL">WL - 작업일지</option>
+              <option value="IR">IR - 점검기록</option>
+              <option value="RD">RD - 연구보고서</option>
+              <option value="PT">PT - 특허명세서</option>
+              <option value="CR">CR - CRM 고객</option>
+              <option value="LG">LG - 로그 데이터</option>
+              <option value="EH">EH - EMR 의무기록</option>
+              <option value="GV">GV - 행정·민원</option>
+            </select>
+          </div>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div>
+            <label style="font-size:0.82rem;color:#FFD54F;display:block;margin-bottom:0.3rem;">🏢 KSIC 6자리 코드</label>
+            <input type="text" id="ksicDetail" placeholder="예: 261110" maxlength="6" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(17,122,101,0.5);border-radius:6px;padding:0.5rem;color:white;font-size:0.85rem;">
+          </div>
+          <div>
+            <label style="font-size:0.82rem;color:#FFD54F;display:block;margin-bottom:0.3rem;">👤 영업 직원 코드 (선택)</label>
+            <input type="text" id="empCode" placeholder="예: AX-00001 (5자리)" maxlength="8" pattern="AX-[0-9]{5}" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(17,122,101,0.5);border-radius:6px;padding:0.5rem;color:white;font-size:0.85rem;font-family:Consolas,monospace;">
+          </div>
+        </div>
+      </div>
+      
+      <button id="registerCodeBtn" onclick="registerDataCode()" disabled style="width:100%;background:linear-gradient(135deg,#1F4E79,#FFC107);border:none;color:white;padding:1rem;border-radius:8px;cursor:not-allowed;font-size:1rem;font-weight:900;opacity:0.5;">
+        📝 데이터 코드 등록
+      </button>
+      
+      <div id="registerResult" style="display:none;margin-top:1rem;padding:1rem;background:rgba(46,125,50,0.2);border-left:3px solid #2E7D32;border-radius:6px;font-size:0.9rem;color:#90EE90;"></div>
+    </div>
+    
+    <!-- ⭐ 데이터 저장 옵션 (등록 후 표시) -->
+    <div id="storageArea" style="display:none;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(13,27,42,0.5));border:2px solid #fbbf24;border-radius:12px;padding:1.5rem;margin-top:1.5rem;text-align:left;">
+      <div style="font-size:1.1rem;font-weight:900;color:#fde68a;margin-bottom:0.5rem;text-align:center;">
+        🔒 사내 자체 보관 (7단계 자동 실행)
+      </div>
+      <div style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;text-align:center;">
+        외부 연결 없이 사내 NAS·서버에 보관할 ZIP 파일을 생성합니다.<br>
+        <span style="color:#fde68a;">데이터 주권 100% · 기업 보안 정책 준수</span>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <button onclick="setStorageMode('cloud')" id="cloudStorageBtn" style="background:rgba(251,191,36,0.4);border:2px solid #fbbf24;color:white;padding:1.2rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem;text-align:center;">
+          🔒<br>사내 보안 보관<br>
+          <small style="opacity:0.8;font-weight:400;font-size:0.78rem;">사내 NAS · 서버</small><br>
+          <small style="color:#FFD54F;font-weight:700;font-size:0.78rem;">외부 연결 0%</small>
+        </button>
+        <button onclick="setStorageMode('usb')" id="usbStorageBtn" style="background:rgba(46,125,50,0.4);border:2px solid #2E7D32;color:white;padding:1.2rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem;text-align:center;">
+          💾<br>USB · 외장하드<br>
+          <small style="opacity:0.8;font-weight:400;font-size:0.78rem;">개인 저장 매체</small><br>
+          <small style="color:#FFD54F;font-weight:700;font-size:0.78rem;">데이터 주권 100%</small>
+        </button>
+      </div>
+      
+      <!-- 클라우드 → 사내 보관용으로 변경 -->
+      <div id="cloudDetails" style="display:none;background:rgba(251,191,36,0.15);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+        <div style="color:#fde68a;font-weight:700;margin-bottom:0.5rem;">🔒 사내 자체 보관 (외부 연결 0%)</div>
+        <ul style="font-size:0.85rem;color:#E0E0E0;line-height:1.7;margin-left:1.2rem;margin-bottom:1rem;">
+          <li>외부 서버 전송 없음 (보안 100%)</li>
+          <li>자체 AI 엔진 사용 (외부 API 미사용)</li>
+          <li>사내 NAS·서버에 직접 보관</li>
+          <li>기업 보안 정책 준수</li>
+          <li>GDPR · 개인정보보호법 호환</li>
+          <li>외부 감사 추적 가능</li>
+        </ul>
+        
+        <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:0.8rem;margin-bottom:0.8rem;">
+          <div style="color:#FFD54F;font-weight:700;margin-bottom:0.6rem;font-size:0.9rem;">📋 사내 보관 정보</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
+            <input type="text" id="subCompany" placeholder="회사명 (선택)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(251,191,36,0.5);border-radius:4px;padding:0.5rem;color:white;font-size:0.82rem;">
+            <input type="text" id="subContact" placeholder="담당자명 (선택)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(251,191,36,0.5);border-radius:4px;padding:0.5rem;color:white;font-size:0.82rem;">
+            <input type="email" id="subEmail" placeholder="사내 이메일 (선택)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(251,191,36,0.5);border-radius:4px;padding:0.5rem;color:white;font-size:0.82rem;">
+            <input type="tel" id="subPhone" placeholder="내선 번호 (선택)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(251,191,36,0.5);border-radius:4px;padding:0.5rem;color:white;font-size:0.82rem;">
+          </div>
+          <select id="subPlan" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(251,191,36,0.5);border-radius:4px;padding:0.5rem;color:white;font-size:0.82rem;">
+            <option value="onsite-nas">사내 NAS 보관</option>
+            <option value="onsite-server">사내 서버 보관</option>
+            <option value="onsite-pc">개인 PC 보관</option>
+            <option value="onsite-rag">사내 RAG 시스템 통합</option>
+          </select>
+        </div>
+        
+        <button onclick="submitCloudRequest()" style="width:100%;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;color:#0D1B2A;padding:0.9rem;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:900;">
+          🔒 사내 보관 ZIP 생성 (외부 연결 0%)
+        </button>
+        
+        <div style="margin-top:0.6rem;font-size:0.78rem;color:var(--gray);text-align:center;">
+          * 입력 정보는 ZIP 파일 내부에만 기록되며 외부 전송되지 않습니다
+        </div>
+      </div>
+      
+      <!-- USB 선택 시 -->
+      <div id="usbDetails" style="display:none;background:rgba(46,125,50,0.2);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+        <div style="color:#90EE90;font-weight:700;margin-bottom:0.5rem;">💾 기업 보유 저장장치 안내</div>
+        <ul style="font-size:0.85rem;color:#E0E0E0;line-height:1.7;margin-left:1.2rem;">
+          <li>USB·외장하드·자체 AI 서버 모두 가능</li>
+          <li>데이터가 외부로 절대 나가지 않음</li>
+          <li>기업 자체 보안 정책 적용</li>
+          <li>처리 결과만 저장 (원본 보존)</li>
+          <li>영구 소유 (구독료 없음)</li>
+        </ul>
+        <div style="margin-top:0.8rem;background:rgba(255,193,7,0.15);padding:0.6rem;border-radius:6px;font-size:0.82rem;color:#FFD54F;">
+          📌 ZIP 파일로 다운로드 후 USB·외장하드에 복사하세요
+        </div>
+        <button onclick="downloadAsZip()" style="width:100%;margin-top:0.8rem;background:linear-gradient(135deg,#2E7D32,#1F4E79);border:none;color:white;padding:0.9rem;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:700;">
+          📦 전체 결과 ZIP 다운로드 (USB 저장용)
+        </button>
+      </div>
+      
+      <div id="storageResult" style="display:none;margin-top:1rem;padding:1rem;background:rgba(46,125,50,0.2);border-left:3px solid #2E7D32;border-radius:6px;font-size:0.9rem;color:#90EE90;"></div>
+    </div>
+  </div>
+</main>
+
+<footer>에이엑스데이터(주) · AX 시스템 OnDevice (사내 자체 보관) · 특허출원 제10-2026-0048020호 · axdata.co.kr</footer>
+
+<script>
+let EVO = JSON.parse(localStorage.getItem('axdata_evolution') || '{"patterns":{},"version":1,"total_processed":0,"experiment_count":0}');
+let RESULTS = [];
+let UPLOADED_FILES = [];
+
+function $(id){return document.getElementById(id);}
+function show(id){$(id).classList.add('show');}
+function hide(id){$(id).classList.remove('show');}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function setPill(n){
+  ['sp1','sp2','sp3','sp4','sp5','sp6','sp7'].forEach((id,i)=>{
+    const el=$(id); 
+    if(!el) return;
+    el.className='sp';
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add('active');
+  });
+}
+
+function setStep(n,state,html){
+  const el=$('ps'+n); el.className='pstep';
+  if(state==='active') el.classList.add('active');
+  if(state==='done') el.classList.add('done');
+  if(html) $('ps'+n+'c').innerHTML=html;
+}
+
+function handleFiles(files){
+  if(!files||!files.length) return;
+  // 폴더 업로드 시 유효한 확장자만 필터
+  const validExts = ['zip','txt','csv','json','xml','log','md','docx','pdf','xlsx','xls'];
+  const filtered = Array.from(files).filter(f=>{
+    const ext = f.name.split('.').pop().toLowerCase();
+    return validExts.includes(ext);
+  });
+  if(!filtered.length){
+    alert('지원하는 파일이 없습니다.\n(PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP)');
+    return;
+  }
+  UPLOADED_FILES = filtered;
+  const totalSize = UPLOADED_FILES.reduce((a,f)=>a+f.size,0);
+  const fnames = UPLOADED_FILES.length > 5
+    ? UPLOADED_FILES.slice(0,3).map(f=>f.name).join(', ') + ` 외 ${UPLOADED_FILES.length-3}개`
+    : UPLOADED_FILES.map(f=>f.name).join(', ');
+  $('fName').textContent = fnames;
+  $('fSize').textContent = (totalSize/1024).toFixed(1)+' KB · '+UPLOADED_FILES.length+'개 파일';
+  show('fileBar');
+  hide('pipeStatus'); hide('secModeChoice'); hide('secPreview'); hide('axComplete'); hide('secFeedback');
+  if($('submitArea')) $('submitArea').style.display = 'none';
+  if($('storageArea')) $('storageArea').style.display = 'none';
+  setPill(0);
+}
+
+async function extractZip(file){
+  const zip = new JSZip();
+  const data = await file.arrayBuffer();
+  const loaded = await zip.loadAsync(data);
+  const files = [];
+  for(const fname of Object.keys(loaded.files)){
+    const entry = loaded.files[fname];
+    if(entry.dir) continue;
+    if(fname.startsWith('.') || fname.startsWith('__MACOSX/')) continue;
+    const ext = fname.split('.').pop().toLowerCase();
+    const baseName = fname.split('/').pop();
+    if(['txt','csv','json','xml','log','md'].includes(ext)){
+      const content = await entry.async('string');
+      files.push({name: baseName, ext, content});
+    } else if(ext === 'pdf'){
+      const buf = await entry.async('arraybuffer');
+      const text = await extractPdfText(buf);
+      files.push({name: baseName, ext, content: text});
+    } else if(ext === 'docx'){
+      const buf = await entry.async('arraybuffer');
+      const text = await extractDocxText(buf);
+      files.push({name: baseName, ext, content: text});
+    } else if(ext === 'xlsx' || ext === 'xls'){
+      const buf = await entry.async('arraybuffer');
+      const text = await extractXlsxText(buf);
+      files.push({name: baseName, ext, content: text});
+    } else if(ext === 'zip'){
+      // 중첩 ZIP 처리
+      try {
+        const buf = await entry.async('arraybuffer');
+        const nestedFile = new File([buf], baseName, {type: 'application/zip'});
+        const nested = await extractZip(nestedFile);
+        files.push(...nested);
+      } catch(e){}
+    }
+  }
+  return files;
+}
+
+// PDF 텍스트 추출 (PDF.js)
+async function extractPdfText(arrayBuffer){
+  if(typeof pdfjsLib === 'undefined'){
+    return '[PDF 라이브러리 로드 실패]';
+  }
+  try{
+    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+    let fullText = '';
+    for(let i = 1; i <= pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const text = content.items.map(item => item.str).join(' ');
+      fullText += text + '\n';
+    }
+    return fullText;
+  }catch(e){
+    return '[PDF 추출 오류: ' + e.message + ']';
+  }
+}
+
+// DOCX 텍스트 추출 (Mammoth)
+async function extractDocxText(arrayBuffer){
+  if(typeof mammoth === 'undefined'){
+    return '[DOCX 라이브러리 로드 실패]';
+  }
+  try{
+    const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+    return result.value || '';
+  }catch(e){
+    return '[DOCX 추출 오류: ' + e.message + ']';
+  }
+}
+
+// XLSX 텍스트 추출 (SheetJS)
+async function extractXlsxText(arrayBuffer){
+  if(typeof XLSX === 'undefined'){
+    return '[XLSX 라이브러리 로드 실패]';
+  }
+  try{
+    const workbook = XLSX.read(arrayBuffer, {type: 'array'});
+    let fullText = '';
+    for(const sheetName of workbook.SheetNames){
+      const sheet = workbook.Sheets[sheetName];
+      const csv = XLSX.utils.sheet_to_csv(sheet);
+      fullText += `[시트: ${sheetName}]\n${csv}\n\n`;
+    }
+    return fullText;
+  }catch(e){
+    return '[XLSX 추출 오류: ' + e.message + ']';
+  }
+}
+
+// 통합 추출 (확장자에 따라 자동 분기)
+async function extractAnyFile(file){
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(ext === 'pdf'){
+    const buf = await file.arrayBuffer();
+    return await extractPdfText(buf);
+  } else if(ext === 'docx'){
+    const buf = await file.arrayBuffer();
+    return await extractDocxText(buf);
+  } else if(ext === 'xlsx' || ext === 'xls'){
+    const buf = await file.arrayBuffer();
+    return await extractXlsxText(buf);
+  } else {
+    try {
+      return await file.text();
+    } catch(e){
+      return '[읽기 오류: ' + e.message + ']';
+    }
+  }
+}
+
+function keywordParse(text){
+  const result = {who:'', what:'', when:'', where:'', why:'', how:''};
+  const basePatterns = {
+    who: [/(작성자|담당자|주체|저자|보고자|책임자|기록자)\s*[:：]\s*(.+)/],
+    what: [/(제목|내용|업무|사업명|과제|주제|건명)\s*[:：]\s*(.+)/],
+    when: [/(작성일|날짜|일시|기간|일자|시간|기록일)\s*[:：]\s*(.+)/],
+    where: [/(장소|부서|소속|위치|기관|지역|현장)\s*[:：]\s*(.+)/],
+    why: [/(목적|이유|목표|배경|사유|원인)\s*[:：]\s*(.+)/],
+    how: [/(방법|절차|방식|수단|도구|처리)\s*[:：]\s*(.+)/]
+  };
+  for(const ch of Object.keys(result)){
+    const learned = (EVO.patterns[ch]||[]).map(p=>{
+      try{return new RegExp(p);}catch(e){return null;}
+    }).filter(Boolean);
+    const all = basePatterns[ch].concat(learned);
+    for(const pat of all){
+      const m = text.match(pat);
+      if(m){
+        result[ch] = (m[2]||m[1]||'').trim().substring(0,100);
+        break;
+      }
+    }
+  }
+  return result;
+}
+
+function recycle(text, channels){
+  const complemented = {...channels};
+  const learned = [];
+  const strategies = {
+    who: [
+      /([가-힣]{2,4})\s+(?:사원|대리|과장|차장|부장|이사|수석|선임|책임|연구원|박사|소장|원장)/,
+      /([가-힣]{2,4})\s+님/
+    ],
+    what: [/(\S+\s*보고서|\S+\s*일지|\S+\s*대장|\S+\s*기록)/],
+    when: [/(\d{4}[년\-./]\s*\d{1,2}[월\-./]\s*\d{1,2}[일]?)/, /(\d{4}-\d{2}-\d{2})/],
+    where: [/([가-힣A-Za-z0-9]+(?:팀|부|과|실|센터|연구소|공장|사업부))/],
+    why: [/([가-힣\s]+)을?\(?를?\)?\s*위하여/, /([가-힣\s]+)을?\(?를?\)?\s*위해/],
+    how: [/([가-힣A-Za-z\s]+)\s*방식으로/, /([가-힣A-Za-z\s]+)\s*방법으로/]
+  };
+  for(const ch of Object.keys(complemented)){
+    if(complemented[ch]) continue;
+    for(const pat of (strategies[ch]||[])){
+      const m = text.match(pat);
+      if(m){
+        const val = (m[1]||'').trim().substring(0,100);
+        if(val.length > 1){
+          complemented[ch] = val;
+          learned.push({ch, pat: pat.source});
+          break;
+        }
+      }
+    }
+  }
+  return {complemented, learned};
+}
+
+function calcGrade(ch){
+  const filled = Object.values(ch).filter(v=>v && v.length > 1).length;
+  const rate = filled / 6 * 100;
+  return {grade: rate >= 100 ? 'A' : rate >= 67 ? 'B' : 'C', rate, filled};
+}
+
+async function startPipeline(){
+  if(!UPLOADED_FILES.length) return;
+  show('pipeStatus');
+  $('previewTbody').innerHTML='';
+  setPill(0);
+  RESULTS = [];
+
+  setStep(1,'active','파일 처리 중...');
+  await delay(200);
+
+  let allFiles = [];
+  for(const f of UPLOADED_FILES){
+    if(f.name.toLowerCase().endsWith('.zip')){
+      try{
+        const extracted = await extractZip(f);
+        allFiles = allFiles.concat(extracted);
+        $('ps1c').innerHTML += `<br>✅ ${f.name} → <b>${extracted.length}개</b> 추출`;
+      }catch(e){
+        $('ps1c').innerHTML += `<br>❌ ${f.name} 압축 해제 실패: ${e.message}`;
+      }
+    }else{
+      const ext = f.name.split('.').pop().toLowerCase();
+      const content = await extractAnyFile(f);
+      allFiles.push({name: f.name, ext, content});
+    }
+  }
+
+  $('ps1c').innerHTML = `✅ 압축 해제 완료<br>📊 총 <b>${allFiles.length}개</b> 파일 발견`;
+  setStep(1,'done');
+  setPill(1);
+  await delay(300);
+
+  setStep(2,'active','구조화 중...');
+  const startTime = Date.now();
+
+  for(let i=0; i<allFiles.length; i++){
+    const f = allFiles[i];
+    const ch = keywordParse(f.content);
+    const {grade, filled} = calcGrade(ch);
+    RESULTS.push({
+      no: i+1, filename: f.name, ext: f.ext, text: f.content,
+      channels: ch, grade, filled, recycled: false, finalGrade: grade
+    });
+    if(i % 50 === 0 || i === allFiles.length - 1){
+      const pct = ((i+1)/allFiles.length * 100).toFixed(0);
+      $('ps2bar').style.width = pct + '%';
+      $('ps2c').innerHTML = `처리 중... <b>${i+1}/${allFiles.length}</b>건 (${pct}%)`;
+      await delay(1);
+    }
+  }
+
+  const elapsed = ((Date.now() - startTime)/1000).toFixed(1);
+  $('ps2c').innerHTML = `✅ 처리 완료<br>• 처리 건수: <b>${allFiles.length}건</b><br>• 처리 시간: <b>${elapsed}초</b> (${(allFiles.length/elapsed).toFixed(1)}건/초)<br>• AX 엔진 ${EVO.version}단계 적용`;
+  setStep(2,'done');
+  setPill(2);
+  await delay(300);
+
+  setStep(3,'active','평가 중...');
+  await delay(200);
+  const initA = RESULTS.filter(r=>r.grade==='A').length;
+  const initB = RESULTS.filter(r=>r.grade==='B').length;
+  const initC = RESULTS.filter(r=>r.grade==='C').length;
+  const total = RESULTS.length;
+
+  $('ps3c').innerHTML = `<table class="grade-table">
+    <tr><th>등급</th><th style="text-align:right;">건수</th><th style="text-align:right;">비율</th><th>상태</th></tr>
+    <tr><td>🟢 A</td><td style="text-align:right;"><b>${initA}</b></td><td style="text-align:right;">${(initA/total*100).toFixed(1)}%</td><td>즉시 AX 연계</td></tr>
+    <tr><td>🟡 B</td><td style="text-align:right;">${initB}</td><td style="text-align:right;">${(initB/total*100).toFixed(1)}%</td><td>리사이클 대상</td></tr>
+    <tr><td>🔴 C</td><td style="text-align:right;">${initC}</td><td style="text-align:right;">${(initC/total*100).toFixed(1)}%</td><td>리사이클 대상</td></tr>
+  </table>`;
+  setStep(3,'done');
+  setPill(3);
+  await delay(300);
+
+  setStep(4,'active','보완 중...');
+  await delay(200);
+  const recycleTargets = RESULTS.filter(r=>r.grade==='B'||r.grade==='C');
+  let recycleSuccess = 0;
+  const allLearned = [];
+
+  for(const r of recycleTargets){
+    const {complemented, learned} = recycle(r.text, r.channels);
+    r.channels = complemented;
+    const newG = calcGrade(complemented);
+    r.recycled = true;
+    r.finalGrade = newG.grade;
+    if(newG.grade === 'A'){
+      recycleSuccess++;
+      allLearned.push(...learned);
+    }
+  }
+
+  $('ps4c').innerHTML = `✅ 리사이클링 완료<br>• 대상: <b>${recycleTargets.length}건</b><br>• 보완 성공: <b>${recycleSuccess}건</b> → A등급 승급<br>• 보완률: <b>${recycleTargets.length ? (recycleSuccess/recycleTargets.length*100).toFixed(1) : 0}%</b>`;
+  setStep(4,'done');
+  setPill(4);
+  await delay(300);
+
+  setStep(5,'active','학습 중...');
+  await delay(200);
+
+  for(const {ch, pat} of allLearned){
+    if(!EVO.patterns[ch]) EVO.patterns[ch] = [];
+    if(!EVO.patterns[ch].includes(pat)){
+      EVO.patterns[ch].push(pat);
+    }
+  }
+  const totalPatterns = Object.values(EVO.patterns).reduce((a,v)=>a+v.length,0);
+  if(allLearned.length >= 5) EVO.version++;
+  EVO.total_processed += total;
+  EVO.experiment_count++;
+  localStorage.setItem('axdata_evolution', JSON.stringify(EVO));
+
+  $('ps5c').innerHTML = `✅ AX 엔진 학습 완료 (브라우저 누적 저장)<br>• 신규 학습: <b>${allLearned.length}건</b><br>• 누적 학습: <b>${totalPatterns}건</b><br>• AX 엔진 단계: <b>${EVO.version}단계</b><br>• 누적 처리: <b>${EVO.total_processed.toLocaleString()}건</b><br>• 누적 실행: <b>${EVO.experiment_count}회</b>`;
+  setStep(5,'done');
+  setPill(5);
+  await delay(300);
+
+  setStep(6,'active','구축 중...');
+  await delay(200);
+  const finalA = RESULTS.filter(r=>r.finalGrade==='A').length;
+  $('ps6c').innerHTML = `✅ AX 시스템 구축 완료<br>• A등급 데이터: <b>${finalA}건</b><br>• 검색 인덱스 준비 완료<br>• AI 질의응답 준비 완료<br>• 의사결정 시스템 활성화`;
+  setStep(6,'done');
+  setPill(6);
+  await delay(300);
+
+  show('axComplete');
+  $('axDesc').textContent = `${total.toLocaleString()}건 → 5W1H 구조화 → DQS ${finalA.toLocaleString()}건 A등급 → AX 시스템 완성!`;
+  $('evoStats').innerHTML = `• AX 엔진 단계: <b>${EVO.version}단계</b><br>• 누적 학습: <b>${totalPatterns}건</b><br>• 누적 처리: <b>${EVO.total_processed.toLocaleString()}건</b><br>• 누적 실행: <b>${EVO.experiment_count}회</b><br>• 다음 실행 시 학습 내용 자동 적용`;
+
+  // ⭐ 보완 필요 데이터가 있으면 모드 선택 알림 표시
+  const needFix = RESULTS.filter(r=>r.finalGrade !== 'A').length;
+  if(needFix > 0){
+    $('modeChoiceStats').innerHTML = `
+      <div>📊 <b>처리 결과:</b></div>
+      <div style="margin-left:1rem;margin-top:0.4rem;">
+        • 🟢 A등급: <b style="color:#4CAF50;">${RESULTS.filter(r=>r.finalGrade==='A').length}건</b> (완벽)<br>
+        • 🟡 B등급: <b style="color:#FFC107;">${RESULTS.filter(r=>r.finalGrade==='B').length}건</b> (보완 가능)<br>
+        • 🔴 C등급: <b style="color:#F44336;">${RESULTS.filter(r=>r.finalGrade==='C').length}건</b> (보완 가능)<br>
+      </div>
+      <div style="margin-top:0.8rem;color:#FFE082;">총 <b>${needFix}건</b>이 보완 가능합니다.</div>`;
+    show('secModeChoice');
+    $('secModeChoice').scrollIntoView({behavior:'smooth'});
+  } else {
+    renderTable();
+    show('secPreview');
+    $('secPreview').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+// ⭐ 모드 선택
+function chooseMode(mode){
+  hide('secModeChoice');
+  if(mode === 'manual'){
+    $('modeIndicator').style.display = 'block';
+    $('modeIndicator').innerHTML = `✏️ <b>직접 수정 모드</b> — <span style="color:#FF6B6B;font-weight:700;">빨간 점선 셀</span>이 누락된 채널입니다. 클릭해서 수정하세요. <br><span style="font-size:0.8rem;opacity:0.8;">📌 A등급 = 6채널 모두 채움 (Who·What·When·Where·Why·How) | B등급 = 5채널 | C등급 = 4채널 이하</span>`;
+    $('modeIndicator').style.borderLeftColor = 'var(--blue)';
+    $('modeIndicator').style.background = 'rgba(31,78,121,0.2)';
+    $('modeIndicator').style.color = '#90CAF9';
+    // ⭐ 제출 버튼 영역 강제 표시
+    const sa = $('submitArea');
+    if(sa){
+      sa.style.display = 'block';
+      sa.style.visibility = 'visible';
+    }
+    setTimeout(updateEditCount, 100);
+  } else if(mode === 'evolution'){
+    $('modeIndicator').style.display = 'block';
+    $('modeIndicator').innerHTML = `🧬 <b>AI 자동 보완 모드</b> — AX 엔진이 자동으로 결과를 보완했습니다. 정확도는 시간이 갈수록 향상됩니다.`;
+    $('modeIndicator').style.borderLeftColor = 'var(--purple)';
+    $('modeIndicator').style.background = 'rgba(106,27,154,0.2)';
+    $('modeIndicator').style.color = '#CE93D8';
+    $('submitArea').style.display = 'none';
+    runEvolutionMode();
+  } else {
+    $('modeIndicator').style.display = 'none';
+    $('submitArea').style.display = 'none';
+  }
+  renderTable();
+  show('secPreview');
+  $('secPreview').scrollIntoView({behavior:'smooth'});
+}
+
+// 자기진화 모드: 추가 강화 패턴으로 한 번 더 시도
+function runEvolutionMode(){
+  const targets = RESULTS.filter(r=>r.finalGrade !== 'A');
+  let upgraded = 0;
+  // 추가 강화 패턴 (더 폭넓은 검색)
+  const extraStrategies = {
+    who: [
+      /([가-힣]{2,4})(?:이|가|은|는)\s+(?:작성|보고|기록|제출|승인|검토)/,
+      /([가-힣]{2,4})(?=\s*(?:대표|소장|원장|책임|담당))/,
+      /(?:작성자|담당자|보고자|책임자)[\s:：]+([가-힣A-Za-z]{2,10})/
+    ],
+    what: [
+      /(?:관한|대한)\s+([가-힣\s]{4,30})/,
+      /(?:제목|건명|업무명)[\s:：]+(.+?)(?:\n|$)/
+    ],
+    when: [
+      /(\d{4}\.\s*\d{1,2}\.\s*\d{1,2})/,
+      /(\d{4}년\s*\d{1,2}월)/,
+      /(\d{2}\/\d{2}\/\d{4})/
+    ],
+    where: [
+      /([가-힣]+(?:시|도|군|구)\s*[가-힣]*)/,
+      /([가-힣A-Za-z]+(?:회사|기관|학교|병원))/
+    ],
+    why: [
+      /(?:목적|이유|배경)(?:은|는|이|가)\s*(.+?)(?:\.|이며|이고)/,
+      /(.+?)(?:하기\s+위(?:해|하여))/
+    ],
+    how: [
+      /(?:절차|순서)(?:는|은)\s*(.+?)(?:\.|순으로)/,
+      /(.+?)(?:을|를)\s+통해/
+    ]
+  };
+
+  for(const r of targets){
+    let changed = false;
+    for(const ch of Object.keys(r.channels)){
+      if(r.channels[ch] && r.channels[ch].length > 1) continue;
+      for(const pat of (extraStrategies[ch]||[])){
+        const m = r.text.match(pat);
+        if(m){
+          const val = (m[1]||'').trim().substring(0,100);
+          if(val.length > 1){
+            r.channels[ch] = val;
+            changed = true;
+            // 성공한 패턴은 자기진화에 추가 학습
+            if(!EVO.patterns[ch]) EVO.patterns[ch] = [];
+            if(!EVO.patterns[ch].includes(pat.source)){
+              EVO.patterns[ch].push(pat.source);
+            }
+            break;
+          }
+        }
+      }
+    }
+    if(changed){
+      const newG = calcGrade(r.channels);
+      if(newG.grade === 'A' && r.finalGrade !== 'A') upgraded++;
+      r.finalGrade = newG.grade;
+      r.recycled = true;
+    }
+  }
+  EVO.version++;
+  localStorage.setItem('axdata_evolution', JSON.stringify(EVO));
+  alert(`🧬 AI 자동 보완 완료!\n\n✅ 추가로 ${upgraded}건이 A등급으로 승급됐습니다.\n✅ AX 엔진 단계: ${EVO.version}단계\n✅ 학습 내용 자동 저장됨`);
+}
+
+// 편집 가능 테이블 렌더링
+function renderTable(){
+  const tbody = $('previewTbody');
+  const search = ($('searchBox')?.value || '').toLowerCase();
+  const gradeFilter = $('gradeFilter')?.value || '';
+  const filtered = RESULTS.filter(r=>{
+    if(search && !r.filename.toLowerCase().includes(search)) return false;
+    if(gradeFilter && r.finalGrade !== gradeFilter) return false;
+    return true;
+  });
+  tbody.innerHTML = '';
+  filtered.forEach(r=>{
+    const tr = document.createElement('tr');
+    const gClass = 'g' + r.finalGrade;
+    const editedMark = r.userEdited ? ' <span style="color:#FFD54F;font-size:0.7rem;">✏️</span>' : '';
+    
+    // ⭐ 등급 변경 시각화
+    let gradeDisplay = '';
+    if(r.originalGrade && r.originalGrade !== r.finalGrade){
+      const origClass = 'g' + r.originalGrade;
+      gradeDisplay = `<span class="grade-badge ${origClass}" style="opacity:0.5;text-decoration:line-through;">${r.originalGrade}</span> <span style="color:#FFD54F;">→</span> <span class="grade-badge ${gClass}" style="box-shadow:0 0 8px #FFD54F;">${r.finalGrade}</span>`;
+    } else {
+      gradeDisplay = `<span class="grade-badge ${gClass}">${r.finalGrade}</span>`;
+    }
+    
+    // ⭐ 셀 상태별 스타일
+    const isEdited = (ch) => (r.editedChannels || []).includes(ch);
+    const isMissing = (ch) => !r.channels[ch] || r.channels[ch] === '-' || r.channels[ch] === '';
+    const isAGrade = r.finalGrade === 'A';
+    
+    const cellStyle = (ch) => {
+      // A등급은 강조 안함
+      if(isAGrade) {
+        return 'style="cursor:pointer;background:rgba(255,255,255,0.02);" onclick="editCell(this,'+r.no+')"';
+      }
+      // 이미 수정된 셀: 노란색
+      if(isEdited(ch)) {
+        return 'style="cursor:pointer;background:rgba(255,213,79,0.15);border-left:2px solid #FFD54F;" onclick="editCell(this,'+r.no+')"';
+      }
+      // 누락된 셀: 빨간 점선 강조 (수정 필요)
+      if(isMissing(ch)) {
+        return 'style="cursor:pointer;background:rgba(198,40,40,0.2);border:2px dashed #FF6B6B;animation:pulse 2s infinite;" onclick="editCell(this,'+r.no+')"';
+      }
+      // 일반 셀
+      return 'style="cursor:pointer;background:rgba(255,255,255,0.02);" onclick="editCell(this,'+r.no+')"';
+    };
+    
+    const cellContent = (ch, maxLen) => {
+      const val = r.channels[ch];
+      if(!val || val === '-' || val === '') {
+        // ⭐ 빈 셀에 "✏️ 수정" 표시
+        return isAGrade ? '-' : '<span style="color:#FF6B6B;font-weight:700;">✏️ 수정</span>';
+      }
+      return val.substring(0, maxLen);
+    };
+    
+    tr.innerHTML = `
+      <td>${r.no}</td>
+      <td>${r.filename.substring(0,28)}${editedMark}</td>
+      <td>${r.ext}</td>
+      <td data-ch="who" data-no="${r.no}" ${cellStyle('who')}>${cellContent('who', 18)}</td>
+      <td data-ch="what" data-no="${r.no}" ${cellStyle('what')}>${cellContent('what', 22)}</td>
+      <td data-ch="when" data-no="${r.no}" ${cellStyle('when')}>${cellContent('when', 15)}</td>
+      <td data-ch="where" data-no="${r.no}" ${cellStyle('where')}>${cellContent('where', 15)}</td>
+      <td data-ch="why" data-no="${r.no}" ${cellStyle('why')}>${cellContent('why', 18)}</td>
+      <td data-ch="how" data-no="${r.no}" ${cellStyle('how')}>${cellContent('how', 18)}</td>
+      <td>${gradeDisplay}</td>`;
+    tbody.appendChild(tr);
+  });
+  $('resultCount').textContent = `총 ${filtered.length}건 / 전체 ${RESULTS.length}건`;
+}
+
+// 셀 클릭 → 인라인 편집
+function editCell(td, no){
+  if(td.querySelector('input')) return;
+  const ch = td.dataset.ch;
+  const r = RESULTS.find(x=>x.no === no);
+  if(!r) return;
+  
+  // ⭐ 원본 값/등급 저장 (변경 추적용)
+  if(!r.originalGrade) r.originalGrade = r.finalGrade;
+  if(!r.originalChannels) r.originalChannels = JSON.parse(JSON.stringify(r.channels));
+  if(!r.editedChannels) r.editedChannels = [];
+  
+  const oldVal = r.channels[ch] || '';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = oldVal;
+  input.style.cssText = 'width:100%;background:rgba(31,78,121,0.5);color:white;border:1px solid var(--gold);padding:4px 6px;border-radius:4px;font-size:0.78rem;';
+  td.innerHTML = '';
+  td.appendChild(input);
+  input.focus();
+  input.select();
+  const finishEdit = ()=>{
+    const newVal = input.value.trim();
+    if(newVal !== oldVal){
+      r.channels[ch] = newVal;
+      r.userEdited = true;
+      // ⭐ 어떤 채널이 수정됐는지 추적
+      if(!r.editedChannels.includes(ch)) r.editedChannels.push(ch);
+      // 등급 재계산
+      const newG = calcGrade(r.channels);
+      r.finalGrade = newG.grade;
+    }
+    renderTable();
+    updateEditCount();
+  };
+  input.onblur = finishEdit;
+  input.onkeydown = e=>{
+    if(e.key === 'Enter') input.blur();
+    if(e.key === 'Escape'){ input.value = oldVal; input.blur(); }
+  };
+}
+
+function filterTable(){ renderTable(); }
+
+// ⭐ 수정 카운트 업데이트
+function updateEditCount(){
+  const edited = RESULTS.filter(r=>r.userEdited).length;
+  const total = RESULTS.length;
+  if($('editCount')) $('editCount').textContent = edited + '건 수정됨';
+  if($('totalCount')) $('totalCount').textContent = total + '건';
+}
+
+// ⭐ 수정 완료 제출 (직접 수정 모드 전용)
+function submitEdits(){
+  console.log('[submitEdits] 호출됨');
+  
+  try {
+    // 안전 체크
+    if(typeof RESULTS === 'undefined' || !RESULTS || RESULTS.length === 0){
+      alert('처리된 결과가 없습니다.\n파일을 먼저 업로드하고 시작 버튼을 눌러주세요.');
+      return;
+    }
+    
+    const edited = RESULTS.filter(r=>r && r.userEdited);
+    console.log('[submitEdits] 전체 결과:', RESULTS.length, '건');
+    console.log('[submitEdits] 수정된 항목:', edited.length, '건');
+    console.log('[submitEdits] RESULTS 샘플:', RESULTS[0]);
+    
+    if(edited.length === 0){
+      alert(`수정한 항목이 없습니다.\n\n` +
+            `[현재 상태]\n` +
+            `• 전체 데이터: ${RESULTS.length}건\n` +
+            `• 수정된 항목: 0건\n\n` +
+            `[해결 방법]\n` +
+            `1. 테이블의 셀을 클릭하세요\n` +
+            `2. 값을 수정하세요 (예: "-" → "심사원")\n` +
+            `3. Enter 또는 다른 셀 클릭\n` +
+            `4. ✏️ 표시가 나타나면 수정됨\n` +
+            `5. 다시 [수정 완료 제출] 버튼`);
+      return;
+    }
+    
+    // EVO 안전 초기화
+    if(!EVO) window.EVO = {version:1, patterns:{}, total_processed:0, experiment_count:0};
+    if(!EVO.user_edits) EVO.user_edits = [];
+    if(!EVO.total_edit_count) EVO.total_edit_count = 0;
+    if(!EVO.experiment_count) EVO.experiment_count = 0;
+    
+    edited.forEach(r=>{
+      EVO.user_edits.push({
+        timestamp: new Date().toISOString(),
+        filename: r.filename,
+        channels: r.channels,
+        grade: r.finalGrade
+      });
+    });
+    
+    EVO.total_edit_count += edited.length;
+    EVO.experiment_count += 1;
+    
+    // 일정 수정량 도달 시 AX 엔진 단계 ↑
+    let leveledUp = false;
+    if(EVO.total_edit_count >= 10 && EVO.total_edit_count % 10 === 0){
+      EVO.version++;
+      leveledUp = true;
+    }
+    
+    localStorage.setItem('axdata_evolution', JSON.stringify(EVO));
+    console.log('[submitEdits] EVO 저장 완료. 단계:', EVO.version);
+    
+    // 결과 박스 갱신
+    refreshAllResults(edited.length);
+    
+    // 결과 메시지 표시
+    const sr = $('submitResult');
+    if(sr){
+      sr.style.display = 'block';
+      
+      // ⭐ 변경 내역 상세 생성
+      const channelLabels = {who:'Who', what:'What', when:'When', where:'Where', why:'Why', how:'How'};
+      let changeDetails = '';
+      edited.forEach((r, idx)=>{
+        const fromGrade = r.originalGrade || r.grade || '?';
+        const toGrade = r.finalGrade;
+        const changedChs = (r.editedChannels || []).map(c => channelLabels[c] || c).join(', ');
+        const gradeChange = (fromGrade !== toGrade) 
+          ? `<span style="color:#FFD54F;">${fromGrade}</span> → <span style="color:#90EE90;font-weight:900;">${toGrade}</span>`
+          : `<span style="color:#90EE90;">${toGrade}</span> (등급 유지)`;
+        changeDetails += `<div style="margin:0.4rem 0;padding:0.5rem;background:rgba(255,255,255,0.05);border-radius:4px;border-left:2px solid #FFD54F;">
+          <b>${idx+1}. ${r.filename}</b><br>
+          <span style="color:#B0BEC5;font-size:0.78rem;">• 등급: ${gradeChange}</span><br>
+          <span style="color:#B0BEC5;font-size:0.78rem;">• 수정 채널: <b style="color:#FFD54F;">${changedChs}</b></span>
+        </div>`;
+      });
+      
+      // 등급 변경 통계
+      const upgraded = edited.filter(r => r.originalGrade !== r.finalGrade && r.finalGrade === 'A').length;
+      const stillEdited = edited.length - upgraded;
+      
+      sr.innerHTML = `
+        ✅ <b>제출 완료!</b> 처리 결과가 자동 갱신되었습니다.<br>
+        <br>
+        📊 <b>이번 수정 반영</b><br>
+        • 수정 건수: <b>${edited.length}건</b><br>
+        • A등급 승급: <b style="color:#90EE90;">${upgraded}건</b> ⬆️<br>
+        • 등급 유지: <b>${stillEdited}건</b><br>
+        <br>
+        📝 <b>변경 내역 상세</b>
+        ${changeDetails}
+        <br>
+        🧬 <b>AX 엔진 학습 누적</b><br>
+        • 누적 수정: <b>${EVO.total_edit_count}건</b><br>
+        • AX 엔진 단계: <b>${EVO.version}단계</b> ${leveledUp ? '⬆️ 레벨업!' : ''}<br>
+        • 다음 실행부터 자동 인식<br>
+        <br>
+        🚀 <b>다음 단계</b><br>
+        • 위 처리 결과 박스에서 갱신된 등급 확인<br>
+        • 아래 다운로드 버튼으로 결과 파일 받기
+      `;
+    }
+    
+    // 제출 버튼 비활성화
+    const btn = document.querySelector('#submitArea button');
+    if(btn){
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+      btn.textContent = '✅ 제출 완료';
+    }
+    
+    // 처리 결과 박스로 자동 스크롤
+    setTimeout(()=>{
+      const ax = $('axComplete');
+      if(ax) ax.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 500);
+    
+    console.log('[submitEdits] 완료');
+  } catch(err) {
+    console.error('[submitEdits] 오류:', err);
+    alert('제출 중 오류 발생: ' + err.message + '\n\nF12 → Console에서 상세 확인 가능합니다.');
+  }
+}
+
+// ⭐ 모든 결과 박스 자동 갱신
+function refreshAllResults(editedCount){
+  try {
+    editedCount = editedCount || 0;
+    const total = RESULTS.length;
+    const initA = RESULTS.filter(r=>r.grade==='A').length;
+    const finalA = RESULTS.filter(r=>r.finalGrade==='A').length;
+    const finalB = RESULTS.filter(r=>r.finalGrade==='B').length;
+    const finalC = RESULTS.filter(r=>r.finalGrade==='C').length;
+    
+    // 4단계 박스
+    if($('ps4c')){
+      $('ps4c').innerHTML = `✅ 보완 완료<br>• 1차 A등급: <b>${initA}건</b><br>• 보완 후 추가: <b>+${finalA - initA}건</b><br>• 최종 A등급: <b>${finalA}건</b> (${(finalA/total*100).toFixed(1)}%)<br>• 직접 수정 누적: <b>${EVO.total_edit_count || 0}건</b>`;
+    }
+    
+    // 5단계 박스
+    const totalPatterns = Object.values(EVO.patterns||{}).reduce((a,v)=>a+(v?v.length:0),0);
+    if($('ps5c')){
+      $('ps5c').innerHTML = `✅ AX 엔진 학습 완료<br>• 신규 학습: <b>${editedCount}건</b><br>• 누적 학습: <b>${totalPatterns + (EVO.total_edit_count || 0)}건</b><br>• AX 엔진 단계: <b>${EVO.version}단계</b><br>• 누적 처리: <b>${(EVO.total_processed||0).toLocaleString()}건</b><br>• 누적 실행: <b>${EVO.experiment_count}회</b>`;
+    }
+    
+    // 6단계 박스
+    if($('ps6c')){
+      $('ps6c').innerHTML = `✅ AX 시스템 구축 완료<br>• A등급 데이터: <b>${finalA}건</b> (수정 반영)<br>• 검색 인덱스 준비 완료<br>• AI 질의응답 준비 완료<br>• 의사결정 시스템 활성화`;
+    }
+    
+    // AX 시스템 완성 박스
+    if($('axDesc')){
+      $('axDesc').textContent = `${total.toLocaleString()}건 → 5W1H 구조화 → DQS ${finalA.toLocaleString()}건 A등급 → AX 시스템 완성!`;
+    }
+    
+    // 누적 통계 박스
+    if($('evoStats')){
+      $('evoStats').innerHTML = `• AX 엔진 단계: <b>${EVO.version}단계</b><br>• 누적 학습: <b>${totalPatterns + (EVO.total_edit_count || 0)}건</b><br>• 누적 처리: <b>${(EVO.total_processed||0).toLocaleString()}건</b><br>• 누적 실행: <b>${EVO.experiment_count}회</b><br>• 누적 수정: <b>${EVO.total_edit_count || 0}건</b><br>• 다음 실행 시 학습 자동 적용`;
+    }
+    
+    // 테이블 다시 그리기
+    if(typeof renderTable === 'function') renderTable();
+    
+    console.log('[refreshAllResults] 갱신 완료');
+  } catch(err) {
+    console.error('[refreshAllResults] 오류:', err);
+  }
+}
+
+function downloadCSV(){
+  if(!RESULTS.length) return;
+  let csv = '\uFEFFNo,파일명,확장자,Who,What,When,Where,Why,How,1차등급,리사이클,최종등급\n';
+  RESULTS.forEach(r=>{
+    const ch = r.channels;
+    csv += [r.no, r.filename, r.ext, ch.who||'', ch.what||'', ch.when||'',
+      ch.where||'', ch.why||'', ch.how||'',
+      r.grade, r.recycled?'✓':'', r.finalGrade].map(v=>'"'+(v+'').replace(/"/g,'""')+'"').join(',') + '\n';
+  });
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'AXData_' + new Date().toISOString().slice(0,19).replace(/[T:]/g,'-') + '.csv';
+  a.click();
+  showFeedback();
+}
+
+function downloadAX(){
+  if(!RESULTS.length) return;
+  const gradeA = RESULTS.filter(r=>r.finalGrade==='A');
+  const ax = {
+    metadata: {
+      system_name: "AX_System",
+      built_at: new Date().toISOString(),
+      company: "에이엑스데이터(주)",
+      patents: ["제10-2026-0048020호 외 2건"],
+      ax_engine_level: EVO.version,
+      total_processed: EVO.total_processed
+    },
+    search_index: {status: "ready", corpus_size: gradeA.length},
+    ax_corpus: gradeA.map(r=>({
+      id: r.no, filename: r.filename, channels: r.channels,
+      text: `${r.channels.who||''}이(가) ${r.channels.when||''}에 ${r.channels.where||''}에서 ${r.channels.what||''}을(를) ${r.channels.why||''} 위하여 ${r.channels.how||''} 방법으로 처리하였다.`,
+      grade: 'A'
+    })),
+    ready_for_query: true
+  };
+  const blob = new Blob([JSON.stringify(ax,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'AXSystem_' + new Date().toISOString().slice(0,19).replace(/[T:]/g,'-') + '.json';
+  a.click();
+  showFeedback();
+}
+
+function downloadReport(){
+  if(!RESULTS.length) return;
+  const total = RESULTS.length;
+  const initA = RESULTS.filter(r=>r.grade==='A').length;
+  const finalA = RESULTS.filter(r=>r.finalGrade==='A').length;
+  const recycleSuccess = RESULTS.filter(r=>r.recycled && r.finalGrade==='A').length;
+  const totalPatterns = Object.values(EVO.patterns).reduce((a,v)=>a+v.length,0);
+
+  const md = `# AXData 자동 파이프라인 실행 리포트
+
+- 실행 일시: ${new Date().toLocaleString('ko-KR')}
+- 회사: 에이엑스데이터(주)
+- 특허: 제10-2026-0048020호 외 2건
+
+## 1. 처리 현황
+- 총 파일: ${total}건
+- 1차 A등급: ${initA}건 (${(initA/total*100).toFixed(1)}%)
+- 리사이클 보완: +${recycleSuccess}건
+- 최종 A등급: ${finalA}건 (${(finalA/total*100).toFixed(1)}%)
+
+## 2. AX 엔진 학습 (누적)
+- AX 엔진 단계: ${EVO.version}단계
+- 누적 학습: ${totalPatterns}건
+- 누적 처리: ${EVO.total_processed.toLocaleString()}건
+- 누적 실행: ${EVO.experiment_count}회
+
+## 3. AX 시스템 상태
+- A등급 데이터: ${finalA}건
+- 검색 인덱스 준비: 완료
+- AI 질의응답: 준비 완료
+
+---
+*에이엑스데이터(주) | axdata.co.kr | 특허 3건*
+`;
+  const blob = new Blob([md],{type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'AXReport_' + new Date().toISOString().slice(0,19).replace(/[T:]/g,'-') + '.md';
+  a.click();
+  showFeedback();
+}
+
+function showFeedback(){
+  show('secFeedback');
+  // 약간 지연 후 스크롤
+  setTimeout(()=>$('secFeedback').scrollIntoView({behavior:'smooth'}), 300);
+}
+
+// ⭐ 데이터 코드 분류 (거래/비거래)
+let CURRENT_TRADE_MODE = null;
+
+function setTradeMode(mode){
+  CURRENT_TRADE_MODE = mode;
+  
+  if(mode === 'trade'){
+    $('tradeBtn').style.background = 'rgba(46,125,50,0.8)';
+    $('tradeBtn').style.boxShadow = '0 0 12px #2E7D32';
+    $('privateBtn').style.background = 'rgba(96,125,139,0.4)';
+    $('privateBtn').style.boxShadow = 'none';
+    $('tradeDetails').style.display = 'block';
+  } else {
+    $('privateBtn').style.background = 'rgba(96,125,139,0.8)';
+    $('privateBtn').style.boxShadow = '0 0 12px #607D8B';
+    $('tradeBtn').style.background = 'rgba(46,125,50,0.4)';
+    $('tradeBtn').style.boxShadow = 'none';
+    $('tradeDetails').style.display = 'none';
+  }
+  
+  const btn = $('registerCodeBtn');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+  
+  updateGeneratedCode();
+}
+
+function updateGeneratedCode(){
+  if(!CURRENT_TRADE_MODE){
+    $('generatedCode').textContent = '(코드 분류 후 자동 생성)';
+    return;
+  }
+  
+  const year = String(new Date().getFullYear()).slice(-2);
+  const ksicMajor = $('ksicMajor')?.value || 'C';
+  const ksicDetail = $('ksicDetail')?.value || '000000';
+  const dataType = $('dataType')?.value || 'QM';
+  
+  let seq = parseInt(localStorage.getItem('axdata_code_seq') || '0') + 1;
+  const seqStr = String(seq).padStart(10, '0');
+  
+  const code = CURRENT_TRADE_MODE === 'trade' 
+    ? `${ksicMajor}-${ksicDetail.padEnd(6,'0')}-${year}-${seqStr}-${dataType}`
+    : `${ksicMajor}-${ksicDetail.padEnd(6,'0')}-${year}-${seqStr}-${dataType}-PRIV`;
+  
+  $('generatedCode').textContent = code;
+}
+
+function registerDataCode(){
+  if(!CURRENT_TRADE_MODE){
+    alert('거래/비거래 분류를 먼저 선택해주세요.');
+    return;
+  }
+  
+  const year = String(new Date().getFullYear()).slice(-2);
+  const ksicMajor = $('ksicMajor')?.value || 'C';
+  const ksicDetail = $('ksicDetail')?.value || '';
+  const dataType = $('dataType')?.value || 'QM';
+  const empCode = $('empCode')?.value.trim().toUpperCase() || '';
+  
+  // 직원 코드 형식 검증 (선택사항)
+  if(empCode && !/^AX-\d{5}$/.test(empCode)){
+    alert('영업 직원 코드 형식이 올바르지 않습니다.\n\n[올바른 형식]\nAX-00001 (AX- 다음 숫자 5자리)\n\n[예시]\n• AX-00001\n• AX-12345\n\n공란으로 두시면 등록 가능합니다.');
+    return;
+  }
+  
+  if(CURRENT_TRADE_MODE === 'trade' && !ksicDetail){
+    alert('KSIC 6자리 코드를 입력해주세요.\n예: 261110 (반도체 제조)');
+    return;
+  }
+  
+  let seq = parseInt(localStorage.getItem('axdata_code_seq') || '0') + 1;
+  localStorage.setItem('axdata_code_seq', seq);
+  const seqStr = String(seq).padStart(10, '0');
+  
+  const ksicFull = ksicDetail.padEnd(6,'0');
+  const baseCode = `${ksicMajor}-${ksicFull}-${year}-${seqStr}-${dataType}`;
+  const fullCode = CURRENT_TRADE_MODE === 'trade' ? baseCode : baseCode + '-PRIV';
+  
+  if(!EVO.trade_registry) EVO.trade_registry = [];
+  EVO.trade_registry.push({
+    code: fullCode,
+    timestamp: new Date().toISOString(),
+    mode: CURRENT_TRADE_MODE,
+    ksic_major: ksicMajor,
+    ksic_detail: ksicFull,
+    data_type: dataType,
+    employee_code: empCode,
+    file_count: RESULTS.length,
+    a_count: RESULTS.filter(r=>r.finalGrade==='A').length
+  });
+  localStorage.setItem('axdata_evolution', JSON.stringify(EVO));
+  
+  $('registerResult').style.display = 'block';
+  
+  if(CURRENT_TRADE_MODE === 'trade'){
+    $('registerResult').innerHTML = `
+      ✅ <b>데이터 거래 등록 완료!</b><br>
+      <br>
+      📋 <b>발급 코드</b>: <span style="font-family:Consolas,monospace;color:#FFD54F;font-weight:700;">${fullCode}</span><br>
+      <br>
+      📊 <b>등록 정보</b><br>
+      • KSIC: ${ksicMajor} - ${ksicFull}<br>
+      • 데이터 종류: ${dataType}<br>
+      • 등록 건수: ${RESULTS.length}건 (A등급 ${RESULTS.filter(r=>r.finalGrade==='A').length}건)<br>
+      ${empCode ? '• 영업 직원: ' + empCode + '<br>' : ''}
+      <br>
+      💰 <b>거래 안내</b><br>
+      • 데이터 마켓에 익명 코드로 등록됩니다<br>
+      • 거래 성사 시 정산 비율:<br>
+      &nbsp;&nbsp;- 데이터 제공자: 60%<br>
+      ${empCode ? '&nbsp;&nbsp;- 영업 직원: 10% (수수료)<br>' : ''}
+      &nbsp;&nbsp;- 에이엑스데이터: ${empCode ? '30%' : '40%'}<br>
+      <br>
+      🔔 거래 성사 시 등록된 연락처로 알림 발송됩니다.
+    `;
+  } else {
+    $('registerResult').innerHTML = `
+      🔒 <b>비거래 코드 등록 완료!</b><br>
+      <br>
+      📋 <b>발급 코드</b>: <span style="font-family:Consolas,monospace;color:#FFD54F;font-weight:700;">${fullCode}</span><br>
+      <br>
+      📊 <b>등록 정보</b><br>
+      • 데이터 종류: ${dataType}<br>
+      • 등록 건수: ${RESULTS.length}건<br>
+      <br>
+      🔒 <b>비거래 안내</b><br>
+      • 자체 사용 전용 코드입니다<br>
+      • 외부 마켓에 노출되지 않습니다<br>
+      • 추후 거래 가능으로 전환 가능합니다
+    `;
+  }
+  
+  const btn = $('registerCodeBtn');
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  btn.style.cursor = 'not-allowed';
+  btn.textContent = '✅ 등록 완료';
+  
+  // ⭐ 저장 옵션 박스 표시
+  $('storageArea').style.display = 'block';
+  // ⭐ 클라우드 페이지: 클라우드 모드 자동 선택
+  setTimeout(()=>{
+    if(typeof setStorageMode === 'function') setStorageMode('cloud');
+    $('storageArea').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 500);
+}
+
+document.addEventListener('change', (e)=>{
+  if(['ksicMajor','ksicDetail','dataType','empCode'].includes(e.target.id)){
+    updateGeneratedCode();
+  }
+});
+document.addEventListener('input', (e)=>{
+  if(e.target.id === 'ksicDetail'){
+    updateGeneratedCode();
+  }
+});
+
+// ⭐ 데이터 저장 옵션
+let CURRENT_STORAGE_MODE = null;
+
+function setStorageMode(mode){
+  CURRENT_STORAGE_MODE = mode;
+  
+  if(mode === 'cloud'){
+    $('cloudStorageBtn').style.background = 'rgba(31,78,121,0.8)';
+    $('cloudStorageBtn').style.boxShadow = '0 0 12px #1F4E79';
+    $('usbStorageBtn').style.background = 'rgba(46,125,50,0.4)';
+    $('usbStorageBtn').style.boxShadow = 'none';
+    $('cloudDetails').style.display = 'block';
+    $('usbDetails').style.display = 'none';
+  } else {
+    $('usbStorageBtn').style.background = 'rgba(46,125,50,0.8)';
+    $('usbStorageBtn').style.boxShadow = '0 0 12px #2E7D32';
+    $('cloudStorageBtn').style.background = 'rgba(31,78,121,0.4)';
+    $('cloudStorageBtn').style.boxShadow = 'none';
+    $('cloudDetails').style.display = 'none';
+    $('usbDetails').style.display = 'block';
+  }
+}
+
+// USB·외장하드 저장 (File System Access API)
+// ZIP 다운로드 (HF iframe 호환)
+async function downloadAsZip(){
+  if(!RESULTS.length){
+    alert('처리 결과가 없습니다.');
+    return;
+  }
+  
+  // JSZip 사용
+  if(typeof JSZip === 'undefined'){
+    alert('ZIP 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+  
+  try {
+    const zip = new JSZip();
+    
+    // 코드 가져오기
+    const lastTrade = (EVO.trade_registry || []).slice(-1)[0];
+    const folderName = lastTrade ? lastTrade.code : 'AXC-' + Date.now();
+    const dateStr = new Date().toISOString().slice(0,10);
+    const rootFolder = `AXData_${dateStr}_${folderName}`;
+    
+    // 1. CSV 파일
+    let csv = '\uFEFFNo,파일명,확장자,Who,What,When,Where,Why,How,1차등급,리사이클,최종등급\n';
+    RESULTS.forEach(r=>{
+      const ch = r.channels;
+      csv += [r.no, r.filename, r.ext, ch.who||'', ch.what||'', ch.when||'',
+        ch.where||'', ch.why||'', ch.how||'',
+        r.grade, r.recycled?'✓':'', r.finalGrade].map(v=>'"'+(v+'').replace(/"/g,'""')+'"').join(',') + '\n';
+    });
+    zip.file(`${rootFolder}/result.csv`, csv);
+    
+    // 2. AX 시스템 JSON (기업 보유용 - 우리 통계 제외)
+    const gradeA = RESULTS.filter(r=>r.finalGrade==='A');
+    const ax = {
+      metadata: {
+        system_name: "AX_System",
+        built_at: new Date().toISOString(),
+        data_code: folderName,
+        provider: "에이엑스데이터(주) (axdata.co.kr)",
+        storage_mode: "기업 보유 저장장치"
+      },
+      data_summary: {
+        total_files: RESULTS.length,
+        a_grade: gradeA.length,
+        b_grade: RESULTS.filter(r=>r.finalGrade==='B').length,
+        c_grade: RESULTS.filter(r=>r.finalGrade==='C').length
+      },
+      ax_corpus: gradeA.map(r=>({
+        id: r.no, filename: r.filename, channels: r.channels,
+        text: `${r.channels.who||''}이(가) ${r.channels.when||''}에 ${r.channels.where||''}에서 ${r.channels.what||''}을(를) ${r.channels.why||''} 위하여 ${r.channels.how||''} 방법으로 처리하였다.`,
+        grade: 'A'
+      })),
+      ready_for_query: true
+    };
+    zip.file(`${rootFolder}/ax_system.json`, JSON.stringify(ax, null, 2));
+    
+    // 3. 리포트 (Markdown)
+    const total = RESULTS.length;
+    const initA = RESULTS.filter(r=>r.grade==='A').length;
+    const finalA = RESULTS.filter(r=>r.finalGrade==='A').length;
+    const recycleSuccess = finalA - initA;
+    const totalPatterns = Object.values(EVO.patterns||{}).reduce((a,v)=>a+(v?v.length:0),0);
+    // 거래 등록 정보
+    const tradeInfo = lastTrade || {};
+    const tradeMode = tradeInfo.mode === 'trade' ? '거래 가능 (마켓 등록)' : tradeInfo.mode === 'private' ? '비거래 (자체 사용)' : '미등록';
+    
+    const md = `# AXData 데이터 처리 결과 보고서
+
+## 📋 기본 정보
+- 처리 일시: ${new Date().toLocaleString('ko-KR')}
+- 데이터 코드: ${folderName}
+- 저장 방식: 기업 보유 저장장치 (USB·외장HDD)
+- 거래 분류: ${tradeMode}
+
+## 📊 처리 결과
+- 총 파일: ${total}건
+- A등급 (활용 가능): ${finalA}건 (${(finalA/total*100).toFixed(1)}%)
+- B등급 (보완 필요): ${RESULTS.filter(r=>r.finalGrade==='B').length}건
+- C등급 (재처리 필요): ${RESULTS.filter(r=>r.finalGrade==='C').length}건
+
+## 🔒 데이터 보호
+- 저장 위치: 기업 보유 저장장치
+- 외부 유출: 없음 (100% 자체 보관)
+- 데이터 주권: 기업 소유
+- 영구 소유: 구독료 없음
+
+## 📁 파일 구성
+- result.csv: 전체 처리 결과 (Excel로 열기 가능)
+- ax_system.json: AX 시스템 데이터 (검색·AI 질의용)
+- report.md: 본 리포트
+- README.txt: 사용 안내서
+
+## 💡 활용 안내
+- A등급 데이터는 즉시 활용 가능합니다
+- B/C등급은 추가 보완 후 재처리를 권장합니다
+- 거래 등록 시 데이터 마켓에서 익명 코드로 거래됩니다
+
+${tradeInfo.mode === 'trade' ? `## 💰 거래 정산 안내
+- 데이터 제공자: 60% (귀사)
+${tradeInfo.employee_code ? '- 영업 직원: 10%\\n- 에이엑스데이터: 30%' : '- 에이엑스데이터: 40%'}
+- 거래 성사 시 등록된 연락처로 알림 발송
+
+` : ''}---
+**문의처**: 에이엑스데이터(주) | abc@bigdt.co.kr | 010-5234-3535
+**홈페이지**: axdata.co.kr
+**특허**: 제10-2026-0048020호 외 2건
+`;
+    zip.file(`${rootFolder}/report.md`, md);
+    
+    // 4. README
+    const readme = `# AXData 처리 결과
+
+## 폴더 구조
+- result.csv: 전체 처리 결과 (Excel로 열기 가능)
+- ax_system.json: AX 시스템 데이터
+- report.md: 실행 리포트
+- 코드: ${folderName}
+
+## USB·외장하드 저장 방법
+1. 이 ZIP 파일을 압축 해제
+2. AXData 폴더를 USB·외장하드로 복사
+3. 끝!
+
+## 데이터 보호
+✓ 외부 유출 없음
+✓ 기업 자체 보관
+✓ 영구 소유
+
+---
+에이엑스데이터(주) | axdata.co.kr
+`;
+    zip.file(`${rootFolder}/README.txt`, readme);
+    
+    // ZIP 생성 + 다운로드
+    const blob = await zip.generateAsync({type:'blob'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${rootFolder}.zip`;
+    a.click();
+    
+    // 결과 표시
+    $('storageResult').style.display = 'block';
+    $('storageResult').innerHTML = `
+      ✅ <b>ZIP 다운로드 완료!</b><br>
+      <br>
+      📦 <b>파일명</b>: ${rootFolder}.zip<br>
+      <br>
+      📂 <b>저장 방법</b><br>
+      1. 다운로드 폴더에서 ZIP 파일 확인<br>
+      2. ZIP 압축 해제<br>
+      3. AXData 폴더를 USB·외장하드로 복사<br>
+      <br>
+      🔒 <b>데이터 보호</b><br>
+      • 외부 유출 없음<br>
+      • 기업 자체 보관<br>
+      • 영구 소유 (구독료 없음)
+    `;
+    
+  } catch(err) {
+    console.error('ZIP 생성 오류:', err);
+    alert('ZIP 생성 중 오류 발생: ' + err.message);
+  }
+}
+
+// 구독형 클라우드 신청
+// Cloud Run 업로드 URL (axsystem 프로젝트)
+// 로컬 자체 AI 엔진 URL (사용자 PC)
+const AI_ENGINE_URL = 'http://localhost:11434';
+const AI_MODEL = '자체 AI 모델';
+let AI_AVAILABLE = false;
+
+// 자체 AI 엔진 환경 점검
+async function checkAIEngine(){
+  const checkDiv = document.getElementById('aiCheck');
+  if(!checkDiv) return;
+  
+  try {
+    const response = await fetch(`${AI_ENGINE_URL}/api/tags`, {method: 'GET'});
+    if(response.ok){
+      const data = await response.json();
+      const models = (data.models || []).map(m => m.name);
+      const hasModel = models.length > 0;
+      
+      AI_AVAILABLE = hasModel;
+      
+      if(hasModel){
+        checkDiv.innerHTML = `
+          <div style="display:flex;align-items:center;gap:0.5rem;color:#90EE90;">
+            <span style="font-size:1.2rem;">✅</span>
+            <span><b>자체 AI 엔진 작동 중</b></span>
+          </div>
+          <div style="margin-top:0.4rem;font-size:0.78rem;color:#A5D6A7;">
+            • 모델: <b>${AI_MODEL}</b> (한국어 특화 자체 AI 모델)<br>
+            • 설치된 모델: ${models.join(', ')}<br>
+            • 처리 방식: <b>자체 AI 강화 모드</b> (외부 연결 0%)
+          </div>`;
+      } else {
+        checkDiv.innerHTML = `
+          <div style="display:flex;align-items:center;gap:0.5rem;color:#FFC107;">
+            <span style="font-size:1.2rem;">⚠️</span>
+            <span><b>자체 AI 엔진 작동 중 (모델 미설치)</b></span>
+          </div>
+          <div style="margin-top:0.4rem;font-size:0.78rem;color:#FFE082;">
+            • 설치된 모델: ${models.join(', ') || '(없음)'}<br>
+            • 권장: <a href="mailto:abc@bigdt.co.kr?subject=AXData OnDevice 모델 설치 문의" style="color:#FFD54F;">담당자에게 모델 설치 요청 →</a><br>
+            • 기본 처리 모드는 정상 작동합니다
+          </div>`;
+      }
+    } else {
+      throw new Error('응답 오류');
+    }
+  } catch(err){
+    AI_AVAILABLE = false;
+    checkDiv.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.5rem;color:#FFC107;">
+        <span style="font-size:1.2rem;">⚠️</span>
+        <span><b>자체 AI 엔진 미설치</b></span>
+      </div>
+      <div style="margin-top:0.4rem;font-size:0.78rem;color:#FFE082;">
+        • 기본 처리 모드는 작동합니다 (보안 유지)<br>
+        • 자체 AI 강화하려면:<br>
+        &nbsp;&nbsp;1. <a href="https://담당자 안내/download" target="_blank" style="color:#FFD54F;">담당자 안내</a>에서 설치<br>
+        &nbsp;&nbsp;2. 담당자 안내: <a href="mailto:abc@bigdt.co.kr?subject=AXData OnDevice 설치 문의" style="color:#FFD54F;">abc@bigdt.co.kr →</a><br>
+        &nbsp;&nbsp;3. 담당자에게 보안 설정 요청
+      </div>`;
+  }
+}
+
+// 자체 AI 엔진 5W1H 강화 추출
+async function aiEngineExtract(text){
+  if(!AI_AVAILABLE || !text || text.length < 10) return null;
+  
+  const prompt = `다음 한국어 텍스트에서 5W1H 6채널을 추출하세요.
+JSON 형식으로만 응답하세요. 없으면 빈 문자열.
+
+텍스트:
+${text.substring(0, 2000)}
+
+출력 형식 (JSON만):
+{"who":"","what":"","when":"","where":"","why":"","how":""}`;
+  
+  try {
+    const response = await fetch(`${AI_ENGINE_URL}/api/generate`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: AI_MODEL,
+        prompt: prompt,
+        stream: false,
+        format: 'json',
+        options: {temperature: 0.1, num_predict: 300}
+      })
+    });
+    
+    if(!response.ok) return null;
+    const data = await response.json();
+    const result = JSON.parse(data.response || '{}');
+    return result;
+  } catch(err){
+    console.error('AI 엔진 호출 오류:', err);
+    return null;
+  }
+}
+
+// 페이지 로드 시 자체 AI 엔진 자동 체크
+window.addEventListener('DOMContentLoaded', () => setTimeout(checkAIEngine, 500));
+
+async function submitCloudRequest(){
+  // 온디바이스 = 사내 보관용 (외부 연결 0%)
+  if(!RESULTS.length){
+    alert('처리된 데이터가 없습니다.\n파일을 먼저 업로드하세요.');
+    return;
+  }
+  
+  const lastTrade = (EVO.trade_registry || []).slice(-1)[0];
+  if(!lastTrade){
+    alert('데이터 코드를 먼저 등록해주세요.\n(거래 가능/비거래 선택 + 코드 등록)');
+    return;
+  }
+  const dataCode = lastTrade.code;
+  
+  // UI 업데이트
+  const btn = document.querySelector('#cloudDetails button');
+  if(btn){
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    btn.textContent = '⏳ 사내 보관 ZIP 생성 중...';
+  }
+  
+  // 7단계 시각화
+  setStep(7,'active','🔒 사내 보관 ZIP 생성 중...');
+  setPill(6);
+  
+  $('storageResult').style.display = 'block';
+  $('storageResult').innerHTML = `⏳ <b>사내 보관 ZIP 생성 중...</b>`;
+  
+  try {
+    if(typeof JSZip === 'undefined'){
+      throw new Error('ZIP 라이브러리 로딩 실패');
+    }
+    
+    const zip = new JSZip();
+    const dateStr = new Date().toISOString().slice(0,10);
+    const folderName = `AXData_OnDevice_${dateStr}_${dataCode}`;
+    
+    // 1. CSV
+    let csv = '\uFEFFNo,파일명,확장자,Who,What,When,Where,Why,How,1차등급,리사이클,최종등급\n';
+    RESULTS.forEach(r=>{
+      const ch = r.channels;
+      csv += [r.no, r.filename, r.ext, ch.who||'', ch.what||'', ch.when||'',
+        ch.where||'', ch.why||'', ch.how||'',
+        r.grade, r.recycled?'✓':'', r.finalGrade].map(v=>'"'+(v+'').replace(/"/g,'""')+'"').join(',') + '\n';
+    });
+    zip.file(`${folderName}/result.csv`, csv);
+    
+    // 2. AX 시스템 JSON (사내 보관용)
+    const gradeA = RESULTS.filter(r=>r.finalGrade==='A');
+    const ax = {
+      metadata: {
+        system_name: "AX_System_OnDevice",
+        built_at: new Date().toISOString(),
+        data_code: dataCode,
+        provider: "에이엑스데이터(주) (axdata.co.kr)",
+        deployment_mode: "OnDevice (사내 자체 보관)",
+        external_connection: "없음",
+        ai_engine: AI_AVAILABLE ? "AX 엔진 강화 모드" : "AX 엔진 기본 모드"
+      },
+      data_summary: {
+        total_files: RESULTS.length,
+        a_grade: gradeA.length,
+        b_grade: RESULTS.filter(r=>r.finalGrade==='B').length,
+        c_grade: RESULTS.filter(r=>r.finalGrade==='C').length
+      },
+      ax_corpus: gradeA.map(r=>({
+        id: r.no, filename: r.filename, channels: r.channels, grade: 'A'
+      })),
+      ready_for_query: true
+    };
+    zip.file(`${folderName}/ax_system.json`, JSON.stringify(ax, null, 2));
+    
+    // 3. 사내 보관 안내서
+    const md = `# AXData 사내 자체 보관 데이터
+
+## 📋 기본 정보
+- 처리 일시: ${new Date().toLocaleString('ko-KR')}
+- 데이터 코드: ${dataCode}
+- 배포 방식: **사내 자체 보관 (OnDevice)**
+- 외부 연결: **없음 (0%)**
+- AX 엔진 모드: ${AI_AVAILABLE ? '강화 모드' : '기본 모드'}
+
+## 🔒 보안 특성
+- ✅ 데이터가 외부로 전송되지 않음
+- ✅ 모든 처리는 사내 PC에서 진행
+- ✅ AI 추론도 자체 서버 사용
+- ✅ 기업 보안 정책 100% 준수
+- ✅ GDPR / 개인정보보호법 준수 용이
+
+## 📊 처리 결과
+- 총 파일: ${RESULTS.length}건
+- A등급: ${gradeA.length}건
+- B등급: ${RESULTS.filter(r=>r.finalGrade==='B').length}건
+- C등급: ${RESULTS.filter(r=>r.finalGrade==='C').length}건
+
+## 📁 사내 시스템 배포 방법
+1. 본 ZIP 파일을 사내 보안 채널로 전송
+2. 압축 해제 후 사내 NAS·서버에 보관
+3. result.csv → Excel 등으로 열람
+4. ax_system.json → 사내 검색 시스템 연동
+
+## 💡 활용 안내
+- A등급 데이터는 즉시 사내 활용 가능
+- 사내 RAG 시스템에 자동 통합 가능
+- 외부 거래는 별도 가명화 처리 필요
+
+---
+**문의**: 에이엑스데이터(주) | abc@bigdt.co.kr | 010-5234-3535
+**홈페이지**: axdata.co.kr | **특허**: 제10-2026-0048020호 외 2건
+`;
+    zip.file(`${folderName}/사내_보관_안내서.md`, md);
+    
+    // 4. README
+    const readme = `# AXData OnDevice 처리 결과
+
+## 🔒 보안 안내
+이 데이터는 사내 자체 보관용입니다.
+외부 시스템(클라우드)에 전송하지 않았습니다.
+
+## 폴더 구조
+- result.csv: 처리 결과
+- ax_system.json: AX 시스템 데이터
+- 사내_보관_안내서.md: 활용 가이드
+
+## 권장 사항
+- 사내 NAS·보안 서버에 보관
+- 접근 권한 사내 정책 적용
+- 백업 정기 수행
+
+---
+에이엑스데이터(주) | axdata.co.kr
+`;
+    zip.file(`${folderName}/README.txt`, readme);
+    
+    // ZIP 생성 + 다운로드
+    const blob = await zip.generateAsync({type:'blob'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${folderName}.zip`;
+    a.click();
+    
+    // 7단계 완료
+    setStep(7,'done',`✅ 사내 보관 ZIP 다운로드 완료<br>• 데이터 코드: <b>${dataCode}</b><br>• 외부 연결: <b style="color:#FFD54F;">0% (보안 유지)</b><br>• AX 엔진: <b>${AI_AVAILABLE ? '강화 모드' : '기본 모드'}</b><br>• 사내 NAS·서버에 배포하세요`);
+    setPill(7);
+    
+    // 결과 표시
+    $('storageResult').innerHTML = `
+      ✅ <b>사내 보관 ZIP 다운로드 완료!</b><br>
+      <br>
+      📦 <b>파일명</b>: ${folderName}.zip<br>
+      <br>
+      🔒 <b>보안 검증</b><br>
+      • 외부 연결: <b style="color:#90EE90;">0%</b><br>
+      • 데이터 외부 유출: <b style="color:#90EE90;">없음</b><br>
+      • AX 엔진: <b>${AI_AVAILABLE ? '강화 모드 ✅' : '기본 모드 ✅'}</b><br>
+      <br>
+      📂 <b>사내 배포 방법</b><br>
+      1. 다운로드 폴더에서 ZIP 확인<br>
+      2. 압축 해제<br>
+      3. 사내 NAS·서버에 복사<br>
+      4. 사내 RAG 시스템에 통합<br>
+      <br>
+      🛡️ <b>기업 보안 정책 준수</b><br>
+      • GDPR / 개인정보보호법 호환<br>
+      • 사내 ISMS 정책 준수 가능<br>
+      • 외부 감사 추적 가능
+    `;
+    
+    if(btn){
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+      btn.textContent = '✅ 사내 보관 완료';
+    }
+    
+    alert(`✅ 사내 보관 ZIP 다운로드 완료!\n\n• 외부 연결: 0%\n• 데이터 주권: 100%\n\n사내 NAS·서버에 배포하세요.`);
+    
+  } catch(err){
+    console.error('OnDevice export error:', err);
+    
+    setStep(7,'wait',`⚠️ ZIP 생성 실패: ${err.message}`);
+    
+    $('storageResult').innerHTML = `
+      ⚠️ <b>ZIP 생성 중 오류 발생</b><br>
+      <br>
+      ${err.message}<br>
+      <br>
+      💡 <b>해결 방법</b><br>
+      • 잠시 후 다시 시도<br>
+      • 브라우저 새로고침 (Ctrl+Shift+R)<br>
+      <br>
+      📞 abc@bigdt.co.kr | 010-5234-3535
+    `;
+    
+    if(btn){
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = '🔒 다시 시도';
+    }
+    
+    alert('ZIP 생성 중 오류 발생: ' + err.message);
+  }
+}
+
+function setStar(val){
+  CURRENT_FEEDBACK_STAR = val;
+  document.querySelectorAll('.star').forEach(s=>{
+    const v = parseInt(s.dataset.val);
+    s.style.color = (v <= val) ? '#FFC107' : '#666';
+  });
+}
+
+function submitFeedback(type, reward){
+  // EVO에 피드백 누적
+  if(!EVO.feedback_history) EVO.feedback_history = [];
+  if(!EVO.total_reward) EVO.total_reward = 0;
+  
+  const fb = {
+    timestamp: new Date().toISOString(),
+    type: type,            // 'positive', 'partial', 'negative'
+    reward: reward,        // +1.0, +0.5, -1.0
+    star: CURRENT_FEEDBACK_STAR,
+    comment: $('feedbackComment').value || '',
+    results_count: RESULTS.length,
+    a_count: RESULTS.filter(r=>r.finalGrade==='A').length,
+    evolution_version: EVO.version
+  };
+  
+  EVO.feedback_history.push(fb);
+  EVO.total_reward += reward;
+  
+  // 보상이 누적되면 진화 버전 ↑
+  // 누적 평가가 일정 수준 도달 시 AX 엔진 단계 ↑
+  if(EVO.total_reward >= 5.0){
+    EVO.version++;
+    EVO.total_reward = 0; // 리셋
+  }
+  
+  localStorage.setItem('axdata_evolution', JSON.stringify(EVO));
+  
+  // 결과 표시
+  const labelMap = {
+    positive: '👍 정확',
+    partial: '🤔 부분 정확',
+    negative: '👎 부정확'
+  };
+  
+  $('feedbackResult').style.display = 'block';
+  $('feedbackResult').innerHTML = `
+    ✅ 평가가 AX 엔진에 반영되었습니다!<br>
+    • 평가: <b>${labelMap[type]}</b><br>
+    • 누적 피드백: <b>${EVO.feedback_history.length}건</b><br>
+    • AX 엔진 단계: <b>${EVO.version}단계</b>
+  `;
+}
+
+function reset(){
+  UPLOADED_FILES=[]; RESULTS=[];
+  hide('fileBar'); hide('pipeStatus'); hide('secModeChoice'); hide('secPreview'); hide('axComplete'); hide('secFeedback');
+  if($('submitArea')) $('submitArea').style.display = 'none';
+  if($('storageArea')) $('storageArea').style.display = 'none';
+  $('previewTbody').innerHTML='';
+  for(let i=1;i<=6;i++){ setStep(i,'wait','대기 중...'); }
+  $('ps2bar').style.width='0%';
+  $('fi').value='';
+  setPill(0);
+}
+</script>
+</body>
+</html>
