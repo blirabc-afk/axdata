@@ -379,14 +379,14 @@ footer{text-align:center;padding:1.5rem;color:var(--gray);font-size:0.78rem;bord
         🔒 사내 자체 보관 (7단계 자동 실행)
       </div>
       <div style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;text-align:center;">
-        외부 연결 없이 사내 NAS·서버에 보관할 ZIP 파일을 생성합니다.<br>
+        외부 연결 없이 사내 공용 저장소 또는 USB에 보관할 ZIP 파일을 생성합니다.<br>
         <span style="color:#fde68a;">데이터 주권 100% · 기업 보안 정책 준수</span>
       </div>
       
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
         <button onclick="setStorageMode('cloud')" id="cloudStorageBtn" style="background:rgba(251,191,36,0.4);border:2px solid #fbbf24;color:white;padding:1.2rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem;text-align:center;">
           🔒<br>사내 보안 보관<br>
-          <small style="opacity:0.8;font-weight:400;font-size:0.78rem;">사내 NAS · 서버</small><br>
+          <small style="opacity:0.8;font-weight:400;font-size:0.78rem;">사내 공용 저장소</small><br>
           <small style="color:#FFD54F;font-weight:700;font-size:0.78rem;">외부 연결 0%</small>
         </button>
         <button onclick="setStorageMode('usb')" id="usbStorageBtn" style="background:rgba(46,125,50,0.4);border:2px solid #2E7D32;color:white;padding:1.2rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem;text-align:center;">
@@ -401,10 +401,10 @@ footer{text-align:center;padding:1.5rem;color:var(--gray);font-size:0.78rem;bord
         <div style="color:#fde68a;font-weight:700;margin-bottom:0.5rem;">🔒 사내 자체 보관 (외부 연결 0%)</div>
         <ul style="font-size:0.85rem;color:#E0E0E0;line-height:1.7;margin-left:1.2rem;margin-bottom:1rem;">
           <li>외부 서버 전송 없음 (보안 100%)</li>
-          <li>자체 AI 엔진 사용 (외부 API 미사용)</li>
-          <li>사내 NAS·서버에 직접 보관</li>
+          <li>자체 AI 엔진 사용 (외부 통신 없음)</li>
+          <li>사내 공용 저장소 또는 PC에 직접 보관</li>
           <li>기업 보안 정책 준수</li>
-          <li>GDPR · 개인정보보호법 호환</li>
+          <li>국내외 개인정보보호법 호환</li>
           <li>외부 감사 추적 가능</li>
         </ul>
         
@@ -417,10 +417,10 @@ footer{text-align:center;padding:1.5rem;color:var(--gray);font-size:0.78rem;bord
             <input type="tel" id="subPhone" placeholder="내선 번호 (선택)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(251,191,36,0.5);border-radius:4px;padding:0.5rem;color:white;font-size:0.82rem;">
           </div>
           <select id="subPlan" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(251,191,36,0.5);border-radius:4px;padding:0.5rem;color:white;font-size:0.82rem;">
-            <option value="onsite-nas">사내 NAS 보관</option>
-            <option value="onsite-server">사내 서버 보관</option>
+            <option value="onsite-shared">사내 공용 저장소 (회사 공용 폴더)</option>
             <option value="onsite-pc">개인 PC 보관</option>
-            <option value="onsite-rag">사내 RAG 시스템 통합</option>
+            <option value="onsite-usb">USB · 외장하드 보관</option>
+            <option value="onsite-server">사내 자체 시스템 통합</option>
           </select>
         </div>
         
@@ -1868,7 +1868,7 @@ async function submitCloudRequest(){
 - ✅ 모든 처리는 사내 PC에서 진행
 - ✅ AI 추론도 자체 서버 사용
 - ✅ 기업 보안 정책 100% 준수
-- ✅ GDPR / 개인정보보호법 준수 용이
+- ✅ 개인정보보호법 준수 용이
 
 ## 📊 처리 결과
 - 총 파일: ${RESULTS.length}건
@@ -1878,13 +1878,13 @@ async function submitCloudRequest(){
 
 ## 📁 사내 시스템 배포 방법
 1. 본 ZIP 파일을 사내 보안 채널로 전송
-2. 압축 해제 후 사내 NAS·서버에 보관
+2. 압축 해제 후 사내 공용 저장소 또는 PC에 보관
 3. result.csv → Excel 등으로 열람
 4. ax_system.json → 사내 검색 시스템 연동
 
 ## 💡 활용 안내
 - A등급 데이터는 즉시 사내 활용 가능
-- 사내 RAG 시스템에 자동 통합 가능
+- 사내 검색·질의응답 시스템에 자동 통합 가능
 - 외부 거래는 별도 가명화 처리 필요
 
 ---
@@ -1906,7 +1906,7 @@ async function submitCloudRequest(){
 - 사내_보관_안내서.md: 활용 가이드
 
 ## 권장 사항
-- 사내 NAS·보안 서버에 보관
+- 사내 공용 저장소 또는 보안 PC에 보관
 - 접근 권한 사내 정책 적용
 - 백업 정기 수행
 
@@ -1923,7 +1923,7 @@ async function submitCloudRequest(){
     a.click();
     
     // 7단계 완료
-    setStep(7,'done',`✅ 사내 보관 ZIP 다운로드 완료<br>• 데이터 코드: <b>${dataCode}</b><br>• 외부 연결: <b style="color:#FFD54F;">0% (보안 유지)</b><br>• AX 엔진: <b>${AI_AVAILABLE ? '강화 모드' : '기본 모드'}</b><br>• 사내 NAS·서버에 배포하세요`);
+    setStep(7,'done',`✅ 사내 보관 ZIP 다운로드 완료<br>• 데이터 코드: <b>${dataCode}</b><br>• 외부 연결: <b style="color:#FFD54F;">0% (보안 유지)</b><br>• AX 엔진: <b>${AI_AVAILABLE ? '강화 모드' : '기본 모드'}</b><br>• 사내 공용 저장소 또는 PC에 보관하세요`);
     setPill(7);
     
     // 결과 표시
@@ -1940,12 +1940,12 @@ async function submitCloudRequest(){
       📂 <b>사내 배포 방법</b><br>
       1. 다운로드 폴더에서 ZIP 확인<br>
       2. 압축 해제<br>
-      3. 사내 NAS·서버에 복사<br>
-      4. 사내 RAG 시스템에 통합<br>
+      3. 사내 공용 저장소 또는 PC에 복사<br>
+      4. 사내 검색·질의응답 시스템에 통합<br>
       <br>
       🛡️ <b>기업 보안 정책 준수</b><br>
-      • GDPR / 개인정보보호법 호환<br>
-      • 사내 ISMS 정책 준수 가능<br>
+      • 개인정보보호법 호환<br>
+      • 사내 정보보안 정책 준수 가능<br>
       • 외부 감사 추적 가능
     `;
     
@@ -1955,7 +1955,7 @@ async function submitCloudRequest(){
       btn.textContent = '✅ 사내 보관 완료';
     }
     
-    alert(`✅ 사내 보관 ZIP 다운로드 완료!\n\n• 외부 연결: 0%\n• 데이터 주권: 100%\n\n사내 NAS·서버에 배포하세요.`);
+    alert(`✅ 사내 보관 ZIP 다운로드 완료!\n\n• 외부 연결: 0%\n• 데이터 주권: 100%\n\n사내 공용 저장소 또는 PC에 보관하세요.`);
     
   } catch(err){
     console.error('OnDevice export error:', err);
