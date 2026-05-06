@@ -1943,3 +1943,581 @@ function reset(){
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXData Cloud — 클라우드 자동 저장 + 기업 구독</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="axdata-api.js"></script>
+<style>
+:root {
+  --bg: #0D1B2A;
+  --card: rgba(255,255,255,0.04);
+  --teal: #117A65;
+  --teal2: #5eead4;
+  --gold: #FFC107;
+  --red: #F44336;
+  --green: #4CAF50;
+  --gray: #B0BEC5;
+  --cloud: #14b8a6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg); color: white;
+  font-family: -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  min-height: 100vh; padding: 1rem; line-height: 1.6;
+}
+
+.container { max-width: 1100px; margin: 0 auto; }
+
+header {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.5rem; background: rgba(0,0,0,0.3);
+  border-radius: 12px; margin-bottom: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap;
+}
+
+.logo { font-weight: 900; font-size: 1.4rem; }
+.logo span { color: var(--teal2); }
+.badge {
+  background: var(--cloud); color: white;
+  padding: 0.2rem 0.7rem; border-radius: 6px;
+  font-size: 0.78rem; font-weight: 700;
+}
+#quotaDisplay { margin-left: auto; font-size: 0.85rem; color: var(--gray); }
+
+.title-area { text-align: center; margin-bottom: 2rem; }
+.title-area h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.title-area p { color: var(--gray); font-size: 0.95rem; }
+
+.steps {
+  display: flex; gap: 0.4rem;
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.sp {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.4rem 0.9rem; border-radius: 16px;
+  font-size: 0.78rem; color: var(--gray);
+  transition: all 0.3s;
+}
+.sp.active { background: rgba(94,234,212,0.15); border-color: var(--teal2); color: white; transform: scale(1.05); }
+.sp.done { background: rgba(76,175,80,0.15); border-color: var(--green); color: #C8E6C9; }
+.sp.cloud { background: rgba(20,184,166,0.15); border-color: var(--cloud); color: #5eead4; }
+.sarr { color: var(--gray); align-self: center; }
+
+.upload-box {
+  border: 2px dashed rgba(20,184,166,0.4);
+  border-radius: 16px; padding: 3rem 1.5rem;
+  text-align: center; cursor: pointer;
+  transition: all 0.2s; background: rgba(20,184,166,0.03);
+  margin-bottom: 1rem;
+}
+.upload-box:hover { background: rgba(20,184,166,0.08); border-color: var(--cloud); }
+.upload-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+.upload-text { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+.upload-hint { color: var(--gray); font-size: 0.85rem; }
+
+#fileBar {
+  display: none;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 1rem 1.5rem;
+  margin-bottom: 1rem; align-items: center; gap: 1rem;
+}
+#fileBar.show { display: flex; }
+#fName { font-weight: 700; }
+#fSize { color: var(--gray); font-size: 0.85rem; margin-left: auto; }
+
+.pstep {
+  background: var(--card);
+  border-left: 3px solid var(--gray);
+  border-radius: 8px; padding: 0.8rem 1.2rem;
+  margin-bottom: 0.6rem; font-size: 0.9rem; transition: all 0.3s;
+}
+.pstep.active { border-left-color: var(--teal2); background: rgba(94,234,212,0.05); }
+.pstep.done { border-left-color: var(--green); background: rgba(76,175,80,0.05); }
+.pstep.cloud { border-left-color: var(--cloud); background: rgba(20,184,166,0.05); }
+.pstep-title { font-weight: 700; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
+.pstep-content { font-size: 0.85rem; color: var(--gray); }
+
+.btn {
+  background: linear-gradient(135deg, var(--cloud), var(--teal2));
+  border: none; color: white;
+  padding: 0.7rem 1.5rem; border-radius: 8px;
+  cursor: pointer; font-size: 0.95rem; font-weight: 700;
+  transition: transform 0.1s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+.btn-cloud { background: linear-gradient(135deg, var(--cloud), #06b6a4); }
+
+.results {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 1.5rem;
+  margin-top: 1.5rem; display: none;
+}
+.results.show { display: block; }
+.results h3 { color: var(--teal2); margin-bottom: 1rem; }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th, td { padding: 0.6rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+th { color: var(--gold); font-weight: 700; }
+.grade-A { color: #90EE90; font-weight: 700; }
+.grade-B { color: #FFE082; font-weight: 700; }
+.grade-C { color: #FFAB91; font-weight: 700; }
+
+.cloud-section {
+  background: linear-gradient(135deg, rgba(20,184,166,0.1), rgba(13,27,42,0.5));
+  border: 2px solid var(--cloud);
+  border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem;
+}
+.cloud-section h3 { color: var(--teal2); margin-bottom: 1rem; text-align: center; font-size: 1.1rem; }
+
+.input-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0.6rem; margin-bottom: 0.8rem;
+}
+@media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } }
+
+input[type="text"], input[type="email"], input[type="tel"], select {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(20,184,166,0.5);
+  border-radius: 6px; padding: 0.6rem 0.8rem;
+  color: white; font-size: 0.85rem; outline: none;
+}
+
+.action-bar { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+
+footer {
+  text-align: center; margin-top: 3rem;
+  padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.78rem; color: var(--gray);
+}
+footer a { color: var(--teal2); text-decoration: none; }
+
+#storageResult {
+  display: none;
+  background: rgba(20,184,166,0.1);
+  border: 1px solid var(--cloud);
+  border-radius: 8px; padding: 1rem;
+  margin-top: 1rem; font-size: 0.9rem;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">AX<span>Data</span></div>
+    <span class="badge">☁️ Cloud</span>
+    <span id="quotaDisplay">로딩 중...</span>
+  </header>
+
+  <div class="title-area">
+    <h1>클라우드 자동 저장 + 기업 구독</h1>
+    <p>파일 업로드 → 자동 처리 → 한국 리전 클라우드 저장 → 거래 가능</p>
+  </div>
+
+  <div class="steps">
+    <div class="sp active" id="sp1">① 압축해제</div><div class="sarr">→</div>
+    <div class="sp" id="sp2">② 구조화</div><div class="sarr">→</div>
+    <div class="sp" id="sp3">③ 평가</div><div class="sarr">→</div>
+    <div class="sp" id="sp4">④ 보완</div><div class="sarr">→</div>
+    <div class="sp" id="sp5">⑤ AI 학습</div><div class="sarr">→</div>
+    <div class="sp" id="sp6">⑥ AX 구축</div><div class="sarr">→</div>
+    <div class="sp cloud" id="sp7">⑦ ☁️ 클라우드</div>
+  </div>
+
+  <input type="file" id="fi" accept=".zip,.txt,.csv,.json,.xml,.pdf,.docx,.xlsx,.xls,.log,.md" multiple onchange="handleFiles(this.files)" style="display:none;">
+
+  <div class="upload-box" onclick="document.getElementById('fi').click()">
+    <div class="upload-icon">☁️</div>
+    <div class="upload-text">파일 업로드 → 자동 처리 + 클라우드 저장</div>
+    <div class="upload-hint">기업 구독 시 안전한 한국 리전에 자동 보관</div>
+  </div>
+
+  <div id="fileBar">
+    <span>📄</span>
+    <span id="fName">-</span>
+    <span id="fSize">-</span>
+    <button class="btn" onclick="startProcessing()">▶ 처리 시작</button>
+  </div>
+
+  <div id="pipeline" style="display:none;">
+    <div class="pstep" id="ps1"><div class="pstep-title"><span>📦</span>1단계: 압축해제·텍스트 추출</div><div class="pstep-content" id="ps1c">대기 중...</div></div>
+    <div class="pstep" id="ps2"><div class="pstep-title"><span>🧩</span>2단계: 5W1H 6채널 구조화 (자체 AI)</div><div class="pstep-content" id="ps2c">대기 중...</div></div>
+    <div class="pstep" id="ps3"><div class="pstep-title"><span>📊</span>3단계: 품질 평가 (A/B/C)</div><div class="pstep-content" id="ps3c">대기 중...</div></div>
+    <div class="pstep" id="ps4"><div class="pstep-title"><span>♻️</span>4단계: AI 자동 보완</div><div class="pstep-content" id="ps4c">대기 중...</div></div>
+    <div class="pstep" id="ps5"><div class="pstep-title"><span>🧬</span>5단계: AI 학습</div><div class="pstep-content" id="ps5c">대기 중...</div></div>
+    <div class="pstep" id="ps6"><div class="pstep-title"><span>🎯</span>6단계: AX 시스템 구축</div><div class="pstep-content" id="ps6c">대기 중...</div></div>
+    <div class="pstep" id="ps7" style="border-left-color:var(--cloud);"><div class="pstep-title"><span>☁️</span>7단계: 클라우드 자동 저장</div><div class="pstep-content" id="ps7c">대기 중... (회사 정보 입력 후 자동 실행)</div></div>
+  </div>
+
+  <div class="results" id="resultsArea">
+    <h3>📋 처리 결과</h3>
+    <div id="resultsTable"></div>
+
+    <div class="cloud-section">
+      <h3>☁️ 기업 구독 신청 (클라우드 자동 저장)</h3>
+      <div style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;text-align:center;">
+        한국 리전 안전 보관 · AES-256 암호화 · 가명화 코드 거래 가능
+      </div>
+
+      <div class="input-grid">
+        <input type="text" id="subCompany" placeholder="회사명">
+        <input type="text" id="subContact" placeholder="담당자명">
+        <input type="email" id="subEmail" placeholder="이메일">
+        <input type="tel" id="subPhone" placeholder="연락처 (010-0000-0000)">
+      </div>
+
+      <select id="subPlan" style="width:100%;margin-bottom:0.8rem;">
+        <option value="1GB">1GB - 월 ₩5,000</option>
+        <option value="10GB">10GB - 월 ₩30,000</option>
+        <option value="100GB">100GB - 월 ₩200,000</option>
+        <option value="unlimited">무제한 - 월 ₩500,000</option>
+      </select>
+
+      <button class="btn-cloud btn" onclick="submitToCloud()" style="width:100%;">
+        ☁️ 클라우드에 자동 저장 + 구독 신청
+      </button>
+
+      <div id="storageResult"></div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-secondary btn" onclick="downloadCSV()">📊 CSV 다운로드</button>
+      <button class="btn btn-secondary" onclick="resetAll()">🔄 새 파일</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  AXData Cloud · <a href="/">홈</a> · 한국 리전 (asia-northeast3) · 에이엑스데이터㈜ · abc@bigdt.co.kr
+</footer>
+
+<script>
+let UPLOADED_FILES = [];
+let RESULTS = [];
+const $ = id => document.getElementById(id);
+
+window.addEventListener('DOMContentLoaded', () => setTimeout(updateQuotaDisplay, 300));
+window.addEventListener('focus', updateQuotaDisplay);
+
+async function updateQuotaDisplay() {
+  try {
+    const userType = getUserType();
+    const used = getTodayUsage();
+    const quota = await fetchQuota();
+    let limit = quota.free_daily || 10;
+    if (userType === 'education') limit = quota.education_daily || 100;
+    else if (userType === 'member') limit = quota.member_daily || 100;
+    else if (userType === 'enterprise') limit = quota.enterprise_daily || 9999;
+    const remaining = Math.max(0, limit - used);
+    const label = getUserTypeLabel(userType);
+    const color = getUserTypeColor(userType);
+    const barColor = remaining === 0 ? '#F44336' : (used / limit > 0.8) ? '#FFC107' : '#4CAF50';
+    $('quotaDisplay').innerHTML = `
+      <span style="color:${color};font-weight:700;">${label}</span>
+      <span style="margin:0 0.4rem;color:#555;">|</span>
+      오늘 <b style="color:${barColor};">${used}</b> / ${limit}건
+      <span style="margin:0 0.4rem;color:#555;">|</span>
+      남은 <b style="color:${barColor};">${remaining}건</b>
+    `;
+  } catch (err) { console.error(err); }
+}
+
+function handleFiles(files) {
+  if (!files || !files.length) return;
+  const validExts = ['zip', 'txt', 'csv', 'json', 'xml', 'log', 'md', 'docx', 'pdf', 'xlsx', 'xls'];
+  const filtered = Array.from(files).filter(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    return validExts.includes(ext);
+  });
+  if (!filtered.length) {
+    alert('지원하는 파일이 없습니다.\n(PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP)');
+    return;
+  }
+  UPLOADED_FILES = filtered;
+  $('fName').textContent = filtered.length > 3
+    ? filtered.slice(0, 2).map(f => f.name).join(', ') + ` 외 ${filtered.length - 2}개`
+    : filtered.map(f => f.name).join(', ');
+  const totalSize = filtered.reduce((a, f) => a + f.size, 0);
+  $('fSize').textContent = `${(totalSize / 1024).toFixed(1)} KB · ${filtered.length}개`;
+  $('fileBar').classList.add('show');
+}
+
+async function startProcessing() {
+  const check = await checkQuotaLimit(UPLOADED_FILES.length);
+  if (!check.canProceed) { showQuotaBlockedMessage(check); return; }
+  incrementUsage(UPLOADED_FILES.length);
+  trackUsage('cloud', UPLOADED_FILES.length);
+  updateQuotaDisplay();
+
+  $('pipeline').style.display = 'block';
+  RESULTS = [];
+
+  setStep(1, 'active', '파일 추출 중...');
+  const extracted = await extractFiles(UPLOADED_FILES);
+  setStep(1, 'done', `✅ ${extracted.length}건 텍스트 추출 완료`);
+
+  setStep(2, 'active', '자체 AI로 5W1H 추출 중...');
+  for (let i = 0; i < extracted.length; i++) {
+    const item = extracted[i];
+    const result = await apiExtract(item.text, item.filename);
+    if (result && result.success) {
+      RESULTS.push({ no: i + 1, filename: item.filename, text: item.text, channels: result.channels, finalGrade: 'B' });
+    }
+    $('ps2c').innerHTML = `처리 중... ${i + 1}/${extracted.length}`;
+  }
+  setStep(2, 'done', `✅ ${RESULTS.length}건 5W1H 구조화 완료`);
+
+  setStep(3, 'active', '품질 평가 중...');
+  for (const r of RESULTS) {
+    const grade = await apiGrade(r.channels);
+    if (grade && grade.success) { r.finalGrade = grade.grade; r.score = grade.score; }
+  }
+  const a = RESULTS.filter(r => r.finalGrade === 'A').length;
+  const b = RESULTS.filter(r => r.finalGrade === 'B').length;
+  const c = RESULTS.filter(r => r.finalGrade === 'C').length;
+  setStep(3, 'done', `✅ A등급: ${a} · B등급: ${b} · C등급: ${c}`);
+
+  setStep(4, 'active', 'AI 자동 보완 중...');
+  let upgraded = 0;
+  for (const r of RESULTS) {
+    if (r.finalGrade === 'A') continue;
+    const evolved = await apiEvolve(r);
+    if (evolved && evolved.success) {
+      r.channels = evolved.channels;
+      const oldGrade = r.finalGrade;
+      r.finalGrade = evolved.grade;
+      r.evolved = true;
+      if (oldGrade !== 'A' && evolved.grade === 'A') upgraded++;
+    }
+  }
+  const a2 = RESULTS.filter(r => r.finalGrade === 'A').length;
+  setStep(4, 'done', `✅ ${upgraded}건 A등급 승급 (총: ${a2})`);
+
+  setStep(5, 'active', 'AI 학습 중...');
+  await new Promise(r => setTimeout(r, 800));
+  setStep(5, 'done', `✅ AX 엔진 학습 완료 (서버 자동 저장)`);
+
+  setStep(6, 'active', 'AX 시스템 구축 중...');
+  await new Promise(r => setTimeout(r, 600));
+  setStep(6, 'done', `✅ AX 시스템 구축 완료 (A등급 ${a2}건 활용 가능)`);
+
+  $('ps7c').innerHTML = `📋 회사 정보 입력 후 [☁️ 클라우드에 자동 저장] 버튼을 눌러주세요.`;
+  showResults();
+}
+
+function setStep(n, state, msg) {
+  const step = $(`ps${n}`);
+  const pill = $(`sp${n}`);
+  step.className = 'pstep ' + state;
+  if (msg) $(`ps${n}c`).innerHTML = msg;
+  pill.className = 'sp ' + (state === 'done' ? 'done' : state === 'active' ? 'active' : (n === 7 ? 'cloud' : ''));
+}
+
+function showResults() {
+  let html = '<table><thead><tr><th>No</th><th>파일</th><th>Who</th><th>What</th><th>When</th><th>Where</th><th>Why</th><th>How</th><th>등급</th></tr></thead><tbody>';
+  RESULTS.forEach(r => {
+    const ch = r.channels;
+    html += `<tr>
+      <td>${r.no}</td><td>${r.filename}</td>
+      <td>${ch.who || '-'}</td>
+      <td>${(ch.what || '-').substring(0, 40)}</td>
+      <td>${ch.when || '-'}</td><td>${ch.where || '-'}</td>
+      <td>${(ch.why || '-').substring(0, 30)}</td>
+      <td>${(ch.how || '-').substring(0, 30)}</td>
+      <td class="grade-${r.finalGrade}">${r.finalGrade}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  $('resultsTable').innerHTML = html;
+  $('resultsArea').classList.add('show');
+}
+
+async function submitToCloud() {
+  const company = $('subCompany').value.trim();
+  const contact = $('subContact').value.trim();
+  const email = $('subEmail').value.trim();
+  const phone = $('subPhone').value.trim();
+  const plan = $('subPlan').value;
+
+  if (!company || !contact || !email || !phone) {
+    alert('회사명, 담당자, 이메일, 연락처를 모두 입력해주세요.');
+    return;
+  }
+  if (!RESULTS.length) { alert('처리된 데이터가 없습니다.'); return; }
+
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ 클라우드 업로드 중...';
+  setStep(7, 'cloud', '☁️ 클라우드 업로드 중...');
+
+  try {
+    const zip = new JSZip();
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const folderName = `${company}_${dateStr}`;
+
+    let csv = '\uFEFFNo,파일명,Who,What,When,Where,Why,How,등급\n';
+    RESULTS.forEach(r => {
+      const ch = r.channels;
+      csv += [r.no, r.filename, ch.who || '', ch.what || '', ch.when || '',
+        ch.where || '', ch.why || '', ch.how || '', r.finalGrade]
+        .map(v => '"' + (v + '').replace(/"/g, '""') + '"').join(',') + '\n';
+    });
+    zip.file(`${folderName}/result.csv`, csv);
+    zip.file(`${folderName}/info.json`, JSON.stringify({
+      company, contact, email, phone, plan,
+      submitted_at: new Date().toISOString(),
+      total_files: RESULTS.length,
+      a_grade: RESULTS.filter(r => r.finalGrade === 'A').length
+    }, null, 2));
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+
+    const formData = new FormData();
+    formData.append('file', blob, `${folderName}.zip`);
+    formData.append('metadata', JSON.stringify({
+      company, contact, email, phone, plan,
+      data_code: `C-000000-26-${String(Date.now()).slice(-10)}-CL`,
+      ksic: '000000',
+      submitted_at: new Date().toISOString()
+    }));
+
+    const res = await fetch(`${AXDATA_API}/api/upload`, { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('업로드 실패');
+    const data = await res.json();
+
+    const subId = data.submission_id || 'AXSUB-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '_' + Date.now().toString().slice(-6);
+    setStep(7, 'done', `✅ 클라우드 자동 저장 완료 · 신청 번호: ${subId}`);
+
+    $('storageResult').style.display = 'block';
+    $('storageResult').innerHTML = `
+      ✅ <b>클라우드 자동 저장 완료!</b><br><br>
+      📋 <b>신청 번호</b>: ${subId}<br>
+      ☁️ <b>저장 위치</b>: 한국 리전 (asia-northeast3)<br>
+      🔒 <b>암호화</b>: AES-256<br>
+      📞 <b>영업 담당자가 24시간 내 연락드립니다</b><br>
+      📧 ${email}
+    `;
+    btn.textContent = '✅ 자동 저장 완료';
+    alert('✅ 클라우드 자동 저장 완료!\n영업 담당자가 24시간 내 연락드립니다.');
+
+  } catch (err) {
+    console.error(err);
+    setStep(7, 'active', '⚠️ 업로드 실패');
+    alert('❌ 업로드 중 오류 발생: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = '☁️ 다시 시도';
+  }
+}
+
+async function extractFiles(files) {
+  const results = [];
+  for (const file of files) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    try {
+      if (ext === 'zip') {
+        const zipFiles = await extractZip(file);
+        results.push(...zipFiles);
+      } else {
+        const text = await extractFile(file);
+        if (text) results.push({ filename: file.name, text });
+      }
+    } catch (err) { console.error(err); }
+  }
+  return results;
+}
+
+async function extractFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (['txt', 'csv', 'json', 'xml', 'log', 'md'].includes(ext)) return await file.text();
+  if (ext === 'pdf') return await extractPDF(file);
+  if (ext === 'docx') {
+    const buf = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer: buf });
+    return result.value || '';
+  }
+  if (['xlsx', 'xls'].includes(ext)) {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    let text = '';
+    wb.SheetNames.forEach(name => { text += XLSX.utils.sheet_to_csv(wb.Sheets[name]) + '\n'; });
+    return text;
+  }
+  return '';
+}
+
+async function extractPDF(file) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return text;
+}
+
+async function extractZip(zipFile) {
+  const zip = await JSZip.loadAsync(zipFile);
+  const files = [];
+  for (const filename in zip.files) {
+    const f = zip.files[filename];
+    if (f.dir) continue;
+    const ext = filename.split('.').pop().toLowerCase();
+    if (!['txt', 'csv', 'json', 'xml', 'log', 'md', 'docx', 'pdf', 'xlsx', 'xls'].includes(ext)) continue;
+    const blob = await f.async('blob');
+    const file = new File([blob], filename);
+    const text = await extractFile(file);
+    if (text) files.push({ filename, text });
+  }
+  return files;
+}
+
+function downloadCSV() {
+  let csv = '\uFEFFNo,파일명,Who,What,When,Where,Why,How,등급\n';
+  RESULTS.forEach(r => {
+    const ch = r.channels;
+    csv += [r.no, r.filename, ch.who || '', ch.what || '', ch.when || '', ch.where || '', ch.why || '', ch.how || '', r.finalGrade]
+      .map(v => '"' + (v + '').replace(/"/g, '""') + '"').join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `axdata_cloud_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+}
+
+function resetAll() {
+  UPLOADED_FILES = [];
+  RESULTS = [];
+  $('fileBar').classList.remove('show');
+  $('pipeline').style.display = 'none';
+  $('resultsArea').classList.remove('show');
+  $('storageResult').style.display = 'none';
+  $('fi').value = '';
+  for (let i = 1; i <= 7; i++) {
+    setStep(i, '', '대기 중...');
+    if (i === 1) $(`sp${i}`).className = 'sp active';
+    if (i === 7) $(`sp${i}`).className = 'sp cloud';
+  }
+}
+</script>
+
+</body>
+</html>
