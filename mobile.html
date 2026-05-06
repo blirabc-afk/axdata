@@ -2,673 +2,558 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="description" content="휴대폰으로 찍고 AI가 정리하는 모바일 AX 시스템">
-<meta name="theme-color" content="#0A1628">
-<title>AXData Mobile · 휴대폰으로 AI 자산 만들기</title>
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0D1B2A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AXData Mobile">
+<title>AXData Mobile — 스마트폰 전용</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="axdata-api.js"></script>
 <style>
-:root{
-  --ink:#0A1628;--ink-2:#0F1E33;--ink-3:#162741;
-  --pearl:#F5F2EA;
-  --gold:#C9A02A;--gold-2:#E5BD52;--gold-3:#A88420;
-  --teal:#1D9E75;--teal-2:#2BC18F;
-  --red:#C0392B;
-  --gray-1:rgba(245,242,234,0.92);
-  --gray-2:rgba(245,242,234,0.62);
-  --gray-3:rgba(245,242,234,0.38);
-  --gray-5:rgba(245,242,234,0.06);
-  --line:rgba(245,242,234,0.08);
-  --line-2:rgba(245,242,234,0.16);
-  --shadow-1:0 1px 2px rgba(0,0,0,0.35),0 8px 24px rgba(0,0,0,0.18);
-  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;
+:root {
+  --bg: #0D1B2A;
+  --card: rgba(255,255,255,0.04);
+  --teal2: #5eead4;
+  --gold: #FFC107;
+  --red: #F44336;
+  --green: #4CAF50;
+  --gray: #B0BEC5;
+  --pink: #f472b6;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{
-  font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-  background:var(--ink);color:var(--gray-1);min-height:100vh;
-  font-size:16px;line-height:1.6;font-weight:400;letter-spacing:-0.01em;
-  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  overflow-x:hidden;
-  display:flex;flex-direction:column;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%,rgba(201,160,42,0.1),transparent),
-    radial-gradient(ellipse 50% 30% at 90% 30%,rgba(201,160,42,0.05),transparent);
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: white;
+  font-family: -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  min-height: 100vh;
+  padding: 0.8rem;
+  line-height: 1.5;
+  font-size: 14px;
+  /* 스크롤 부드럽게 */
+  -webkit-overflow-scrolling: touch;
 }
-.hdr{position:sticky;top:0;z-index:50;background:rgba(10,22,40,0.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:12px 16px;}
-.hdr-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--pearl);}
-.brand-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-3) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--ink);letter-spacing:0.02em;box-shadow:0 2px 8px rgba(201,160,42,0.3);}
-.brand-name{font-size:16px;font-weight:700;letter-spacing:0.04em;color:var(--pearl);}
-.brand-name .accent{color:var(--gold);font-weight:800;}
-.back-btn{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--gray-2);text-decoration:none;padding:7px 12px;border:1px solid var(--line);border-radius:100px;transition:all 0.25s;}
-.back-btn:hover{color:var(--pearl);border-color:var(--gold);}
-.wrap{max-width:680px;margin:0 auto;padding:0 16px;width:100%;}
 
-.roadmap-banner{background:linear-gradient(135deg,rgba(201,160,42,0.1) 0%,rgba(201,160,42,0.03) 100%);border-bottom:1px solid rgba(201,160,42,0.2);padding:10px 16px;text-align:center;}
-.roadmap-text{font-size:11px;color:var(--gold-2);letter-spacing:0.06em;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
-.roadmap-text .badge{font-size:9px;font-weight:800;padding:2px 7px;background:var(--gold);color:var(--ink);border-radius:100px;letter-spacing:0.1em;}
+.container { max-width: 600px; margin: 0 auto; }
 
-.hero{padding:36px 0 24px;text-align:center;}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;padding:5px 12px;border:1px solid rgba(201,160,42,0.3);border-radius:100px;background:rgba(201,160,42,0.06);}
-.hero-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--teal-2);animation:pulse 2s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-.hero h1{font-size:clamp(24px,6vw,34px);font-weight:700;line-height:1.25;letter-spacing:-0.02em;color:var(--pearl);margin-bottom:12px;}
-.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--gold-2) 0%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;}
-.hero-sub{font-size:14px;color:var(--gray-2);max-width:480px;margin:0 auto;line-height:1.65;}
+/* 헤더 - 모바일 최적화 */
+header {
+  background: rgba(0,0,0,0.4);
+  border-radius: 16px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(244,114,182,0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0.5rem;
+  z-index: 100;
+}
 
-.input-section{padding:20px 0 32px;}
-.mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:5px;margin-bottom:16px;}
-.mode-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;background:transparent;border:none;font-family:inherit;font-size:11px;font-weight:600;color:var(--gray-2);border-radius:var(--r-sm);cursor:pointer;transition:all 0.25s;}
-.mode-tab svg{width:18px;height:18px;}
-.mode-tab.active{background:var(--ink-3);color:var(--gold);box-shadow:inset 0 0 0 1px var(--line-2);}
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
 
-.input-panel{display:none;}
-.input-panel.active{display:block;}
-.upload-area{background:var(--ink-2);border:1.5px dashed var(--line-2);border-radius:var(--r-lg);padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.3s;display:block;}
-.upload-area:hover,.upload-area:active{border-color:var(--gold);background:var(--ink-3);}
-.upload-area input{display:none;}
-.upload-icon{font-size:42px;margin-bottom:12px;opacity:0.8;}
-.upload-title{font-size:15px;font-weight:600;color:var(--pearl);margin-bottom:4px;}
-.upload-desc{font-size:12px;color:var(--gray-3);}
-.upload-hint{display:block;margin-top:10px;font-size:11px;color:var(--gold);font-weight:600;}
+.logo { font-weight: 900; font-size: 1.2rem; }
+.logo span { color: var(--teal2); }
+.badge {
+  background: var(--pink);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+#quotaDisplay {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--gray);
+  text-align: right;
+  line-height: 1.3;
+}
 
-.text-input-area{background:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:16px;}
-.text-input-area textarea{width:100%;min-height:140px;background:var(--ink);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;color:var(--pearl);font-family:inherit;font-size:14px;line-height:1.6;resize:vertical;}
-.text-input-area textarea:focus{outline:none;border-color:var(--gold);}
-.text-input-area textarea::placeholder{color:var(--gray-3);}
+/* 타이틀 */
+.title-area { text-align: center; margin-bottom: 1.2rem; padding: 0.5rem; }
+.title-area h1 { font-size: 1.3rem; margin-bottom: 0.3rem; }
+.title-area p { color: var(--gray); font-size: 0.82rem; }
 
-/* 이미지 미리보기 */
-.image-preview{display:none;margin-top:14px;padding:8px;background:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r-md);}
-.image-preview.show{display:block;}
-.image-preview img{display:block;width:100%;max-height:280px;object-fit:contain;border-radius:var(--r-sm);background:var(--ink);}
-.image-preview-info{display:flex;align-items:center;gap:8px;padding:8px 4px 4px;font-size:11px;color:var(--gray-3);}
-.image-preview-info .pname{font-weight:600;color:var(--pearl);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+/* 7단계 - 모바일 가로 스크롤 */
+.steps {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 1.2rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  -webkit-overflow-scrolling: touch;
+}
+.steps::-webkit-scrollbar { height: 2px; }
+.steps::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 2px; }
 
-.file-bar{display:none;align-items:center;gap:12px;padding:14px 16px;background:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r-md);margin-top:14px;}
-.file-bar.show{display:flex;}
-.file-icon{font-size:24px;flex-shrink:0;}
-.file-info{flex:1;min-width:0;}
-.file-name{font-size:13px;font-weight:600;color:var(--pearl);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.file-size{font-size:11px;color:var(--gray-3);margin-top:2px;}
+.sp {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.4rem 0.7rem;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  color: var(--gray);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.sp.active { background: rgba(94,234,212,0.15); border-color: var(--teal2); color: white; }
+.sp.done { background: rgba(76,175,80,0.15); border-color: var(--green); color: #C8E6C9; }
 
-.action-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:16px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--r-md);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.25s;box-shadow:0 4px 14px rgba(201,160,42,0.25);letter-spacing:-0.01em;}
-.action-btn:hover,.action-btn:active{background:var(--gold-2);transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,160,42,0.35);}
-.action-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-.action-btn svg{width:18px;height:18px;}
+/* 업로드 박스 - 큰 터치 영역 */
+.upload-box {
+  border: 2px dashed rgba(244,114,182,0.5);
+  border-radius: 16px;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(244,114,182,0.05);
+  margin-bottom: 1rem;
+  transition: background 0.2s;
+}
+.upload-box:active { background: rgba(244,114,182,0.15); }
 
-.status-card{display:none;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
-.status-card.show{display:block;}
-.sstep{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
-.sstep:last-child{border-bottom:none;}
-.si{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px;transition:all 0.3s;}
-.si.wait{background:var(--gray-5);color:var(--gray-3);border:1px solid var(--line);}
-.si.run{background:var(--gold);color:var(--ink);animation:breath 1.4s ease-in-out infinite;}
-.si.done{background:var(--teal);color:var(--pearl);}
-@keyframes breath{0%,100%{box-shadow:0 0 0 0 rgba(201,160,42,0.5);}50%{box-shadow:0 0 0 6px rgba(201,160,42,0);}}
-.s-title{font-size:13px;font-weight:600;color:var(--pearl);margin-bottom:1px;}
-.s-sub{font-size:11px;color:var(--gray-3);}
+.upload-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+.upload-text { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+.upload-hint { color: var(--gray); font-size: 0.78rem; }
 
-.result-section{display:none;padding:8px 0 32px;}
-.result-section.show{display:block;}
-.result-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:linear-gradient(180deg,rgba(43,193,143,0.08) 0%,transparent 100%);border:1px solid rgba(43,193,143,0.25);border-radius:var(--r-md);margin-bottom:16px;}
-.result-title{font-size:14px;font-weight:700;color:var(--teal-2);}
-.grade-badge{font-size:13px;font-weight:800;padding:4px 12px;border-radius:100px;background:var(--gold);color:var(--ink);letter-spacing:0.04em;}
+#fileBar {
+  display: none;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+}
+#fileBar.show { display: block; }
+.file-info { font-size: 0.85rem; margin-bottom: 0.6rem; }
+#fName { font-weight: 700; }
+#fSize { color: var(--gray); font-size: 0.78rem; }
 
-.w5h1{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:8px;margin-bottom:16px;}
-.ch-row{display:grid;grid-template-columns:54px 1fr;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line);}
-.ch-row:last-child{border-bottom:none;}
-.chl{font-size:10px;font-weight:700;letter-spacing:0.14em;color:var(--gold);align-self:center;}
-.chv{font-size:13px;color:var(--pearl);line-height:1.55;word-break:break-word;}
+/* 처리 단계 */
+.pstep {
+  background: var(--card);
+  border-left: 3px solid var(--gray);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+.pstep.active { border-left-color: var(--teal2); background: rgba(94,234,212,0.05); }
+.pstep.done { border-left-color: var(--green); background: rgba(76,175,80,0.05); }
+.pstep-title { font-weight: 700; margin-bottom: 0.2rem; }
+.pstep-content { font-size: 0.78rem; color: var(--gray); }
 
-.dqs-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;margin-bottom:16px;}
-.dqs-title{font-size:11px;font-weight:700;letter-spacing:0.14em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
-.drow{display:flex;align-items:center;gap:12px;padding:8px 0;}
-.dlabel{font-size:12px;color:var(--pearl);min-width:64px;}
-.dwrap{flex:1;background:var(--gray-5);border-radius:100px;height:6px;overflow:hidden;}
-.dbar{height:100%;border-radius:100px;background:var(--teal);transition:width 1.2s cubic-bezier(0.16,1,0.3,1);width:0%;}
-.dscore{font-size:12px;font-weight:600;color:var(--gold);min-width:38px;text-align:right;}
+/* 버튼 - 큰 터치 영역 */
+.btn {
+  background: linear-gradient(135deg, var(--pink), #ec4899);
+  border: none;
+  color: white;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  width: 100%;
+  transition: transform 0.1s;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; }
+.btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
 
-.qa-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;margin-bottom:16px;}
-.qa-title{font-size:11px;font-weight:700;letter-spacing:0.14em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
-.qa-input-wrap{display:flex;gap:8px;}
-.qa-input{flex:1;background:var(--ink);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:11px 14px;color:var(--pearl);font-size:13px;font-family:inherit;}
-.qa-input:focus{outline:none;border-color:var(--gold);}
-.qa-input::placeholder{color:var(--gray-3);}
-.btn-qa{background:var(--gold);color:var(--ink);border:none;border-radius:var(--r-sm);padding:0 16px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background 0.25s;}
-.btn-qa:hover{background:var(--gold-2);}
-.qa-answer{display:none;margin-top:12px;padding:12px 14px;background:var(--ink);border:1px solid var(--line);border-radius:var(--r-sm);font-size:13px;color:var(--teal-2);line-height:1.65;white-space:pre-wrap;font-family:'JetBrains Mono','SF Mono',Consolas,monospace;max-height:240px;overflow-y:auto;}
-.qa-answer.show{display:block;}
+/* 결과 카드 - 모바일 친화 */
+.results {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+  display: none;
+}
+.results.show { display: block; }
+.results h3 { color: var(--pink); margin-bottom: 0.8rem; font-size: 1rem; }
 
-.bottom-actions{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
-.btn-line{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:var(--ink-3);color:var(--pearl);border:1px solid var(--line-2);border-radius:var(--r-md);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.25s;text-decoration:none;}
-.btn-line:hover{border-color:var(--gold);}
-.btn-line svg{width:15px;height:15px;}
+/* 모바일 카드형 결과 (테이블 대신) */
+.result-card {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 0.7rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--gray);
+  font-size: 0.82rem;
+}
+.result-card.A { border-left-color: var(--green); }
+.result-card.B { border-left-color: var(--gold); }
+.result-card.C { border-left-color: var(--red); }
 
-.info-section{padding:24px 0 32px;}
-.info-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:18px;margin-bottom:10px;}
-.info-card-title{font-size:12px;font-weight:700;letter-spacing:0.1em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
-.info-card-desc{font-size:12px;color:var(--gray-2);line-height:1.65;}
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+.result-filename { font-weight: 700; font-size: 0.85rem; }
+.result-grade { padding: 0.1rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
+.result-grade.A { background: rgba(76,175,80,0.2); color: #90EE90; }
+.result-grade.B { background: rgba(255,193,7,0.2); color: #FFE082; }
+.result-grade.C { background: rgba(244,67,54,0.2); color: #FFAB91; }
 
-.ftr{margin-top:auto;padding:24px 16px;border-top:1px solid var(--line);background:var(--ink-2);text-align:center;}
-.ftr-brand{font-size:14px;font-weight:700;letter-spacing:0.06em;color:var(--pearl);margin-bottom:4px;}
-.ftr-brand .mark{color:var(--gold);}
-.ftr-meta{font-size:10px;color:var(--gray-3);letter-spacing:0.04em;line-height:1.85;}
-.ftr-meta a{color:var(--gray-2);text-decoration:none;}
-.ftr-meta a:hover{color:var(--gold);}
+.result-channel {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  margin: 0.2rem 0;
+}
+.result-channel-label { color: var(--gold); font-weight: 700; }
+.result-channel-value { color: #E0E0E0; word-break: break-all; }
 
-::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:var(--ink);}
-::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px;}
-@media (prefers-reduced-motion:reduce){*{animation-duration:0.01ms !important;transition-duration:0.01ms !important;}}
+.action-bar { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+
+/* PWA 설치 안내 */
+.pwa-hint {
+  background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(13,27,42,0.5));
+  border: 1px solid rgba(244,114,182,0.3);
+  border-radius: 12px;
+  padding: 0.8rem;
+  font-size: 0.78rem;
+  margin-bottom: 1rem;
+  color: #fce7f3;
+}
+.pwa-hint b { color: var(--pink); }
+
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.72rem;
+  color: var(--gray);
+}
+footer a { color: var(--teal2); text-decoration: none; }
 </style>
 </head>
 <body>
 
-<div class="roadmap-banner">
-  <span class="roadmap-text">
-    <span class="badge">ROADMAP</span>
-    On-Device AI · 양자화 LLM 탑재 예정 (투자 유치 후 본격 개발)
-  </span>
+<div class="container">
+
+  <header>
+    <div class="header-row">
+      <div class="logo">AX<span>Data</span></div>
+      <span class="badge">📱 Mobile</span>
+      <span id="quotaDisplay">로딩 중...</span>
+    </div>
+  </header>
+
+  <div class="title-area">
+    <h1>📱 AXData 모바일</h1>
+    <p>언제 어디서나 즉시 사용</p>
+  </div>
+
+  <!-- PWA 설치 안내 -->
+  <div class="pwa-hint" id="pwaHint">
+    💡 <b>홈 화면에 추가</b>하면 앱처럼 사용 가능!<br>
+    <small style="color:var(--gray);">메뉴 → "홈 화면에 추가" 클릭</small>
+  </div>
+
+  <div class="steps">
+    <div class="sp active" id="sp1">①압축</div>
+    <div class="sp" id="sp2">②구조화</div>
+    <div class="sp" id="sp3">③평가</div>
+    <div class="sp" id="sp4">④보완</div>
+    <div class="sp" id="sp5">⑤학습</div>
+    <div class="sp" id="sp6">⑥AX</div>
+  </div>
+
+  <input type="file" id="fi" accept=".zip,.txt,.csv,.json,.xml,.pdf,.docx,.xlsx,.xls,.log,.md" multiple onchange="handleFiles(this.files)" style="display:none;">
+
+  <div class="upload-box" onclick="document.getElementById('fi').click()">
+    <div class="upload-icon">📂</div>
+    <div class="upload-text">파일 선택</div>
+    <div class="upload-hint">PDF · DOCX · XLSX · TXT · ZIP</div>
+  </div>
+
+  <div id="fileBar">
+    <div class="file-info">
+      <div id="fName">-</div>
+      <div id="fSize">-</div>
+    </div>
+    <button class="btn" onclick="startProcessing()">▶ 처리 시작</button>
+  </div>
+
+  <div id="pipeline" style="display:none;">
+    <div class="pstep" id="ps1"><div class="pstep-title">📦 1단계: 압축해제</div><div class="pstep-content" id="ps1c">대기 중...</div></div>
+    <div class="pstep" id="ps2"><div class="pstep-title">🧩 2단계: 5W1H 구조화</div><div class="pstep-content" id="ps2c">대기 중...</div></div>
+    <div class="pstep" id="ps3"><div class="pstep-title">📊 3단계: 품질 평가</div><div class="pstep-content" id="ps3c">대기 중...</div></div>
+    <div class="pstep" id="ps4"><div class="pstep-title">♻️ 4단계: AI 자동 보완</div><div class="pstep-content" id="ps4c">대기 중...</div></div>
+    <div class="pstep" id="ps5"><div class="pstep-title">🧬 5단계: AI 학습</div><div class="pstep-content" id="ps5c">대기 중...</div></div>
+    <div class="pstep" id="ps6"><div class="pstep-title">🎯 6단계: AX 시스템</div><div class="pstep-content" id="ps6c">대기 중...</div></div>
+  </div>
+
+  <div class="results" id="resultsArea">
+    <h3>📋 처리 결과</h3>
+    <div id="resultsList"></div>
+    <div class="action-bar">
+      <button class="btn" onclick="downloadCSV()">📊 CSV 다운로드</button>
+      <button class="btn-secondary btn" onclick="resetAll()">🔄 새 파일</button>
+    </div>
+  </div>
+
 </div>
 
-<header class="hdr">
-  <div class="hdr-inner">
-    <a href="/" class="brand">
-      <div class="brand-icon">AX</div>
-      <div class="brand-name"><span class="accent">AX</span>Data</div>
-    </a>
-    <a href="/" class="back-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 19"/></svg>
-      홈으로
-    </a>
-  </div>
-</header>
-
-<section class="hero">
-  <div class="wrap">
-    <div class="hero-eyebrow">
-      <span class="dot"></span>
-      Mobile · Live · Camera + AI Vision
-    </div>
-    <h1>휴대폰으로 찍으면<br><em>AI가 즉시 분석</em></h1>
-    <p class="hero-sub">영수증·메모·간판·메시지를 사진 한 장으로. Gemini Vision이 5W1H로 자동 구조화합니다.</p>
-  </div>
-</section>
-
-<section class="input-section">
-  <div class="wrap">
-
-    <div class="mode-tabs" role="tablist">
-      <button class="mode-tab active" data-mode="camera" onclick="switchMode('camera')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        카메라
-      </button>
-      <button class="mode-tab" data-mode="file" onclick="switchMode('file')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        파일
-      </button>
-      <button class="mode-tab" data-mode="text" onclick="switchMode('text')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
-        텍스트
-      </button>
-    </div>
-
-    <!-- 카메라 패널 -->
-    <div class="input-panel active" id="panel-camera">
-      <label class="upload-area" for="cameraInput">
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImage(this.files[0])">
-        <div class="upload-icon">📷</div>
-        <div class="upload-title">사진 촬영하기</div>
-        <div class="upload-desc">영수증·메모·간판·문서 등을 찍으세요</div>
-        <span class="upload-hint">📱 휴대폰: 카메라 자동 실행</span>
-      </label>
-    </div>
-
-    <!-- 파일 패널 -->
-    <div class="input-panel" id="panel-file">
-      <label class="upload-area" for="fileInput">
-        <input type="file" id="fileInput" onchange="handleFile(this.files[0])">
-        <div class="upload-icon">📂</div>
-        <div class="upload-title">파일 선택하기</div>
-        <div class="upload-desc">TXT · CSV · JSON · 이미지 모두 지원</div>
-      </label>
-    </div>
-
-    <!-- 텍스트 패널 -->
-    <div class="input-panel" id="panel-text">
-      <div class="text-input-area">
-        <textarea id="textInput" placeholder="여기에 텍스트를 직접 입력하거나 붙여넣으세요.&#10;&#10;예: 카카오톡 주문 메시지, 손글씨 옮긴 메모, 통화 후 정리한 내용 등..."></textarea>
-      </div>
-    </div>
-
-    <!-- 이미지 미리보기 -->
-    <div class="image-preview" id="imagePreview">
-      <img id="previewImg" alt="미리보기">
-      <div class="image-preview-info">
-        <span class="pname" id="previewName"></span>
-        <span id="previewSize"></span>
-      </div>
-    </div>
-
-    <!-- 파일 정보 (이미지 아닌 경우) -->
-    <div class="file-bar" id="fileBar">
-      <span class="file-icon" id="fIcon">📄</span>
-      <div class="file-info">
-        <div class="file-name" id="fName"></div>
-        <div class="file-size" id="fSize"></div>
-      </div>
-    </div>
-
-    <button class="action-btn" id="actionBtn" onclick="processInput()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1M3 12h1M12 21v-1M21 12h-1M5.636 5.636l.707.707M17.657 17.657l.707.707M5.636 18.364l.707-.707M17.657 6.343l.707-.707"/><circle cx="12" cy="12" r="4"/></svg>
-      AI 구조화 시작
-    </button>
-
-  </div>
-</section>
-
-<div class="wrap">
-  <div class="status-card" id="statusBox">
-    <div class="sstep">
-      <div class="si done" id="s1">✓</div>
-      <div><div class="s-title">입력 인식 완료</div><div class="s-sub" id="s1sub"></div></div>
-    </div>
-    <div class="sstep">
-      <div class="si wait" id="s2">2</div>
-      <div><div class="s-title" id="s2title">AI 호출</div><div class="s-sub" id="s2sub">Gemini · Cloud Run</div></div>
-    </div>
-    <div class="sstep">
-      <div class="si wait" id="s3">3</div>
-      <div><div class="s-title">5W1H 구조화</div><div class="s-sub">6채널 자동 매핑</div></div>
-    </div>
-    <div class="sstep">
-      <div class="si wait" id="s4">4</div>
-      <div><div class="s-title">DQS 품질평가</div><div class="s-sub">A · B · C 등급</div></div>
-    </div>
-  </div>
-</div>
-
-<section class="result-section" id="resultSection">
-  <div class="wrap">
-    <div class="result-header">
-      <div class="result-title">✓ AX 시스템 구축 완료</div>
-      <div class="grade-badge" id="gradeBadge">A</div>
-    </div>
-    <div class="w5h1">
-      <div class="ch-row"><div class="chl">WHO</div><div class="chv" id="r-who">-</div></div>
-      <div class="ch-row"><div class="chl">WHAT</div><div class="chv" id="r-what">-</div></div>
-      <div class="ch-row"><div class="chl">WHEN</div><div class="chv" id="r-when">-</div></div>
-      <div class="ch-row"><div class="chl">WHERE</div><div class="chv" id="r-where">-</div></div>
-      <div class="ch-row"><div class="chl">WHY</div><div class="chv" id="r-why">-</div></div>
-      <div class="ch-row"><div class="chl">HOW</div><div class="chv" id="r-how">-</div></div>
-    </div>
-    <div class="dqs-card">
-      <div class="dqs-title">DQS 품질평가</div>
-      <div class="drow"><div class="dlabel">완전성</div><div class="dwrap"><div class="dbar" id="bar1"></div></div><div class="dscore" id="sc1">0%</div></div>
-      <div class="drow"><div class="dlabel">정확성</div><div class="dwrap"><div class="dbar" id="bar2"></div></div><div class="dscore" id="sc2">0%</div></div>
-      <div class="drow"><div class="dlabel">일관성</div><div class="dwrap"><div class="dbar" id="bar3"></div></div><div class="dscore" id="sc3">0%</div></div>
-    </div>
-    <div class="qa-card">
-      <div class="qa-title">AI 질의응답</div>
-      <div class="qa-input-wrap">
-        <input type="text" class="qa-input" id="qaInput" placeholder="예: 주요 내용은?" onkeydown="if(event.key==='Enter')askQA()">
-        <button class="btn-qa" onclick="askQA()">묻기</button>
-      </div>
-      <div class="qa-answer" id="qaAnswer"></div>
-    </div>
-    <div class="bottom-actions">
-      <button class="btn-line" onclick="saveJSON()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        JSON 다운로드
-      </button>
-      <button class="btn-line" onclick="reset()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        새로 시작하기
-      </button>
-    </div>
-  </div>
-</section>
-
-<section class="info-section" id="infoSection">
-  <div class="wrap">
-    <div class="info-card">
-      <div class="info-card-title">📷 카메라 + AI Vision</div>
-      <div class="info-card-desc">휴대폰 카메라로 영수증·메모·간판을 촬영하면 Gemini Vision이 사진 속 내용을 분석해 자동으로 5W1H 구조화합니다.</div>
-    </div>
-    <div class="info-card">
-      <div class="info-card-title">📂 파일 업로드</div>
-      <div class="info-card-desc">TXT·CSV·JSON 등 문서 파일과 이미지 파일 모두 업로드 가능. 형식 자동 인식.</div>
-    </div>
-    <div class="info-card">
-      <div class="info-card-title">✏️ 텍스트 직접 입력</div>
-      <div class="info-card-desc">카카오톡 주문, 손글씨 옮긴 내용, 통화 후 정리 노트 등을 그대로 붙여넣기.</div>
-    </div>
-  </div>
-</section>
-
-<footer class="ftr">
-  <div class="ftr-brand"><span class="mark">AX</span> SYSTEM</div>
-  <div class="ftr-meta">
-    <a href="mailto:abc@bigdt.co.kr">abc@bigdt.co.kr</a> · <a href="tel:01052343535">010-5234-3535</a><br>
-    배종옥 공학박사 · NCS200107<br>
-    특허 4건 (등록 1 · 출원 3) · © 2026 AXData
-  </div>
+<footer>
+  📱 AXData Mobile · <a href="/">홈</a> · 에이엑스데이터㈜
 </footer>
 
 <script>
-const AXSYSTEM_URL = 'https://axsystem-330974399500.asia-northeast3.run.app';
-let currentMode = 'camera';
-let currentFile = null;       // 일반 파일
-let currentImageFile = null;  // 이미지 파일
-let resultData = {};
+let UPLOADED_FILES = [];
+let RESULTS = [];
+const $ = id => document.getElementById(id);
 
-function $(id){return document.getElementById(id);}
-function show(id){$(id).classList.add('show');}
-function hide(id){$(id).classList.remove('show');}
-function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(updateQuotaDisplay, 300);
+  // PWA 설치된 상태면 안내 숨김
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    $('pwaHint').style.display = 'none';
+  }
+});
+window.addEventListener('focus', updateQuotaDisplay);
 
-function switchMode(mode){
-  currentMode = mode;
-  document.querySelectorAll('.mode-tab').forEach(t=>{
-    t.classList.toggle('active', t.dataset.mode===mode);
+async function updateQuotaDisplay() {
+  try {
+    const userType = getUserType();
+    const used = getTodayUsage();
+    const quota = await fetchQuota();
+    let limit = quota.free_daily || 10;
+    if (userType === 'education') limit = quota.education_daily || 100;
+    else if (userType === 'member') limit = quota.member_daily || 100;
+    else if (userType === 'enterprise') limit = quota.enterprise_daily || 9999;
+    const remaining = Math.max(0, limit - used);
+    const label = getUserTypeLabel(userType);
+    const color = getUserTypeColor(userType);
+    const barColor = remaining === 0 ? '#F44336' : (used / limit > 0.8) ? '#FFC107' : '#4CAF50';
+    $('quotaDisplay').innerHTML = `
+      <span style="color:${color};font-weight:700;">${label}</span><br>
+      <b style="color:${barColor};">${used}</b>/${limit} · 남은 <b style="color:${barColor};">${remaining}</b>
+    `;
+  } catch (err) { console.error(err); }
+}
+
+function handleFiles(files) {
+  if (!files || !files.length) return;
+  const validExts = ['zip', 'txt', 'csv', 'json', 'xml', 'log', 'md', 'docx', 'pdf', 'xlsx', 'xls'];
+  const filtered = Array.from(files).filter(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    return validExts.includes(ext);
   });
-  document.querySelectorAll('.input-panel').forEach(p=>p.classList.remove('active'));
-  $('panel-'+mode).classList.add('active');
-  hide('fileBar');
-  hide('imagePreview');
-  currentFile = null;
-  currentImageFile = null;
-}
-
-function setStep(id, state){
-  const el = $(id);
-  el.classList.remove('wait','run','done');
-  if(state==='run'){el.classList.add('run');el.textContent='⏳';}
-  else if(state==='done'){el.classList.add('done');el.textContent='✓';}
-  else el.classList.add('wait');
-}
-
-// 카메라 입력 (이미지만)
-function handleImage(file){
-  if(!file) return;
-  if(!file.type.startsWith('image/')){
-    alert('이미지 파일만 가능합니다.');
+  if (!filtered.length) {
+    alert('지원하는 파일이 없습니다.\n(PDF · DOCX · XLSX · TXT · ZIP)');
     return;
   }
-  currentImageFile = file;
-  currentFile = null;
-  
-  // 미리보기
-  const reader = new FileReader();
-  reader.onload = e => {
-    $('previewImg').src = e.target.result;
-    $('previewName').textContent = file.name;
-    $('previewSize').textContent = (file.size/1024).toFixed(1)+' KB';
-    show('imagePreview');
-    hide('fileBar');
-  };
-  reader.readAsDataURL(file);
+  UPLOADED_FILES = filtered;
+  $('fName').textContent = filtered.length > 2
+    ? filtered.slice(0, 1).map(f => f.name).join(', ') + ` 외 ${filtered.length - 1}개`
+    : filtered.map(f => f.name).join(', ');
+  const totalSize = filtered.reduce((a, f) => a + f.size, 0);
+  $('fSize').textContent = `${(totalSize / 1024).toFixed(1)} KB · ${filtered.length}개`;
+  $('fileBar').classList.add('show');
 }
 
-// 일반 파일 입력 (이미지 또는 텍스트)
-function handleFile(file){
-  if(!file) return;
-  
-  // 이미지면 카메라와 동일 처리
-  if(file.type.startsWith('image/')){
-    handleImage(file);
-    return;
+async function startProcessing() {
+  const check = await checkQuotaLimit(UPLOADED_FILES.length);
+  if (!check.canProceed) { showQuotaBlockedMessage(check); return; }
+  incrementUsage(UPLOADED_FILES.length);
+  trackUsage('mobile', UPLOADED_FILES.length);
+  updateQuotaDisplay();
+
+  $('pipeline').style.display = 'block';
+  RESULTS = [];
+
+  setStep(1, 'active', '파일 추출 중...');
+  const extracted = await extractFiles(UPLOADED_FILES);
+  setStep(1, 'done', `✅ ${extracted.length}건`);
+
+  setStep(2, 'active', '5W1H 추출 중...');
+  for (let i = 0; i < extracted.length; i++) {
+    const item = extracted[i];
+    const result = await apiExtract(item.text, item.filename);
+    if (result && result.success) {
+      RESULTS.push({ no: i + 1, filename: item.filename, text: item.text, channels: result.channels, finalGrade: 'B' });
+    }
+    $('ps2c').innerHTML = `${i + 1}/${extracted.length}`;
   }
-  
-  // 텍스트 파일
-  currentFile = file;
-  currentImageFile = null;
-  const ext = file.name.split('.').pop().toLowerCase();
-  $('fIcon').textContent = ext==='csv'?'📊':ext==='json'?'🔢':'📄';
-  $('fName').textContent = file.name;
-  $('fSize').textContent = (file.size/1024).toFixed(1)+' KB · '+ext.toUpperCase();
-  show('fileBar');
-  hide('imagePreview');
-}
+  setStep(2, 'done', `✅ ${RESULTS.length}건 완료`);
 
-function readFileAsText(file){
-  return new Promise(resolve=>{
-    const r = new FileReader();
-    r.onload = e => resolve(e.target.result);
-    r.onerror = () => resolve('');
-    r.readAsText(file, 'utf-8');
-  });
-}
-
-function readFileAsBase64(file){
-  return new Promise(resolve=>{
-    const r = new FileReader();
-    r.onload = e => resolve(e.target.result);
-    r.onerror = () => resolve('');
-    r.readAsDataURL(file);
-  });
-}
-
-async function processInput(){
-  // 입력 종류 결정
-  const isImage = !!currentImageFile;
-  const isFile = !!currentFile;
-  const isText = currentMode === 'text' && $('textInput').value.trim();
-
-  if(!isImage && !isFile && !isText){
-    alert('파일을 선택하거나 텍스트를 입력해 주세요.');
-    return;
+  setStep(3, 'active', '평가 중...');
+  for (const r of RESULTS) {
+    const grade = await apiGrade(r.channels);
+    if (grade && grade.success) { r.finalGrade = grade.grade; r.score = grade.score; }
   }
+  const a = RESULTS.filter(r => r.finalGrade === 'A').length;
+  const b = RESULTS.filter(r => r.finalGrade === 'B').length;
+  const c = RESULTS.filter(r => r.finalGrade === 'C').length;
+  setStep(3, 'done', `✅ A:${a} B:${b} C:${c}`);
 
-  // 처리 시작
-  hide('resultSection');
-  $('infoSection').style.display = 'none';
-  show('statusBox');
-  ['s2','s3','s4'].forEach(id=>setStep(id,'wait'));
+  setStep(4, 'active', 'AI 보완 중...');
+  let upgraded = 0;
+  for (const r of RESULTS) {
+    if (r.finalGrade === 'A') continue;
+    const evolved = await apiEvolve(r);
+    if (evolved && evolved.success) {
+      r.channels = evolved.channels;
+      const oldGrade = r.finalGrade;
+      r.finalGrade = evolved.grade;
+      r.evolved = true;
+      if (oldGrade !== 'A' && evolved.grade === 'A') upgraded++;
+    }
+  }
+  const a2 = RESULTS.filter(r => r.finalGrade === 'A').length;
+  setStep(4, 'done', `✅ ${upgraded}건 승급 (A:${a2})`);
 
-  let response = '';
-  let inputName = '';
-  let visionData = null;
+  setStep(5, 'active', '학습 중...');
+  await new Promise(r => setTimeout(r, 600));
+  setStep(5, 'done', `✅ 완료`);
 
-  if(isImage){
-    // 이미지 분기 - Gemini Vision 사용
-    inputName = currentImageFile.name;
-    $('s1sub').textContent = '🖼️ '+inputName;
-    $('s2title').textContent = 'Gemini Vision AI';
-    $('s2sub').textContent = '이미지 → 텍스트 분석 중';
-    setStep('s2','run');
-    
+  setStep(6, 'active', '구축 중...');
+  await new Promise(r => setTimeout(r, 500));
+  setStep(6, 'done', `✅ AX 시스템 ${a2}건 활용 가능`);
+
+  showResults();
+}
+
+function setStep(n, state, msg) {
+  const step = $(`ps${n}`);
+  const pill = $(`sp${n}`);
+  step.className = 'pstep ' + state;
+  if (msg) $(`ps${n}c`).innerHTML = msg;
+  pill.className = 'sp ' + (state === 'done' ? 'done' : state === 'active' ? 'active' : '');
+}
+
+// 모바일: 카드형 결과
+function showResults() {
+  let html = '';
+  RESULTS.forEach(r => {
+    const ch = r.channels;
+    html += `<div class="result-card ${r.finalGrade}">
+      <div class="result-header">
+        <span class="result-filename">📄 ${r.filename}</span>
+        <span class="result-grade ${r.finalGrade}">${r.finalGrade}</span>
+      </div>
+      <div class="result-channel"><span class="result-channel-label">Who</span><span class="result-channel-value">${ch.who || '-'}</span></div>
+      <div class="result-channel"><span class="result-channel-label">What</span><span class="result-channel-value">${(ch.what || '-').substring(0, 60)}</span></div>
+      <div class="result-channel"><span class="result-channel-label">When</span><span class="result-channel-value">${ch.when || '-'}</span></div>
+      <div class="result-channel"><span class="result-channel-label">Where</span><span class="result-channel-value">${ch.where || '-'}</span></div>
+      <div class="result-channel"><span class="result-channel-label">Why</span><span class="result-channel-value">${(ch.why || '-').substring(0, 50)}</span></div>
+      <div class="result-channel"><span class="result-channel-label">How</span><span class="result-channel-value">${(ch.how || '-').substring(0, 50)}</span></div>
+    </div>`;
+  });
+  $('resultsList').innerHTML = html;
+  $('resultsArea').classList.add('show');
+  $('resultsArea').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function extractFiles(files) {
+  const results = [];
+  for (const file of files) {
+    const ext = file.name.split('.').pop().toLowerCase();
     try {
-      const dataUrl = await readFileAsBase64(currentImageFile);
-      const res = await fetch(AXSYSTEM_URL+'/process_image', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          image_base64: dataUrl,
-          mime_type: currentImageFile.type,
-          filename: currentImageFile.name
-        })
-      });
-      const data = await res.json();
-      if(data.error){
-        alert('이미지 분석 오류: '+data.error);
-        reset();
-        return;
+      if (ext === 'zip') {
+        const zipFiles = await extractZip(file);
+        results.push(...zipFiles);
+      } else {
+        const text = await extractFile(file);
+        if (text) results.push({ filename: file.name, text });
       }
-      visionData = data;
-      response = data.answer || '';
-      setStep('s2','done');
-    } catch(e){
-      alert('AI 엔진 연결 오류. 잠시 후 다시 시도해 주세요.\n('+e.message+')');
-      reset();
-      return;
-    }
-  } else {
-    // 텍스트 분기 - 기존 /query 사용
+    } catch (err) { console.error(err); }
+  }
+  return results;
+}
+
+async function extractFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (['txt', 'csv', 'json', 'xml', 'log', 'md'].includes(ext)) return await file.text();
+  if (ext === 'pdf') return await extractPDF(file);
+  if (ext === 'docx') {
+    const buf = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer: buf });
+    return result.value || '';
+  }
+  if (['xlsx', 'xls'].includes(ext)) {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
     let text = '';
-    if(isText){
-      text = $('textInput').value.trim();
-      inputName = '텍스트 입력 ('+new Date().toLocaleString('ko-KR')+')';
-    } else {
-      text = await readFileAsText(currentFile);
-      inputName = currentFile.name;
-    }
-    $('s1sub').textContent = inputName.length>40 ? inputName.slice(0,40)+'...' : inputName;
-    $('s2title').textContent = 'Gemini AI';
-    $('s2sub').textContent = 'Cloud Run';
-    setStep('s2','run');
-    await delay(300);
-
-    const prompt = '[파일 내용]:\n'+text.slice(0,1500)+'\n\n---\n위 [파일 내용]만 보고 아래 형식으로 한국어 6줄만 출력해. 다른 말 없이.\nWHO: (파일에 나온 사람/조직)\nWHAT: (파일의 주요 내용)\nWHEN: (파일의 날짜/시기)\nWHERE: (파일의 장소)\nWHY: (파일의 목적/이유)\nHOW: (파일의 처리방법)';
-    try {
-      const res = await fetch(AXSYSTEM_URL+'/query', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({text: text, question: prompt})
-      });
-      const data = await res.json();
-      response = data.answer || '[응답 없음]';
-      setStep('s2','done');
-    } catch(e){
-      alert('AI 엔진 연결 오류. 잠시 후 다시 시도해 주세요.\n('+e.message+')');
-      reset();
-      return;
-    }
+    wb.SheetNames.forEach(name => { text += XLSX.utils.sheet_to_csv(wb.Sheets[name]) + '\n'; });
+    return text;
   }
+  return '';
+}
 
-  setStep('s3','run');
-  await delay(400);
-
-  // 5W1H 파싱
-  let channels;
-  if(visionData && visionData.channels){
-    channels = {
-      who:   visionData.channels.CH1_Who   || '-',
-      what:  visionData.channels.CH2_What  || '-',
-      when:  visionData.channels.CH3_When  || '-',
-      where: visionData.channels.CH4_Where || '-',
-      why:   visionData.channels.CH5_Why   || '-',
-      how:   visionData.channels.CH6_How   || '-',
-    };
-  } else {
-    const get = key => {
-      const m = response.match(new RegExp('^'+key+'\\s*:\\s*(.+)$','im'));
-      if(!m) return '-';
-      return m[1].replace(/\*+/g,'').replace(/^[\s\-]+/,'').trim();
-    };
-    channels = {
-      who: get('WHO'), what: get('WHAT'), when: get('WHEN'),
-      where: get('WHERE'), why: get('WHY'), how: get('HOW')
-    };
+async function extractPDF(file) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n';
   }
+  return text;
+}
 
-  resultData = {
-    filename: inputName,
-    rawText: response,
-    ...channels,
-    timestamp: new Date().toISOString()
-  };
+async function extractZip(zipFile) {
+  const zip = await JSZip.loadAsync(zipFile);
+  const files = [];
+  for (const filename in zip.files) {
+    const f = zip.files[filename];
+    if (f.dir) continue;
+    const ext = filename.split('.').pop().toLowerCase();
+    if (!['txt', 'csv', 'json', 'xml', 'log', 'md', 'docx', 'pdf', 'xlsx', 'xls'].includes(ext)) continue;
+    const blob = await f.async('blob');
+    const file = new File([blob], filename);
+    const text = await extractFile(file);
+    if (text) files.push({ filename, text });
+  }
+  return files;
+}
 
-  ['who','what','when','where','why','how'].forEach(k=>{
-    $('r-'+k).textContent = resultData[k];
+function downloadCSV() {
+  let csv = '\uFEFFNo,파일명,Who,What,When,Where,Why,How,등급\n';
+  RESULTS.forEach(r => {
+    const ch = r.channels;
+    csv += [r.no, r.filename, ch.who || '', ch.what || '', ch.when || '', ch.where || '', ch.why || '', ch.how || '', r.finalGrade]
+      .map(v => '"' + (v + '').replace(/"/g, '""') + '"').join(',') + '\n';
   });
-  setStep('s3','done');
-
-  setStep('s4','run');
-  await delay(500);
-
-  // 등급 산정
-  let c1, c2, c3, grade;
-  if(visionData){
-    c1 = visionData.rate || Math.round((Object.values(channels).filter(v=>v&&v!=='-').length/6)*100);
-    c2 = Math.min(100, c1 + Math.floor(Math.random()*8));
-    c3 = Math.min(100, c1 + Math.floor(Math.random()*6));
-    grade = visionData.grade || (c1>=90?'A':c1>=67?'B':'C');
-  } else {
-    const filled = ['who','what','when','where','why','how'].filter(k=>resultData[k]&&resultData[k]!=='-').length;
-    c1 = Math.round((filled/6)*100);
-    c2 = Math.min(100, c1 + Math.floor(Math.random()*10));
-    c3 = Math.min(100, c1 + Math.floor(Math.random()*8));
-    const avg = Math.round((c1+c2+c3)/3);
-    grade = avg>=90 ? 'A' : avg>=75 ? 'B' : 'C';
-  }
-  resultData.grade = grade;
-
-  setStep('s4','done');
-  show('resultSection');
-
-  await delay(200);
-  $('bar1').style.width = c1+'%'; $('sc1').textContent = c1+'%';
-  await delay(150);
-  $('bar2').style.width = c2+'%'; $('sc2').textContent = c2+'%';
-  await delay(150);
-  $('bar3').style.width = c3+'%'; $('sc3').textContent = c3+'%';
-  $('gradeBadge').textContent = grade;
-
-  $('resultSection').scrollIntoView({behavior:'smooth', block:'start'});
-}
-
-function askQA(){
-  const q = $('qaInput').value.trim();
-  if(!q){alert('질문을 입력해 주세요.');return;}
-  const ql = q.toLowerCase();
-  const map = [
-    {keys:['주요','핵심','요약','전체','모든','정리','내용은','뭔가요','무엇인가','알려'], label:'ALL'},
-    {keys:['누구','담당','사람','주체','who'], label:'WHO', val:resultData.who},
-    {keys:['무엇을','주제','what','어떤'], label:'WHAT', val:resultData.what},
-    {keys:['언제','시기','날짜','기간','when'], label:'WHEN', val:resultData.when},
-    {keys:['어디','장소','위치','where'], label:'WHERE', val:resultData.where},
-    {keys:['왜','이유','목적','why','원인'], label:'WHY', val:resultData.why},
-    {keys:['어떻게','방법','how','절차','처리'], label:'HOW', val:resultData.how}
-  ];
-  const matched = map.find(m=>m.keys.some(k=>ql.includes(k)));
-  let answer = '';
-  if(matched && matched.label==='ALL'){
-    answer = '📋 AX 시스템 구조화 결과\n\n' +
-      'WHO  : '+resultData.who+'\n'+
-      'WHAT : '+resultData.what+'\n'+
-      'WHEN : '+resultData.when+'\n'+
-      'WHERE: '+resultData.where+'\n'+
-      'WHY  : '+resultData.why+'\n'+
-      'HOW  : '+resultData.how+'\n\n'+
-      '데이터 품질 등급: '+resultData.grade;
-  } else if(matched){
-    answer = '['+matched.label+']\n\n'+matched.val;
-  } else {
-    answer = 'WHO  : '+resultData.who+'\nWHAT : '+resultData.what+'\nWHEN : '+resultData.when+'\nWHERE: '+resultData.where+'\nWHY  : '+resultData.why+'\nHOW  : '+resultData.how;
-  }
-  $('qaAnswer').textContent = answer;
-  show('qaAnswer');
-}
-
-function saveJSON(){
-  const blob = new Blob([JSON.stringify(resultData,null,2)], {type:'application/json'});
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = (resultData.filename||'AX').replace(/\.[^.]+$/,'')+'_5W1H.json';
+  a.download = `axdata_mobile_${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
 }
 
-function reset(){
-  currentFile = null;
-  currentImageFile = null;
-  resultData = {};
-  hide('fileBar');
-  hide('imagePreview');
-  hide('statusBox');
-  hide('resultSection');
-  hide('qaAnswer');
-  $('infoSection').style.display = 'block';
-  $('textInput').value = '';
-  $('cameraInput').value = '';
-  $('fileInput').value = '';
-  $('qaInput').value = '';
-  ['s2','s3','s4'].forEach(id=>setStep(id,'wait'));
-  ['bar1','bar2','bar3'].forEach(id=>{$(id).style.width='0%';});
-  ['sc1','sc2','sc3'].forEach(id=>{$(id).textContent='0%';});
-  window.scrollTo({top:0, behavior:'smooth'});
+function resetAll() {
+  UPLOADED_FILES = [];
+  RESULTS = [];
+  $('fileBar').classList.remove('show');
+  $('pipeline').style.display = 'none';
+  $('resultsArea').classList.remove('show');
+  $('fi').value = '';
+  for (let i = 1; i <= 6; i++) {
+    setStep(i, '', '대기 중...');
+    if (i === 1) $(`sp${i}`).className = 'sp active';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 
