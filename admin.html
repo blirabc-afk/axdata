@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXData 관리자 — axdata.co.kr</title>
+<style>
+:root {
+  --bg: #0D1B2A;
+  --card: rgba(255,255,255,0.04);
+  --teal: #117A65;
+  --teal2: #5eead4;
+  --gold: #FFC107;
+  --blue: #1F4E79;
+  --purple: #6A1B9A;
+  --red: #F44336;
+  --green: #4CAF50;
+  --gray: #B0BEC5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: white;
+  font-family: -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo { font-weight: 900; font-size: 1.4rem; }
+.logo span { color: var(--teal2); }
+
+.badge {
+  background: var(--gold);
+  color: var(--bg);
+  padding: 0.2rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+#status {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--gray);
+}
+
+/* 로그인 */
+#loginBox {
+  max-width: 400px;
+  margin: 4rem auto;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+#loginBox h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: var(--gold);
+}
+
+#loginBox p {
+  color: var(--gray);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+input[type="password"], input[type="number"], input[type="text"] {
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+
+input:focus {
+  border-color: var(--gold);
+}
+
+.btn {
+  background: linear-gradient(135deg, var(--gold), #FFA000);
+  border: none;
+  color: var(--bg);
+  font-weight: 900;
+  padding: 0.9rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.1s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary { background: linear-gradient(135deg, var(--teal), var(--teal2)); color: white; }
+.btn-danger { background: var(--red); color: white; }
+.btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+
+/* 관리자 화면 */
+#adminPanel {
+  display: none;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.tab {
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: var(--gray);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.tab:hover { color: white; }
+
+.tab-content {
+  display: none;
+  padding: 1.5rem 0;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Quota 카드 */
+.quota-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .quota-grid { grid-template-columns: 1fr; }
+}
+
+.quota-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.quota-card.free { border-left: 4px solid var(--gray); }
+.quota-card.education { border-left: 4px solid var(--gold); }
+.quota-card.member { border-left: 4px solid var(--teal2); }
+.quota-card.enterprise { border-left: 4px solid var(--purple); }
+
+.quota-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.quota-label {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.quota-desc {
+  font-size: 0.78rem;
+  color: var(--gray);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.quota-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.quota-input-row input {
+  flex: 1;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.quota-unit {
+  color: var(--gray);
+  font-size: 0.85rem;
+}
+
+/* 통계 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--teal2);
+  margin: 0.3rem 0;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+/* 채널별 통계 */
+.channel-stats {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.channel-stats h3 {
+  font-size: 1rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.channel-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 100px 100px;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+
+.channel-row:last-child { border-bottom: none; }
+
+.channel-name { font-weight: 700; }
+.channel-bar-bg {
+  background: rgba(255,255,255,0.05);
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.channel-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--teal2));
+  transition: width 0.5s;
+}
+
+/* 메시지 박스 */
+.message-box {
+  background: rgba(76,175,80,0.15);
+  border: 1px solid var(--green);
+  color: #C8E6C9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.message-box.error {
+  background: rgba(244,67,54,0.15);
+  border-color: var(--red);
+  color: #FFCDD2;
+}
+
+footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.78rem;
+  color: var(--gray);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 로그인 화면 -->
+  <div id="loginBox">
+    <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔐</div>
+    <h2>AXData 관리자 로그인</h2>
+    <p>관리자 비밀번호를 입력하세요</p>
+    <input type="password" id="passwordInput" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()" autofocus>
+    <div style="height: 1rem;"></div>
+    <button class="btn" onclick="login()" style="width: 100%;">로그인</button>
+    <div id="loginError" style="color: var(--red); margin-top: 1rem; font-size: 0.85rem; display: none;">비밀번호가 틀렸습니다</div>
+    <div style="margin-top: 1.5rem; font-size: 0.78rem; color: var(--gray);">
+      에이엑스데이터㈜ 관리자 전용 페이지<br>
+      <a href="https://axdata.co.kr" style="color: var(--teal2);">← axdata.co.kr 홈으로</a>
+    </div>
+  </div>
+
+  <!-- 관리자 패널 -->
+  <div id="adminPanel">
+    <header>
+      <div class="logo">AX<span>Data</span></div>
+      <span class="badge">🔐 관리자</span>
+      <span id="status">서버 연결 확인 중...</span>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('quota')">📊 무료 건수 조정</button>
+      <button class="tab" onclick="switchTab('stats')">📈 사용 통계</button>
+      <button class="tab" onclick="switchTab('settings')">⚙️ 설정</button>
+    </div>
+
+    <!-- Tab: Quota -->
+    <div class="tab-content active" id="tab-quota">
+      <div class="message-box" id="quotaMsg"></div>
+
+      <div style="margin-bottom: 1rem; color: var(--gray); font-size: 0.9rem;">
+        💡 4가지 사용자 유형의 일일 무료 건수를 조정하세요. 변경사항은 즉시 적용됩니다.
+      </div>
+
+      <div class="quota-grid">
+
+        <div class="quota-card free">
+          <div class="quota-icon">🆓</div>
+          <div class="quota-label">무료 사용자</div>
+          <div class="quota-desc">로그인 없이 체험하는 일반 사용자<br>(브라우저 기준)</div>
+          <div class="quota-input-row">
+            <input type="number" id="quota_free" min="0" max="9999" value="10">
+            <span class="quota-unit">건/일</span>
+          </div>
+        </div>
+
+        <div class="quota-card education">
+          <div class="quota-icon">🎓</div>
+          <div class="quota-label">교육생</div>
+          <div class="quota-desc">교육 과정 참여자<br>(교육 코드로 인증)</div>
+          <div class="quota-input-row">
+            <input type="number" id="quota_education" min="0" max="9999" value="100">
+            <span class="quota-unit">건/일</span>
+          </div>
+        </div>
+
+        <div class="quota-card member">
+          <div class="quota-icon">👤</div>
+          <div class="quota-label">일반 회원</div>
+          <div class="quota-desc">회원가입 완료자<br>(이메일 인증)</div>
+          <div class="quota-input-row">
+            <input type="number" id="quota_member" min="0" max="9999" value="100">
+            <span class="quota-unit">건/일</span>
+          </div>
+        </div>
+
+        <div class="quota-card enterprise">
+          <div class="quota-icon">🏢</div>
+          <div class="quota-label">기업 고객</div>
+          <div class="quota-desc">유료 구독 기업<br>(사실상 무제한)</div>
+          <div class="quota-input-row">
+            <input type="number" id="quota_enterprise" min="0" max="99999" value="9999">
+            <span class="quota-unit">건/일</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn-primary btn" onclick="saveQuota()">💾 변경사항 저장</button>
+        <button class="btn-secondary btn" onclick="loadQuota()">🔄 새로고침</button>
+        <button class="btn-secondary btn" onclick="resetQuota()" style="margin-left: auto;">↩️ 기본값으로</button>
+      </div>
+
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,193,7,0.05); border: 1px solid rgba(255,193,7,0.2); border-radius: 8px; font-size: 0.82rem; color: var(--gray);">
+        💡 <b style="color: var(--gold);">교육 호응도 활용 팁</b><br>
+        • 교육 시작 전: 교육생 100건 → 200건으로 임시 증가<br>
+        • 교육 종료 후: 다시 100건으로 복원<br>
+        • 호응도 높을 때: 교육생 건수 증가 → 추가 학습 유도
+      </div>
+
+      <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--gray);" id="lastUpdated">
+        마지막 업데이트: -
+      </div>
+    </div>
+
+    <!-- Tab: Stats -->
+    <div class="tab-content" id="tab-stats">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div style="font-size: 1.5rem;">🚀</div>
+          <div class="stat-value" id="stat_runs">-</div>
+          <div class="stat-label">총 실행</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 1.5rem;">📁</div>
+          <div class="stat-value" id="stat_files">-</div>
+          <div class="stat-label">처리 파일</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 1.5rem;">☁️</div>
+          <div class="stat-value" id="stat_storage">-</div>
+          <div class="stat-label">클라우드 저장</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 1.5rem;">📅</div>
+          <div class="stat-value" id="stat_today">-</div>
+          <div class="stat-label">오늘 실행</div>
+        </div>
+      </div>
+
+      <div class="channel-stats">
+        <h3>📊 채널별 사용 현황</h3>
+        <div id="channelStats">데이터 로딩 중...</div>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn-primary btn" onclick="loadStats()">🔄 새로고침</button>
+      </div>
+
+      <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--gray);" id="statsUpdated">
+        마지막 조회: -
+      </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div class="tab-content" id="tab-settings">
+      <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+        <h3 style="color: var(--gold); margin-bottom: 1rem;">🔐 비밀번호 변경</h3>
+        <div style="color: var(--gray); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.6;">
+          비밀번호 변경은 <b>GCP Cloud Shell</b>에서 다음 명령어로 진행하세요:
+          <pre style="background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.78rem; color: var(--teal2); overflow-x: auto;">gcloud run services update axdata-uploader \
+  --region asia-northeast3 \
+  --update-env-vars ADMIN_PASSWORD=새비밀번호</pre>
+        </div>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+        <h3 style="color: var(--teal2); margin-bottom: 1rem;">🌐 시스템 정보</h3>
+        <div style="font-size: 0.85rem; line-height: 2;">
+          • Cloud Run URL: <code style="color: var(--teal2);" id="info_url">-</code><br>
+          • 서비스 버전: <span id="info_version">-</span><br>
+          • API 엔드포인트: <span id="info_endpoints">-</span><br>
+          • 도메인: <span style="color: var(--teal2);">axdata.co.kr</span><br>
+          • 운영사: 에이엑스데이터㈜
+        </div>
+      </div>
+
+      <div style="background: rgba(244,67,54,0.05); border: 1px solid rgba(244,67,54,0.2); border-radius: 12px; padding: 1.5rem;">
+        <h3 style="color: var(--red); margin-bottom: 1rem;">⚠️ 보안 주의</h3>
+        <ul style="font-size: 0.85rem; line-height: 1.8; color: var(--gray); margin-left: 1.2rem;">
+          <li>이 페이지 URL은 <b style="color: var(--red);">절대 외부에 공개하지 마세요</b></li>
+          <li>비밀번호는 정기적으로 변경하세요</li>
+          <li>관리자 작업 후 반드시 로그아웃하세요</li>
+          <li>공용 PC에서는 사용하지 마세요</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <button class="btn-danger btn" onclick="logout()">🚪 로그아웃</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  AXData 관리자 v2.1 · axdata.co.kr · 에이엑스데이터㈜
+</footer>
+
+<script>
+const API_BASE = 'https://axdata-uploader-330974399500.asia-northeast3.run.app';
+let ADMIN_PWD = '';
+
+// 로그인
+async function login() {
+  const pwd = document.getElementById('passwordInput').value;
+  if (!pwd) return;
+
+  document.getElementById('loginError').style.display = 'none';
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/quota?password=${encodeURIComponent(pwd)}`);
+    if (res.status === 401) {
+      document.getElementById('loginError').style.display = 'block';
+      return;
+    }
+    if (!res.ok) throw new Error('서버 오류');
+
+    const data = await res.json();
+    if (!data.success) throw new Error('인증 실패');
+
+    // 로그인 성공
+    ADMIN_PWD = pwd;
+    sessionStorage.setItem('axdata_admin_pwd', pwd);
+    showAdminPanel();
+    populateQuota(data.quota);
+
+  } catch (err) {
+    document.getElementById('loginError').textContent = '오류: ' + err.message;
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+// 관리자 패널 표시
+function showAdminPanel() {
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  document.getElementById('status').textContent = '✅ 서버 연결됨';
+
+  // 시스템 정보 표시
+  fetch(`${API_BASE}/`).then(r => r.json()).then(d => {
+    document.getElementById('info_url').textContent = API_BASE;
+    document.getElementById('info_version').textContent = d.version || '-';
+    document.getElementById('info_endpoints').textContent = (d.endpoints || []).length + '개';
+  }).catch(() => {});
+}
+
+// 탭 전환
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  if (tab === 'stats') loadStats();
+}
+
+// Quota 채우기
+function populateQuota(quota) {
+  document.getElementById('quota_free').value = quota.free_daily || 10;
+  document.getElementById('quota_education').value = quota.education_daily || 100;
+  document.getElementById('quota_member').value = quota.member_daily || 100;
+  document.getElementById('quota_enterprise').value = quota.enterprise_daily || 9999;
+
+  if (quota.updated_at) {
+    document.getElementById('lastUpdated').textContent =
+      '마지막 업데이트: ' + new Date(quota.updated_at).toLocaleString('ko-KR');
+  }
+}
+
+// Quota 새로고침
+async function loadQuota() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/quota?password=${encodeURIComponent(ADMIN_PWD)}`);
+    const data = await res.json();
+    populateQuota(data.quota);
+    showMessage('quotaMsg', '✅ 최신 설정을 불러왔습니다', 'success');
+  } catch (err) {
+    showMessage('quotaMsg', '❌ 오류: ' + err.message, 'error');
+  }
+}
+
+// Quota 저장
+async function saveQuota() {
+  try {
+    const body = {
+      password: ADMIN_PWD,
+      free_daily: parseInt(document.getElementById('quota_free').value) || 0,
+      education_daily: parseInt(document.getElementById('quota_education').value) || 0,
+      member_daily: parseInt(document.getElementById('quota_member').value) || 0,
+      enterprise_daily: parseInt(document.getElementById('quota_enterprise').value) || 0,
+      admin_name: '관리자'
+    };
+
+    const res = await fetch(`${API_BASE}/admin/quota`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showMessage('quotaMsg', '✅ 변경사항이 저장되었습니다 (즉시 적용)', 'success');
+      populateQuota(data.quota);
+    } else {
+      throw new Error(data.error || '저장 실패');
+    }
+  } catch (err) {
+    showMessage('quotaMsg', '❌ 오류: ' + err.message, 'error');
+  }
+}
+
+// Quota 기본값
+function resetQuota() {
+  if (!confirm('기본값으로 되돌리시겠습니까?')) return;
+  document.getElementById('quota_free').value = 10;
+  document.getElementById('quota_education').value = 100;
+  document.getElementById('quota_member').value = 100;
+  document.getElementById('quota_enterprise').value = 9999;
+  showMessage('quotaMsg', '💡 기본값으로 설정됨. [저장] 버튼을 눌러 적용하세요', 'success');
+}
+
+// 통계 로드
+async function loadStats() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/stats?password=${encodeURIComponent(ADMIN_PWD)}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    const stats = data.stats;
+    document.getElementById('stat_runs').textContent = (stats.total_runs || 0).toLocaleString();
+    document.getElementById('stat_files').textContent = (stats.total_files || 0).toLocaleString();
+    document.getElementById('stat_storage').textContent = (stats.storage_files || 0).toLocaleString();
+
+    const today = new Date().toISOString().slice(0, 10);
+    const todayStats = (stats.daily || {})[today] || { runs: 0 };
+    document.getElementById('stat_today').textContent = (todayStats.runs || 0).toLocaleString();
+
+    // 채널별 통계
+    const channels = stats.channels || {};
+    const labels = {
+      saas: '🎓 SaaS (웹)',
+      ondevice: '💻 온디바이스',
+      mobile: '📱 모바일',
+      enterprise: '🏢 기업'
+    };
+
+    const maxRuns = Math.max(1, ...Object.values(channels).map(c => c.runs || 0));
+    let html = '';
+    Object.keys(labels).forEach(key => {
+      const c = channels[key] || { runs: 0, files: 0 };
+      const pct = (c.runs / maxRuns * 100);
+      html += `<div class="channel-row">
+        <span class="channel-name">${labels[key]}</span>
+        <div class="channel-bar-bg"><div class="channel-bar" style="width: ${pct}%;"></div></div>
+        <span style="text-align: right; color: var(--teal2); font-weight: 700;">${c.runs}회</span>
+        <span style="text-align: right; color: var(--gold);">${c.files}건</span>
+      </div>`;
+    });
+    document.getElementById('channelStats').innerHTML = html || '<div style="color: var(--gray);">아직 사용 데이터가 없습니다</div>';
+
+    document.getElementById('statsUpdated').textContent =
+      '마지막 조회: ' + new Date().toLocaleString('ko-KR');
+
+  } catch (err) {
+    document.getElementById('channelStats').innerHTML =
+      '<div style="color: var(--red);">오류: ' + err.message + '</div>';
+  }
+}
+
+// 메시지 표시
+function showMessage(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'message-box' + (type === 'error' ? ' error' : '');
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// 로그아웃
+function logout() {
+  if (!confirm('로그아웃 하시겠습니까?')) return;
+  sessionStorage.removeItem('axdata_admin_pwd');
+  ADMIN_PWD = '';
+  location.reload();
+}
+
+// 페이지 로드 시 세션 확인
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem('axdata_admin_pwd');
+  if (saved) {
+    document.getElementById('passwordInput').value = saved;
+    login();
+  }
+});
+</script>
+
+</body>
+</html>
