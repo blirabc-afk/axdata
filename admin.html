@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AXData 관리자 — axdata.co.kr</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
   --bg: #0D1B2A;
@@ -355,7 +354,7 @@ footer {
     <div class="tabs">
       <button class="tab active" onclick="switchTab('quota')">📊 무료 건수 조정</button>
       <button class="tab" onclick="switchTab('stats')">📈 사용 통계</button>
-      <button class="tab" onclick="switchTab('qr')">📱 QR 코드</button>
+      <button class="tab" onclick="switchTab('urls')">🔗 접속 URL</button>
       <button class="tab" onclick="switchTab('settings')">⚙️ 설정</button>
     </div>
 
@@ -469,78 +468,76 @@ footer {
     </div>
 
     <!-- Tab: QR Code -->
-    <div class="tab-content" id="tab-qr">
+    <!-- Tab: URLs (접속 URL 목록) -->
+    <div class="tab-content" id="tab-urls">
       <div style="margin-bottom: 1rem; color: var(--gray); font-size: 0.9rem;">
-        💡 4채널 접속용 QR 코드를 자동 생성합니다. 책·명함·영업 자료에 활용하세요.
+        💡 4채널 접속 URL입니다. 복사해서 QR 코드는 원하시는 도구로 만드세요. (예: naver.me, qr-code-generator.com)
       </div>
 
-      <!-- QR 사이즈 조정 -->
-      <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-        <span style="color: var(--gold); font-weight: 700;">⚙️ QR 코드 설정</span>
-        <label style="display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem;">
-          크기:
-          <select id="qrSize" onchange="generateAllQR()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.4rem 0.8rem; border-radius: 6px;">
-            <option value="200">작게 (200px)</option>
-            <option value="300" selected>중간 (300px)</option>
-            <option value="500">크게 (500px)</option>
-            <option value="800">인쇄용 (800px)</option>
-          </select>
-        </label>
-        <button class="btn btn-primary" onclick="downloadAllQR()" style="margin-left: auto;">📥 4개 모두 다운로드</button>
-      </div>
-
-      <!-- 4채널 QR 카드 -->
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;" id="qrGrid">
+      <div style="display: grid; gap: 1rem;">
 
         <!-- 1. SaaS 무료 -->
-        <div class="qr-card" style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; text-align: center; border-left: 4px solid var(--gray);">
-          <div style="font-size: 1.8rem; margin-bottom: 0.3rem;">🆓</div>
-          <h3 style="margin-bottom: 0.3rem;">무료 체험 (SaaS)</h3>
-          <div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 1rem;">교육·전시·체험용 (10건/일)</div>
-          <div id="qr_free" style="background: white; padding: 1rem; border-radius: 8px; display: inline-block;"></div>
-          <div style="margin-top: 0.8rem; font-size: 0.75rem; color: var(--teal2); word-break: break-all;" id="url_free">https://axdata.co.kr/saas</div>
-          <div style="margin-top: 0.8rem; display: flex; gap: 0.4rem; justify-content: center;">
-            <button class="btn btn-secondary" onclick="downloadQR('free', '🆓_무료체험')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📥 다운로드</button>
-            <button class="btn btn-secondary" onclick="copyURL('https://axdata.co.kr/saas')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📋 URL 복사</button>
+        <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.2rem; border-left: 4px solid var(--gray);">
+          <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.4rem;">🆓</span>
+            <span style="font-weight: 700; font-size: 1rem;">무료 체험 (SaaS)</span>
+            <span style="font-size: 0.78rem; color: var(--gray); margin-left: auto;">교육·전시·체험용 · 10건/일</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" value="https://axdata.co.kr/saas" readonly style="flex: 1; font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.6rem; color: var(--teal2);">
+            <button class="btn btn-primary" onclick="copyURL('https://axdata.co.kr/saas')" style="font-size: 0.85rem; padding: 0.5rem 1rem;">📋 복사</button>
           </div>
         </div>
 
         <!-- 2. 교육생 -->
-        <div class="qr-card" style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; text-align: center; border-left: 4px solid var(--gold);">
-          <div style="font-size: 1.8rem; margin-bottom: 0.3rem;">🎓</div>
-          <h3 style="margin-bottom: 0.3rem;">교육생 전용</h3>
-          <div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 1rem;">교육 과정 참여자 (100건/일)</div>
-          <div id="qr_education" style="background: white; padding: 1rem; border-radius: 8px; display: inline-block;"></div>
-          <div style="margin-top: 0.8rem; font-size: 0.75rem; color: var(--teal2); word-break: break-all;" id="url_education">https://axdata.co.kr/saas?edu=1</div>
-          <div style="margin-top: 0.8rem; display: flex; gap: 0.4rem; justify-content: center;">
-            <button class="btn btn-secondary" onclick="downloadQR('education', '🎓_교육생')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📥 다운로드</button>
-            <button class="btn btn-secondary" onclick="copyURL('https://axdata.co.kr/saas?edu=1')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📋 URL 복사</button>
+        <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.2rem; border-left: 4px solid var(--gold);">
+          <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.4rem;">🎓</span>
+            <span style="font-weight: 700; font-size: 1rem;">교육생 전용</span>
+            <span style="font-size: 0.78rem; color: var(--gray); margin-left: auto;">교육 과정 참여자 · 100건/일</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" value="https://axdata.co.kr/saas?edu=1" readonly style="flex: 1; font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.6rem; color: var(--teal2);">
+            <button class="btn btn-primary" onclick="copyURL('https://axdata.co.kr/saas?edu=1')" style="font-size: 0.85rem; padding: 0.5rem 1rem;">📋 복사</button>
           </div>
         </div>
 
         <!-- 3. 온디바이스 -->
-        <div class="qr-card" style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; text-align: center; border-left: 4px solid var(--teal2);">
-          <div style="font-size: 1.8rem; margin-bottom: 0.3rem;">💻</div>
-          <h3 style="margin-bottom: 0.3rem;">사내 자체 보관</h3>
-          <div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 1rem;">기업·개인 PC 설치 (외부 연결 0%)</div>
-          <div id="qr_ondevice" style="background: white; padding: 1rem; border-radius: 8px; display: inline-block;"></div>
-          <div style="margin-top: 0.8rem; font-size: 0.75rem; color: var(--teal2); word-break: break-all;" id="url_ondevice">https://axdata.co.kr/ondevice</div>
-          <div style="margin-top: 0.8rem; display: flex; gap: 0.4rem; justify-content: center;">
-            <button class="btn btn-secondary" onclick="downloadQR('ondevice', '💻_온디바이스')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📥 다운로드</button>
-            <button class="btn btn-secondary" onclick="copyURL('https://axdata.co.kr/ondevice')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📋 URL 복사</button>
+        <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.2rem; border-left: 4px solid var(--teal2);">
+          <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.4rem;">💻</span>
+            <span style="font-weight: 700; font-size: 1rem;">사내 자체 보관 (온디바이스)</span>
+            <span style="font-size: 0.78rem; color: var(--gray); margin-left: auto;">기업·개인 PC · 외부 연결 0%</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" value="https://axdata.co.kr/ondevice" readonly style="flex: 1; font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.6rem; color: var(--teal2);">
+            <button class="btn btn-primary" onclick="copyURL('https://axdata.co.kr/ondevice')" style="font-size: 0.85rem; padding: 0.5rem 1rem;">📋 복사</button>
           </div>
         </div>
 
         <!-- 4. 클라우드 (기업) -->
-        <div class="qr-card" style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; text-align: center; border-left: 4px solid var(--purple);">
-          <div style="font-size: 1.8rem; margin-bottom: 0.3rem;">☁️</div>
-          <h3 style="margin-bottom: 0.3rem;">클라우드 (기업)</h3>
-          <div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 1rem;">유료 구독 기업 (무제한)</div>
-          <div id="qr_enterprise" style="background: white; padding: 1rem; border-radius: 8px; display: inline-block;"></div>
-          <div style="margin-top: 0.8rem; font-size: 0.75rem; color: var(--teal2); word-break: break-all;" id="url_enterprise">https://axdata.co.kr/cloud</div>
-          <div style="margin-top: 0.8rem; display: flex; gap: 0.4rem; justify-content: center;">
-            <button class="btn btn-secondary" onclick="downloadQR('enterprise', '☁️_클라우드기업')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📥 다운로드</button>
-            <button class="btn btn-secondary" onclick="copyURL('https://axdata.co.kr/cloud')" style="font-size: 0.78rem; padding: 0.5rem 0.8rem;">📋 URL 복사</button>
+        <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.2rem; border-left: 4px solid var(--purple);">
+          <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.4rem;">☁️</span>
+            <span style="font-weight: 700; font-size: 1rem;">클라우드 (기업)</span>
+            <span style="font-size: 0.78rem; color: var(--gray); margin-left: auto;">유료 구독 기업 · 무제한</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" value="https://axdata.co.kr/cloud" readonly style="flex: 1; font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.6rem; color: var(--teal2);">
+            <button class="btn btn-primary" onclick="copyURL('https://axdata.co.kr/cloud')" style="font-size: 0.85rem; padding: 0.5rem 1rem;">📋 복사</button>
+          </div>
+        </div>
+
+        <!-- 5. 관리자 -->
+        <div style="background: rgba(244,67,54,0.05); border: 1px solid rgba(244,67,54,0.2); border-radius: 12px; padding: 1.2rem; border-left: 4px solid var(--red);">
+          <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.4rem;">🔐</span>
+            <span style="font-weight: 700; font-size: 1rem;">관리자 (이 페이지)</span>
+            <span style="font-size: 0.78rem; color: var(--red); margin-left: auto;">⚠️ 외부 공유 금지</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" value="https://axdata.co.kr/admin.html" readonly style="flex: 1; font-family: monospace; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.6rem; color: var(--red);">
+            <button class="btn btn-secondary" onclick="copyURL('https://axdata.co.kr/admin.html')" style="font-size: 0.85rem; padding: 0.5rem 1rem;">📋 복사</button>
           </div>
         </div>
 
@@ -548,25 +545,18 @@ footer {
 
       <!-- 활용 가이드 -->
       <div style="margin-top: 1.5rem; background: rgba(255,193,7,0.05); border: 1px solid rgba(255,193,7,0.2); border-radius: 12px; padding: 1.5rem;">
-        <h3 style="color: var(--gold); margin-bottom: 1rem;">💡 QR 코드 활용 가이드</h3>
+        <h3 style="color: var(--gold); margin-bottom: 1rem;">💡 활용 가이드</h3>
         <div style="font-size: 0.85rem; line-height: 1.8; color: #E0E0E0;">
-          <b>📚 책 출간 활용</b><br>
-          • 표지·뒷면: 🆓 무료 체험 QR<br>
-          • 챕터 끝: 해당 채널 QR (실습 유도)<br>
-          • 인쇄 권장: 800px 크기로 다운로드<br>
+          <b>📚 책 출간</b> · 표지·뒷면 · 챕터 끝<br>
+          <b>🎤 학술 발표</b> · PPT 슬라이드<br>
+          <b>💼 영업</b> · 명함 · 제안서 · 교육 자료<br>
+          <b>📢 마케팅</b> · 인쇄물 · 포스터 · 전시 부스<br>
           <br>
-          <b>🎤 학술 발표 활용</b><br>
-          • 슬라이드 우하단: 🆓 무료 체험 QR<br>
-          • 청중이 즉시 시연 체험 가능<br>
-          <br>
-          <b>💼 영업 활용</b><br>
-          • 명함 뒷면: ☁️ 클라우드 QR<br>
-          • 제안서 표지: 🏢 기업 QR<br>
-          • 교육 자료: 🎓 교육생 QR<br>
-          <br>
-          <b>📢 마케팅 활용</b><br>
-          • 인쇄물·포스터: 🆓 무료 체험<br>
-          • 전시 부스: 4가지 모두 표시
+          <b>🔧 QR 코드 만들기 (외부 도구)</b><br>
+          • 네이버 단축 URL: <a href="https://me2.do" target="_blank" style="color: var(--teal2);">me2.do</a><br>
+          • 구글 QR: 검색창에 "QR 코드 만들기"<br>
+          • 무료 도구: qr-code-generator.com<br>
+          • 카카오톡 단축 URL: kr.lo
         </div>
       </div>
 
@@ -673,76 +663,6 @@ function switchTab(tab) {
   document.getElementById('tab-' + tab).classList.add('active');
 
   if (tab === 'stats') loadStats();
-  if (tab === 'qr') generateAllQR();
-}
-
-// ⭐ QR 코드 생성
-const QR_CHANNELS = {
-  free: { url: 'https://axdata.co.kr/saas', label: 'SaaS 무료', color: '#B0BEC5' },
-  education: { url: 'https://axdata.co.kr/saas?edu=1', label: '교육생', color: '#FFC107' },
-  ondevice: { url: 'https://axdata.co.kr/ondevice', label: '온디바이스', color: '#5eead4' },
-  enterprise: { url: 'https://axdata.co.kr/cloud', label: '클라우드 기업', color: '#CE93D8' }
-};
-
-function generateAllQR() {
-  const size = parseInt(document.getElementById('qrSize')?.value || 300);
-
-  Object.keys(QR_CHANNELS).forEach(key => {
-    const channel = QR_CHANNELS[key];
-    const div = document.getElementById('qr_' + key);
-    if (!div) return;
-
-    div.innerHTML = '';
-
-    if (typeof QRCode === 'undefined') {
-      div.innerHTML = '<div style="color:red;font-size:0.8rem;padding:1rem;">QR 라이브러리 로딩 중...</div>';
-      setTimeout(generateAllQR, 500);
-      return;
-    }
-
-    new QRCode(div, {
-      text: channel.url,
-      width: size,
-      height: size,
-      colorDark: '#0D1B2A',
-      colorLight: '#FFFFFF',
-      correctLevel: QRCode.CorrectLevel.H
-    });
-  });
-}
-
-// ⭐ 단일 QR 다운로드
-function downloadQR(key, name) {
-  const div = document.getElementById('qr_' + key);
-  if (!div) return;
-
-  const canvas = div.querySelector('canvas');
-  const img = div.querySelector('img');
-  const source = canvas || img;
-
-  if (!source) {
-    alert('QR 코드가 생성되지 않았습니다');
-    return;
-  }
-
-  const dataURL = canvas ? canvas.toDataURL('image/png') : img.src;
-  const a = document.createElement('a');
-  a.href = dataURL;
-  a.download = `axdata_QR_${name}.png`;
-  a.click();
-}
-
-// ⭐ 4개 모두 다운로드
-async function downloadAllQR() {
-  const channels = Object.keys(QR_CHANNELS);
-  const labels = ['🆓_무료체험', '🎓_교육생', '💻_온디바이스', '☁️_클라우드기업'];
-
-  for (let i = 0; i < channels.length; i++) {
-    downloadQR(channels[i], labels[i]);
-    await new Promise(r => setTimeout(r, 500));  // 0.5초 간격
-  }
-
-  alert('✅ 4개 QR 코드 모두 다운로드 완료!\n\n다운로드 폴더에서 확인하세요.');
 }
 
 // ⭐ URL 복사
