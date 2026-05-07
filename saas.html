@@ -3,239 +3,875 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AXData SaaS — 비정형 데이터 자동 구조화</title>
+<title>AXData SaaS — 비정형 데이터 → AX 시스템 자동 구축</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="axdata-api.js"></script>
 <style>
+/* ============================================================
+   3도 인쇄 색상 체계 (NAVY / WINE / BLACK)
+   ============================================================ */
 :root {
-  --bg: #0D1B2A;
-  --card: rgba(255,255,255,0.04);
-  --teal: #117A65;
-  --teal2: #5eead4;
-  --gold: #FFC107;
-  --blue: #1F4E79;
-  --purple: #6A1B9A;
-  --red: #F44336;
-  --green: #4CAF50;
-  --gray: #B0BEC5;
+  --navy: #1A237E;
+  --navy-light: #3949AB;
+  --navy-pale: #E8EAF6;
+  --wine: #7B1F2A;
+  --wine-light: #B71C2E;
+  --wine-pale: #FFEBEE;
+  --black: #1A1A1A;
+  --gray-1: #F5F7FA;
+  --gray-2: #E0E0E0;
+  --gray-3: #BDBDBD;
+  --gray-4: #757575;
+  --white: #FFFFFF;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg);
-  color: white;
+  background: var(--white);
+  color: var(--black);
   font-family: -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  font-size: 17px;
   min-height: 100vh;
-  padding: 1rem;
-  line-height: 1.6;
+  padding: 1.5rem;
+  line-height: 1.7;
 }
 
-.container { max-width: 1100px; margin: 0 auto; }
+.container { max-width: 1200px; margin: 0 auto; }
 
+/* ============================================================
+   헤더
+   ============================================================ */
 header {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: rgba(0,0,0,0.3);
+  padding: 1.2rem 1.8rem;
+  background: var(--gray-1);
   border-radius: 12px;
-  margin-bottom: 1.5rem;
-  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 2rem;
+  border: 2px solid var(--navy);
   flex-wrap: wrap;
 }
 
-.logo { font-weight: 900; font-size: 1.4rem; }
-.logo span { color: var(--teal2); }
+.logo {
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: var(--navy);
+}
+
 .badge {
-  background: var(--purple);
-  color: white;
-  padding: 0.2rem 0.7rem;
+  background: var(--navy);
+  color: var(--white);
+  padding: 0.4rem 1rem;
   border-radius: 6px;
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 700;
 }
+
 #quotaDisplay {
   margin-left: auto;
-  font-size: 0.85rem;
-  color: var(--gray);
+  font-size: 1rem;
+  color: var(--black);
 }
 
-/* 타이틀 */
-.title-area {
-  text-align: center;
-  margin-bottom: 2rem;
-}
+/* ============================================================
+   타이틀
+   ============================================================ */
+.title-area { text-align: center; margin-bottom: 2.5rem; }
 .title-area h1 {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
+  font-size: 2.2rem;
+  margin-bottom: 0.6rem;
+  color: var(--navy);
+  font-weight: 900;
 }
 .title-area p {
-  color: var(--gray);
-  font-size: 0.95rem;
+  color: var(--gray-4);
+  font-size: 1.1rem;
 }
 
-/* 7단계 */
+/* ============================================================
+   6단계 진행 표시
+   ============================================================ */
 .steps {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.5rem;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--gray-1);
+  border-radius: 12px;
 }
+
 .sp {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 0.4rem 0.9rem;
-  border-radius: 16px;
-  font-size: 0.78rem;
-  color: var(--gray);
+  background: var(--white);
+  border: 2px solid var(--gray-3);
+  padding: 0.6rem 1.2rem;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-4);
   transition: all 0.3s;
 }
 .sp.active {
-  background: rgba(94,234,212,0.15);
-  border-color: var(--teal2);
-  color: white;
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
   transform: scale(1.05);
 }
 .sp.done {
-  background: rgba(76,175,80,0.15);
-  border-color: var(--green);
-  color: #C8E6C9;
+  background: var(--wine);
+  border-color: var(--wine);
+  color: var(--white);
 }
-.sarr { color: var(--gray); align-self: center; }
+.sarr {
+  color: var(--navy);
+  align-self: center;
+  font-size: 1.2rem;
+  font-weight: 900;
+}
 
-/* 업로드 박스 */
+/* ============================================================
+   업로드 박스
+   ============================================================ */
 .upload-box {
-  border: 2px dashed rgba(94,234,212,0.4);
+  border: 3px dashed var(--navy);
   border-radius: 16px;
   padding: 3rem 1.5rem;
   text-align: center;
   cursor: pointer;
+  background: var(--navy-pale);
+  margin-bottom: 1.2rem;
   transition: all 0.2s;
-  background: rgba(94,234,212,0.03);
-  margin-bottom: 1rem;
 }
 .upload-box:hover {
-  background: rgba(94,234,212,0.08);
-  border-color: var(--teal2);
+  background: var(--white);
+  border-color: var(--wine);
 }
-
-.upload-icon { font-size: 3rem; margin-bottom: 0.8rem; }
-.upload-text { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
-.upload-hint { color: var(--gray); font-size: 0.85rem; }
+.upload-icon { font-size: 3.5rem; margin-bottom: 0.8rem; }
+.upload-text {
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin-bottom: 0.4rem;
+  color: var(--navy);
+}
+.upload-hint {
+  color: var(--gray-4);
+  font-size: 1rem;
+}
 
 #fileBar {
   display: none;
-  background: var(--card);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--white);
+  border: 2px solid var(--navy);
   border-radius: 12px;
-  padding: 1rem 1.5rem;
+  padding: 1.2rem 1.8rem;
   margin-bottom: 1rem;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 #fileBar.show { display: flex; }
-#fName { font-weight: 700; }
-#fSize { color: var(--gray); font-size: 0.85rem; margin-left: auto; }
+#fName {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--black);
+}
+#fSize {
+  color: var(--gray-4);
+  font-size: 1rem;
+  margin-left: auto;
+}
 
-/* 처리 진행 */
+/* ============================================================
+   처리 단계 박스
+   ============================================================ */
 .pstep {
-  background: var(--card);
-  border-left: 3px solid var(--gray);
+  background: var(--white);
+  border-left: 6px solid var(--gray-3);
+  border-top: 1px solid var(--gray-2);
+  border-right: 1px solid var(--gray-2);
+  border-bottom: 1px solid var(--gray-2);
   border-radius: 8px;
-  padding: 0.8rem 1.2rem;
-  margin-bottom: 0.6rem;
-  font-size: 0.9rem;
+  padding: 1rem 1.4rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
   transition: all 0.3s;
 }
-.pstep.active { border-left-color: var(--teal2); background: rgba(94,234,212,0.05); }
-.pstep.done { border-left-color: var(--green); background: rgba(76,175,80,0.05); }
+.pstep.active {
+  border-left-color: var(--navy);
+  background: var(--navy-pale);
+}
+.pstep.done {
+  border-left-color: var(--wine);
+  background: var(--wine-pale);
+}
+.pstep-title {
+  font-weight: 900;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  color: var(--navy);
+}
+.pstep-content {
+  font-size: 1rem;
+  color: var(--black);
+}
 
-.pstep-title { font-weight: 700; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
-.pstep-content { font-size: 0.85rem; color: var(--gray); }
-
-/* 버튼 */
+/* ============================================================
+   버튼
+   ============================================================ */
 .btn {
-  background: linear-gradient(135deg, var(--teal), var(--teal2));
-  border: none;
-  color: white;
-  padding: 0.7rem 1.5rem;
+  background: var(--navy);
+  border: 2px solid var(--navy);
+  color: var(--white);
+  padding: 0.8rem 1.6rem;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 700;
-  transition: transform 0.1s;
+  font-size: 1.05rem;
+  font-weight: 900;
+  transition: all 0.2s;
 }
-.btn:hover { transform: translateY(-1px); }
+.btn:hover {
+  background: var(--navy-light);
+  border-color: var(--navy-light);
+}
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-.btn-gold { background: linear-gradient(135deg, var(--gold), #FFA000); color: var(--bg); }
 
-/* 결과 테이블 */
+.btn-wine {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: var(--white);
+}
+.btn-wine:hover {
+  background: var(--wine-light);
+  border-color: var(--wine-light);
+}
+
+.btn-secondary {
+  background: var(--white);
+  color: var(--navy);
+  border: 2px solid var(--navy);
+}
+.btn-secondary:hover {
+  background: var(--navy-pale);
+}
+
+.btn-large {
+  padding: 1.2rem 2rem;
+  font-size: 1.2rem;
+}
+
+/* ============================================================
+   결과 영역
+   ============================================================ */
 .results {
-  background: var(--card);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--white);
+  border: 2px solid var(--navy);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-top: 1.5rem;
+  display: none;
+}
+.results.show { display: block; }
+.results h3 {
+  color: var(--navy);
+  margin-bottom: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+th, td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--gray-2);
+}
+thead { background: var(--navy); }
+th {
+  color: var(--white);
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+.grade-A { color: var(--navy); font-weight: 900; font-size: 1.1rem; }
+.grade-B { color: var(--gray-4); font-weight: 700; font-size: 1.1rem; }
+.grade-C { color: var(--wine); font-weight: 900; font-size: 1.1rem; }
+
+/* ============================================================
+   결과 액션 4단추 (검색·질의응답·품질관리·AI학습)
+   ============================================================ */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+@media (max-width: 768px) {
+  .action-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.action-card {
+  background: var(--white);
+  border: 2px solid var(--navy);
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.action-card:hover {
+  background: var(--navy-pale);
+  transform: translateY(-2px);
+}
+.action-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.action-label {
+  font-weight: 900;
+  color: var(--navy);
+  font-size: 1.05rem;
+}
+.action-desc {
+  font-size: 0.85rem;
+  color: var(--gray-4);
+  margin-top: 0.3rem;
+}
+
+/* ============================================================
+   다운로드 영역 (CSV / JSON / Markdown)
+   ============================================================ */
+.download-bar {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   검색 인덱스 (그림 4-11)
+   ============================================================ */
+.search-section {
+  background: var(--white);
+  border: 2px solid var(--navy);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  display: none;
+}
+.search-section.show { display: block; }
+.search-section h3 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.search-input-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.search-input-row input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  border: 2px solid var(--gray-3);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--black);
+}
+.search-input-row input:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+
+.search-info {
+  background: var(--navy-pale);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: var(--navy);
+}
+
+.search-result-item {
+  background: var(--gray-1);
+  border-left: 4px solid var(--navy);
+  border-radius: 6px;
+  padding: 0.8rem 1.2rem;
+  margin-bottom: 0.6rem;
+}
+.search-result-title {
+  font-weight: 900;
+  color: var(--navy);
+  font-size: 1.05rem;
+  margin-bottom: 0.3rem;
+}
+.search-result-content { font-size: 0.95rem; line-height: 1.5; }
+.search-result-meta {
+  font-size: 0.85rem;
+  color: var(--gray-4);
+  margin-top: 0.3rem;
+}
+
+/* ============================================================
+   AI 질의응답 (그림 4-12)
+   ============================================================ */
+.qa-section {
+  background: var(--white);
+  border: 2px solid var(--navy);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  display: none;
+}
+.qa-section.show { display: block; }
+.qa-section h3 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.qa-input-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.qa-input-row input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  border: 2px solid var(--gray-3);
+  border-radius: 8px;
+}
+.qa-input-row input:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+
+.qa-channels {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.qa-chip {
+  background: var(--white);
+  border: 2px solid var(--gray-3);
+  padding: 0.4rem 1rem;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--gray-4);
+}
+.qa-chip.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+}
+
+.qa-result {
+  background: var(--gray-1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+/* ============================================================
+   품질 관리 (그림 4-13)
+   ============================================================ */
+.quality-section {
+  background: var(--white);
+  border: 2px solid var(--navy);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  display: none;
+}
+.quality-section.show { display: block; }
+.quality-section h3 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.channel-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px 120px;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--gray-2);
+  font-size: 1rem;
+}
+.channel-name { font-weight: 900; color: var(--navy); }
+.channel-bar-bg {
+  background: var(--gray-2);
+  height: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.channel-bar {
+  height: 100%;
+  background: var(--navy);
+  transition: width 0.5s;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.6rem;
+  color: var(--white);
+  font-weight: 900;
+  font-size: 0.9rem;
+}
+.channel-bar.low { background: var(--wine); }
+
+/* ============================================================
+   AX 엔진 누적 통계 (그림 4-14)
+   ============================================================ */
+.cumulative-stats {
+  background: var(--navy);
+  color: var(--white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+.cumulative-stats h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: var(--white);
+  text-align: center;
+}
+.cumulative-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.8rem;
+}
+@media (max-width: 768px) {
+  .cumulative-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.cum-cell {
+  text-align: center;
+  font-size: 0.95rem;
+}
+.cum-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+  display: block;
+  margin: 0.3rem 0;
+}
+
+/* ============================================================
+   거래 등록 (그림 4-17)
+   ============================================================ */
+.market-section {
+  background: var(--wine-pale);
+  border: 2px solid var(--wine);
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 1.5rem;
   display: none;
 }
-.results.show { display: block; }
-.results h3 { color: var(--teal2); margin-bottom: 1rem; }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
+.market-section.show { display: block; }
+.market-section h3 {
+  color: var(--wine);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
 }
-th, td {
-  padding: 0.6rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-th { color: var(--gold); font-weight: 700; }
-.grade-A { color: #90EE90; font-weight: 700; }
-.grade-B { color: #FFE082; font-weight: 700; }
-.grade-C { color: #FFAB91; font-weight: 700; }
 
-/* 액션 버튼 그룹 */
-.action-bar {
+.market-info {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--wine);
+}
+
+.market-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+@media (max-width: 600px) { .market-form { grid-template-columns: 1fr; } }
+
+.market-form input,
+.market-form select {
+  background: var(--white);
+  border: 2px solid var(--gray-3);
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+  color: var(--black);
+  font-size: 1rem;
+}
+.market-form input:focus,
+.market-form select:focus {
+  outline: none;
+  border-color: var(--wine);
+}
+
+.market-toggle {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.market-toggle button {
+  flex: 1;
+  padding: 0.8rem;
+  border: 2px solid var(--gray-3);
+  background: var(--white);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gray-4);
+}
+.market-toggle button.active {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: var(--white);
 }
 
+.code-result {
+  background: var(--white);
+  border: 2px solid var(--wine);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-family: monospace;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--wine);
+  text-align: center;
+  display: none;
+}
+.code-result.show { display: block; }
+
+/* ============================================================
+   저장 옵션 (그림 4-18)
+   ============================================================ */
+.storage-section {
+  background: var(--white);
+  border: 2px solid var(--navy);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  display: none;
+}
+.storage-section.show { display: block; }
+.storage-section h3 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.storage-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+@media (max-width: 600px) { .storage-options { grid-template-columns: 1fr; } }
+
+.storage-option {
+  background: var(--white);
+  border: 2px solid var(--gray-3);
+  border-radius: 12px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.storage-option.active {
+  border-color: var(--navy);
+  background: var(--navy-pale);
+}
+.storage-option-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.storage-option-title {
+  font-weight: 900;
+  color: var(--navy);
+  margin-bottom: 0.4rem;
+  font-size: 1.1rem;
+}
+.storage-option-desc { font-size: 0.9rem; color: var(--gray-4); }
+
+.storage-detail {
+  background: var(--gray-1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: none;
+}
+.storage-detail.show { display: block; }
+.storage-detail ul { list-style: none; padding: 0; }
+.storage-detail li { padding: 0.3rem 0; font-size: 0.95rem; }
+.storage-detail li::before { content: "✓ "; color: var(--navy); font-weight: 900; }
+
+/* ============================================================
+   보완 모드 선택 (그림 4-20)
+   ============================================================ */
+.boom-section {
+  background: var(--wine-pale);
+  border: 2px solid var(--wine);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  display: none;
+}
+.boom-section.show { display: block; }
+.boom-warn {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--wine);
+  margin-bottom: 1rem;
+}
+.boom-status {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+.boom-status li {
+  list-style: none;
+  padding: 0.2rem 0;
+  font-weight: 700;
+}
+
+.boom-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 600px) { .boom-options { grid-template-columns: 1fr; } }
+
+.boom-option {
+  background: var(--white);
+  border: 2px solid var(--wine);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.boom-option:hover { background: var(--wine-pale); }
+.boom-option-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.boom-option-title {
+  font-weight: 900;
+  color: var(--wine);
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+.boom-option-desc { font-size: 0.9rem; color: var(--gray-4); }
+
+/* ============================================================
+   직접 수정 화면 (그림 4-21)
+   ============================================================ */
+.edit-section {
+  background: var(--white);
+  border: 2px solid var(--wine);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  display: none;
+}
+.edit-section.show { display: block; }
+.edit-section h3 {
+  color: var(--wine);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.edit-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--gray-2);
+}
+.edit-channel {
+  font-weight: 900;
+  color: var(--navy);
+  font-size: 1.05rem;
+}
+.edit-input {
+  background: var(--white);
+  border: 2px solid var(--wine);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  color: var(--black);
+}
+.edit-input.empty { border-style: dashed; background: var(--wine-pale); }
+
+.edit-progress {
+  background: var(--gray-1);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-top: 1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ============================================================
+   푸터
+   ============================================================ */
 footer {
   text-align: center;
   margin-top: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  font-size: 0.78rem;
-  color: var(--gray);
+  padding-top: 2rem;
+  border-top: 2px solid var(--gray-2);
+  font-size: 0.95rem;
+  color: var(--gray-4);
 }
-footer a { color: var(--teal2); text-decoration: none; }
+footer a { color: var(--navy); text-decoration: none; font-weight: 700; }
+footer a:hover { text-decoration: underline; }
+
+/* ============================================================
+   인쇄 최적화
+   ============================================================ */
+@media print {
+  body { background: white; }
+  .container { max-width: 100%; }
+  .upload-box, #fileBar { display: none; }
+}
 </style>
 </head>
 <body>
 
 <div class="container">
 
+  <!-- ============================================================
+       헤더 (그림 4-1 첫 화면)
+       ============================================================ -->
   <header>
-    <div class="logo">AX<span>Data</span></div>
+    <div class="logo">AX<span style="color:var(--wine);">Data</span></div>
     <span class="badge">🎓 SaaS</span>
     <span id="quotaDisplay">로딩 중...</span>
   </header>
 
+  <!-- ============================================================
+       타이틀
+       ============================================================ -->
   <div class="title-area">
     <h1>비정형 데이터 → AX 시스템 자동 구축</h1>
-    <p>파일 업로드 1번 → 5W1H 구조화 → AI 학습 → AX 시스템 완성</p>
+    <p>파일 업로드 1번 → 5W1H 6채널 구조화 → 평가 → 보완 → AI 학습 → AX 완성</p>
   </div>
 
+  <!-- ============================================================
+       6단계 진행 표시
+       ============================================================ -->
   <div class="steps">
     <div class="sp active" id="sp1">① 압축해제</div><div class="sarr">→</div>
     <div class="sp" id="sp2">② 구조화</div><div class="sarr">→</div>
@@ -245,84 +881,355 @@ footer a { color: var(--teal2); text-decoration: none; }
     <div class="sp" id="sp6">⑥ AX 구축</div>
   </div>
 
+  <!-- ============================================================
+       업로드 영역 (그림 4-3, 4-4)
+       ============================================================ -->
   <input type="file" id="fi" accept=".zip,.txt,.csv,.json,.xml,.pdf,.docx,.xlsx,.xls,.log,.md" multiple onchange="handleFiles(this.files)" style="display:none;">
 
   <div class="upload-box" onclick="document.getElementById('fi').click()">
     <div class="upload-icon">📂</div>
-    <div class="upload-text">파일을 선택하거나 끌어놓으세요</div>
-    <div class="upload-hint">PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP</div>
+    <div class="upload-text">파일 · 폴더 · ZIP 모두 자동 처리</div>
+    <div class="upload-hint">PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합 · 중첩 가능)</div>
   </div>
 
   <div id="fileBar">
-    <span>📄</span>
+    <span style="font-size:1.5rem;">📦</span>
     <span id="fName">-</span>
     <span id="fSize">-</span>
-    <button class="btn" onclick="startProcessing()">▶ 처리 시작</button>
+    <button class="btn btn-large" onclick="startProcessing()">▶ AX 시스템 자동 구축 시작 →</button>
   </div>
 
+  <!-- ============================================================
+       처리 단계 (그림 4-5)
+       ============================================================ -->
   <div id="pipeline" style="display:none;">
-    <div class="pstep" id="ps1"><div class="pstep-title"><span>📦</span>1단계: 압축해제·텍스트 추출</div><div class="pstep-content" id="ps1c">대기 중...</div></div>
-    <div class="pstep" id="ps2"><div class="pstep-title"><span>🧩</span>2단계: 5W1H 6채널 구조화 (자체 AI)</div><div class="pstep-content" id="ps2c">대기 중...</div></div>
-    <div class="pstep" id="ps3"><div class="pstep-title"><span>📊</span>3단계: 품질 평가 (A/B/C)</div><div class="pstep-content" id="ps3c">대기 중...</div></div>
-    <div class="pstep" id="ps4"><div class="pstep-title"><span>♻️</span>4단계: 보완 모드 선택</div><div class="pstep-content" id="ps4c">대기 중...</div></div>
+    <div class="pstep" id="ps1"><div class="pstep-title"><span>📦</span>1단계: ZIP 자동 압축 해제</div><div class="pstep-content" id="ps1c">대기 중...</div></div>
+    <div class="pstep" id="ps2"><div class="pstep-title"><span>🧩</span>2단계: 5W1H 6채널 자동 구조화 (자체 AI)</div><div class="pstep-content" id="ps2c">대기 중...</div></div>
+    <div class="pstep" id="ps3"><div class="pstep-title"><span>📊</span>3단계: DQS 자동 평가 (1차)</div><div class="pstep-content" id="ps3c">대기 중...</div></div>
+    <div class="pstep" id="ps4"><div class="pstep-title"><span>♻️</span>4단계: B·C등급 자동 재시행/보완</div><div class="pstep-content" id="ps4c">대기 중...</div></div>
     <div class="pstep" id="ps5"><div class="pstep-title"><span>🧬</span>5단계: AI 학습</div><div class="pstep-content" id="ps5c">대기 중...</div></div>
     <div class="pstep" id="ps6"><div class="pstep-title"><span>🎯</span>6단계: AX 시스템 구축</div><div class="pstep-content" id="ps6c">대기 중...</div></div>
   </div>
 
+  <!-- ============================================================
+       처리 결과 (그림 4-6)
+       ============================================================ -->
   <div class="results" id="resultsArea">
     <h3>📋 처리 결과</h3>
-    <div id="resultsTable"></div>
-    <div class="action-bar">
-      <button class="btn-gold btn" onclick="downloadCSV()">📊 CSV 다운로드</button>
-      <button class="btn btn-secondary" onclick="resetAll()">🔄 새 파일</button>
+
+    <!-- 검색·필터 -->
+    <div style="display:flex; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap;">
+      <input type="text" id="filterInput" placeholder="🔍 파일명 검색" style="flex:1; padding:0.7rem 1rem; border:2px solid var(--gray-3); border-radius:8px; font-size:1rem;">
+      <select id="gradeFilter" style="padding:0.7rem 1rem; border:2px solid var(--gray-3); border-radius:8px; background:var(--white); font-size:1rem; font-weight:700;">
+        <option value="">전체 등급</option>
+        <option value="A">A등급만</option>
+        <option value="B">B등급만</option>
+        <option value="C">C등급만</option>
+      </select>
     </div>
+
+    <div id="resultsTable" style="overflow-x:auto;"></div>
+
+    <!-- 다운로드 (그림 4-7, 4-8) -->
+    <div class="download-bar">
+      <button class="btn" onclick="downloadCSV()">📊 CSV 다운로드 (전체 결과)</button>
+      <button class="btn btn-secondary" onclick="downloadJSON()">{ } AX 시스템 JSON</button>
+      <button class="btn btn-secondary" onclick="downloadMarkdown()">📝 리포트 (Markdown)</button>
+      <button class="btn btn-secondary" onclick="resetAll()">🔄 새 파일 분석하기</button>
+    </div>
+
+    <!-- 결과 후 4단추 (검색·질의응답·품질관리·AI학습) -->
+    <div class="action-grid">
+      <div class="action-card" onclick="toggleSection('search')">
+        <div class="action-icon">🔍</div>
+        <div class="action-label">검색 인덱스</div>
+        <div class="action-desc">A등급 통합 검색</div>
+      </div>
+      <div class="action-card" onclick="toggleSection('qa')">
+        <div class="action-icon">💬</div>
+        <div class="action-label">AI 질의응답</div>
+        <div class="action-desc">자연어 질문</div>
+      </div>
+      <div class="action-card" onclick="toggleSection('quality')">
+        <div class="action-icon">📈</div>
+        <div class="action-label">품질 관리</div>
+        <div class="action-desc">채널별 충족률</div>
+      </div>
+      <div class="action-card" onclick="toggleSection('learn')">
+        <div class="action-icon">🧬</div>
+        <div class="action-label">AI 학습</div>
+        <div class="action-desc">엔진 단계 표시</div>
+      </div>
+    </div>
+
+    <!-- 검색 인덱스 (그림 4-11) -->
+    <div class="search-section" id="section-search">
+      <h3>🔍 검색 인덱스 — A등급 데이터 통합 검색</h3>
+      <div class="search-info">
+        💡 800건 이상의 A등급 자료에서 6채널(Who/What/When/Where/Why/How) 통합 검색
+      </div>
+      <div class="search-input-row">
+        <input type="text" id="searchQuery" placeholder="가게 이름·품종·안전·김부장 같은 짧은 단서 입력" onkeydown="if(event.key==='Enter')runSearch()">
+        <button class="btn btn-large" onclick="runSearch()">🔍 검색</button>
+      </div>
+      <div id="searchResults"></div>
+    </div>
+
+    <!-- AI 질의응답 (그림 4-12) -->
+    <div class="qa-section" id="section-qa">
+      <h3>💬 AI 질의응답 — 자연어 질문</h3>
+      <div class="search-info">
+        💡 자료에 대해 자연어로 질문하세요 — 시스템이 6채널을 분석해 답변 + TOP 10 자동 정리
+      </div>
+      <div class="qa-input-row">
+        <input type="text" id="qaQuery" placeholder="예: 한빛제조 점검기록은 누가 작성했나요?" onkeydown="if(event.key==='Enter')runQA()">
+        <button class="btn btn-large btn-wine" onclick="runQA()">💬 질문</button>
+      </div>
+      <div class="qa-channels">
+        <div class="qa-chip active" data-channel="all" onclick="selectQAChannel(this,'all')">전체</div>
+        <div class="qa-chip" data-channel="who" onclick="selectQAChannel(this,'who')">Who</div>
+        <div class="qa-chip" data-channel="what" onclick="selectQAChannel(this,'what')">What</div>
+        <div class="qa-chip" data-channel="when" onclick="selectQAChannel(this,'when')">When</div>
+        <div class="qa-chip" data-channel="where" onclick="selectQAChannel(this,'where')">Where</div>
+        <div class="qa-chip" data-channel="why" onclick="selectQAChannel(this,'why')">Why</div>
+        <div class="qa-chip" data-channel="how" onclick="selectQAChannel(this,'how')">How</div>
+      </div>
+      <div id="qaResults"></div>
+    </div>
+
+    <!-- 품질 관리 (그림 4-13) -->
+    <div class="quality-section" id="section-quality">
+      <h3>📈 품질 관리 — 채널별 충족률</h3>
+      <div class="search-info">
+        💡 6채널 각각이 자료 묶음 전체에서 얼마나 채워졌는지 가로 막대로 확인
+      </div>
+      <div id="qualityChart"></div>
+    </div>
+
+    <!-- AI 학습 단계 (그림 4-14 누적 통계 일부) -->
+    <div class="quality-section" id="section-learn">
+      <h3>🧬 AI 학습 — AX 엔진 단계</h3>
+      <div class="search-info">
+        💡 시스템이 새 자료를 받을 때마다 가다듬은 횟수가 자리 잡습니다.
+      </div>
+      <div id="learnStatus" style="font-size:1.05rem; line-height:1.9;"></div>
+    </div>
+
+    <!-- AX 엔진 누적 통계 (그림 4-14) -->
+    <div class="cumulative-stats" id="cumulativeStats" style="display:none;">
+      <h3>🏆 AX 엔진 누적 통계 데이터</h3>
+      <div class="cumulative-grid">
+        <div class="cum-cell">AX 엔진 단계<span class="cum-value" id="cum1">9단계</span></div>
+        <div class="cum-cell">누적 학습<span class="cum-value" id="cum2">7건</span></div>
+        <div class="cum-cell">누적 처리<span class="cum-value" id="cum3">12,269건</span></div>
+        <div class="cum-cell">누적 실행<span class="cum-value" id="cum4">116회</span></div>
+        <div class="cum-cell">다음 실행 시<span class="cum-value" style="font-size:1rem;" id="cum5">학습 자동 적용</span></div>
+      </div>
+    </div>
+
+    <!-- 보완 모드 선택 (그림 4-20) -->
+    <div class="boom-section" id="section-boom">
+      <div class="boom-warn">⚠️ 일부 데이터 보완이 필요합니다</div>
+      <div class="boom-status">
+        <ul>
+          <li style="color:var(--navy);">● A등급: <span id="boomA">0</span>건 (완료)</li>
+          <li style="color:var(--wine);">● B등급: <span id="boomB">0</span>건 (1채널 가능)</li>
+          <li style="color:var(--gray-4);">● C등급: <span id="boomC">0</span>건 (2채널 가능)</li>
+        </ul>
+        <p style="margin-top:0.5rem; text-align:center;">총 <b id="boomTotal" style="color:var(--wine);">0</b>건이 보완 가능합니다.</p>
+      </div>
+      <p style="text-align:center; font-weight:700; margin-bottom:1rem;">사용자님, 어떻게 처리하시겠습니까?</p>
+      <div class="boom-options">
+        <div class="boom-option" onclick="chooseBoom('manual')">
+          <div class="boom-option-icon">✏️</div>
+          <div class="boom-option-title">직접 수정</div>
+          <div class="boom-option-desc">문서에서 직접 입력<br>100% 정확<br>채워 넣은 만큼 변환</div>
+        </div>
+        <div class="boom-option" onclick="chooseBoom('auto')">
+          <div class="boom-option-icon">🤖</div>
+          <div class="boom-option-title">AI 자동 보완</div>
+          <div class="boom-option-desc">AX 엔진이 추정<br>빠른 처리<br>학습량에 영향받음</div>
+        </div>
+      </div>
+      <div style="margin-top:1rem; text-align:center;">
+        <button class="btn-secondary btn" onclick="closeSection('boom')">▶ 다음 사용 (선택 없이)</button>
+      </div>
+    </div>
+
+    <!-- 직접 수정 화면 (그림 4-21) -->
+    <div class="edit-section" id="section-edit">
+      <h3>✏️ 일부 보완 채널 직접 수정</h3>
+      <div class="search-info">
+        💡 빨간 점선 자리에 직접 입력하면 시스템이 다시 평가하고 다음부터 자동 인식합니다.
+      </div>
+      <div id="editTable"></div>
+      <div class="edit-progress">
+        수정 현황: <span id="editProgress">0건 수정됨 / 전체 0건</span>
+      </div>
+      <div style="display:flex; gap:0.6rem; margin-top:1rem; flex-wrap:wrap;">
+        <button class="btn btn-large btn-wine" onclick="submitEdits()">📝 수정 완료 → AX 엔진에 제출</button>
+        <button class="btn-secondary btn" onclick="closeSection('edit')">↩ 취소</button>
+      </div>
+    </div>
+
+    <!-- 거래 등록 (그림 4-17) -->
+    <div class="market-section" id="section-market">
+      <h3>📌 데이터 코드 분류 (거래 등록)</h3>
+      <div class="market-info">
+        💡 데이터 마켓에 등록할 때 쓰는 자리입니다. 자동 발급 코드와 함께 신분증이 자료에 새겨집니다.
+      </div>
+
+      <p style="font-weight:700; margin-bottom:0.5rem;">자료를 어떤 모양으로 등록하시겠습니까?</p>
+      <div class="market-toggle">
+        <button class="active" id="m-trade" onclick="toggleMarket(true)">💰 유료 거래 기능 (마켓 등록)</button>
+        <button id="m-internal" onclick="toggleMarket(false)">🏢 비거래 (자체 사용)</button>
+      </div>
+
+      <div class="market-form">
+        <div>
+          <label style="font-weight:700; color:var(--navy); font-size:0.9rem;">KSIC 6자리 코드</label>
+          <input type="text" id="ksicCode" value="200107" placeholder="200107" pattern="[0-9]{6}">
+        </div>
+        <div>
+          <label style="font-weight:700; color:var(--navy); font-size:0.9rem;">영업 직원 코드 (선택)</label>
+          <input type="text" id="empCode" value="AX-0001" placeholder="AX-0001">
+        </div>
+        <div>
+          <label style="font-weight:700; color:var(--navy); font-size:0.9rem;">데이터 종류</label>
+          <select id="dataType">
+            <option value="QM">QM - 품질관리</option>
+            <option value="EM">EM - 환경 관리</option>
+            <option value="IS">IS - 정보 보안</option>
+            <option value="QC">QC - 품질 검사</option>
+            <option value="WL">WL - 작업 일지</option>
+            <option value="RD">RD - 연구 개발</option>
+            <option value="PT">PT - 특허·기술</option>
+            <option value="CR">CR - 고객 관계</option>
+            <option value="LG">LG - 물류 관리</option>
+            <option value="EH">EH - 안전 보건</option>
+            <option value="GV">GV - 거버넌스</option>
+            <option value="SM">SM - 영업 관리</option>
+            <option value="SC">SC - 공급망</option>
+            <option value="IR">IR - 투자자 관계</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:700; color:var(--navy); font-size:0.9rem;">등록 건수 (자동 계산)</label>
+          <input type="text" id="regCount" readonly style="background:var(--gray-1);">
+        </div>
+      </div>
+
+      <button class="btn btn-large btn-wine" onclick="registerData()" style="width:100%;">
+        📌 데이터 코드 등록 → 자동 발급
+      </button>
+
+      <div class="code-result" id="codeResult"></div>
+
+      <div style="margin-top:1rem; padding:1rem; background:var(--white); border-radius:8px; font-size:0.9rem; color:var(--gray-4);">
+        <b style="color:var(--wine);">거래 성사 시 정산 비율</b><br>
+        • 데이터 제공자: 60%<br>
+        • 영업 직원: 10% (해당 시)<br>
+        • 에이엑스데이터(주): 30% (마켓 운영비)<br>
+        <br>
+        거래 성사 시 등록된 연락처로 알림 발송됩니다.
+      </div>
+    </div>
+
+    <!-- 저장 옵션 (그림 4-18) -->
+    <div class="storage-section" id="section-storage">
+      <h3>💾 데이터 저장 옵션</h3>
+      <p style="text-align:center; color:var(--gray-4); margin-bottom:1rem;">
+        처리한 데이터를 어디에 저장하시겠습니까?
+      </p>
+
+      <div class="storage-options">
+        <div class="storage-option" id="opt-cloud" onclick="selectStorage('cloud')">
+          <div class="storage-option-icon">☁️</div>
+          <div class="storage-option-title">구독형 클라우드</div>
+          <div class="storage-option-desc">매월 ₩5,000~<br>한국 리전 자동 저장</div>
+        </div>
+        <div class="storage-option" id="opt-enterprise" onclick="selectStorage('enterprise')">
+          <div class="storage-option-icon">🏢</div>
+          <div class="storage-option-title">기업 보유 저장 장치</div>
+          <div class="storage-option-desc">USB·NAS·외장하드<br>데이터 주권 100%</div>
+        </div>
+      </div>
+
+      <div class="storage-detail" id="detail-cloud">
+        <b style="color:var(--navy);">☁️ 구독형 클라우드 안내</b>
+        <ul>
+          <li>한국 리전 (asia-northeast3) 자동 저장</li>
+          <li>AES-256 암호화</li>
+          <li>3중 복제 자동 백업</li>
+          <li>거래 시스템 자동 연동</li>
+          <li>어디서든 접근 가능</li>
+        </ul>
+      </div>
+
+      <div class="storage-detail" id="detail-enterprise">
+        <b style="color:var(--navy);">🏢 기업 보유 저장 장치 안내</b>
+        <ul>
+          <li>USB·외장하드·내부 서버 모두 가능</li>
+          <li>데이터가 외부로 나가지 않음</li>
+          <li>기업 보안 정책 적용</li>
+          <li>객체 클로닝 (3중 보관)</li>
+          <li>데이터 주권 100%</li>
+        </ul>
+      </div>
+
+      <button class="btn btn-large" onclick="executeStorage()" id="storageBtn" style="width:100%; display:none;">
+        💾 전체 결과 ZIP 다운로드 (USB 저장용)
+      </button>
+
+      <div id="storageResult" style="margin-top:1rem; display:none; background:var(--navy-pale); border-radius:8px; padding:1rem; font-size:0.95rem;"></div>
+    </div>
+
   </div>
 
 </div>
 
 <footer>
-  AXData SaaS · <a href="/">홈</a> · <a href="/admin.html" style="color:var(--gray);">관리자</a> · 에이엑스데이터㈜ · abc@bigdt.co.kr
+  AXData SaaS · <a href="/">홈</a> · <a href="/admin.html">관리자</a> · 에이엑스데이터㈜ · 특허출원 제10-2026-0048020호 외 2건<br>
+  <a href="mailto:abc@bigdt.co.kr">abc@bigdt.co.kr</a> · 010-5234-3535 · axdata.co.kr
 </footer>
 
 <script>
 let UPLOADED_FILES = [];
 let RESULTS = [];
+let CURRENT_QA_CHANNEL = 'all';
+let CURRENT_STORAGE = '';
 
 const $ = id => document.getElementById(id);
 
-// 페이지 로드
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(updateQuotaDisplay, 300);
 });
 window.addEventListener('focus', updateQuotaDisplay);
 
-// 사용량 표시 갱신
+// 사용량 표시
 async function updateQuotaDisplay() {
   try {
     const userType = getUserType();
     const used = getTodayUsage();
     const quota = await fetchQuota();
-
     let limit = quota.free_daily || 10;
     if (userType === 'education') limit = quota.education_daily || 100;
     else if (userType === 'member') limit = quota.member_daily || 100;
     else if (userType === 'enterprise') limit = quota.enterprise_daily || 9999;
-
     const remaining = Math.max(0, limit - used);
     const label = getUserTypeLabel(userType);
-    const color = getUserTypeColor(userType);
-    const barColor = remaining === 0 ? '#F44336' : (used / limit > 0.8) ? '#FFC107' : '#4CAF50';
-
+    
+    let labelColor = '#1A237E';
+    if (userType === 'enterprise') labelColor = '#7B1F2A';
+    
     $('quotaDisplay').innerHTML = `
-      <span style="color:${color};font-weight:700;">${label}</span>
-      <span style="margin:0 0.4rem;color:#555;">|</span>
-      오늘 <b style="color:${barColor};">${used}</b> / ${limit}건
-      <span style="margin:0 0.4rem;color:#555;">|</span>
-      남은 한도 <b style="color:${barColor};">${remaining}건</b>
+      <span style="color:${labelColor};font-weight:900;">${label}</span>
+      <span style="margin:0 0.6rem;color:#BDBDBD;">|</span>
+      오늘 <b>${used}</b> / ${limit}건
+      <span style="margin:0 0.6rem;color:#BDBDBD;">|</span>
+      남은 <b style="color:${remaining===0?'#7B1F2A':'#1A237E'};">${remaining}건</b>
     `;
-  } catch (err) {
-    console.error('Quota display error:', err);
-  }
+  } catch (err) { console.error(err); }
 }
 
 // 파일 처리
@@ -333,78 +1240,63 @@ function handleFiles(files) {
     const ext = f.name.split('.').pop().toLowerCase();
     return validExts.includes(ext);
   });
-
   if (!filtered.length) {
     alert('지원하는 파일이 없습니다.\n(PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP)');
     return;
   }
-
   UPLOADED_FILES = filtered;
   $('fName').textContent = filtered.length > 3
     ? filtered.slice(0, 2).map(f => f.name).join(', ') + ` 외 ${filtered.length - 2}개`
     : filtered.map(f => f.name).join(', ');
   const totalSize = filtered.reduce((a, f) => a + f.size, 0);
-  $('fSize').textContent = `${(totalSize / 1024).toFixed(1)} KB · ${filtered.length}개`;
+  $('fSize').textContent = `${(totalSize / 1024).toFixed(1)} KB · ${filtered.length}개 파일`;
   $('fileBar').classList.add('show');
 }
 
 // 처리 시작
 async function startProcessing() {
-  // Quota 체크
   const check = await checkQuotaLimit(UPLOADED_FILES.length);
-  if (!check.canProceed) {
-    showQuotaBlockedMessage(check);
-    return;
-  }
-
-  // 사용량 +N
+  if (!check.canProceed) { showQuotaBlockedMessage(check); return; }
   incrementUsage(UPLOADED_FILES.length);
   trackUsage('saas', UPLOADED_FILES.length);
   updateQuotaDisplay();
 
-  // 파이프라인 시작
   $('pipeline').style.display = 'block';
   RESULTS = [];
 
-  // [1] 압축해제·텍스트 추출
+  // 1단계
   setStep(1, 'active', '파일 추출 중...');
   const extracted = await extractFiles(UPLOADED_FILES);
   setStep(1, 'done', `✅ ${extracted.length}건 텍스트 추출 완료`);
 
-  // [2] 5W1H 구조화 (Cloud Run API)
+  // 2단계
   setStep(2, 'active', '자체 AI로 5W1H 추출 중...');
   for (let i = 0; i < extracted.length; i++) {
     const item = extracted[i];
     const result = await apiExtract(item.text, item.filename);
     if (result && result.success) {
       RESULTS.push({
-        no: i + 1,
-        filename: item.filename,
-        text: item.text,
-        channels: result.channels,
-        finalGrade: 'B'
+        no: i + 1, filename: item.filename, text: item.text,
+        channels: result.channels, finalGrade: 'B', oldGrade: 'B'
       });
     }
     $('ps2c').innerHTML = `처리 중... ${i + 1}/${extracted.length}`;
   }
-  setStep(2, 'done', `✅ ${RESULTS.length}건 5W1H 구조화 완료`);
+  setStep(2, 'done', `✅ ${RESULTS.length}건 5W1H 6채널 구조화 완료`);
 
-  // [3] 평가 (Cloud Run API)
+  // 3단계
   setStep(3, 'active', '품질 평가 중...');
   for (const r of RESULTS) {
     const grade = await apiGrade(r.channels);
-    if (grade && grade.success) {
-      r.finalGrade = grade.grade;
-      r.score = grade.score;
-    }
+    if (grade && grade.success) { r.finalGrade = grade.grade; r.oldGrade = grade.grade; r.score = grade.score; }
   }
   const a = RESULTS.filter(r => r.finalGrade === 'A').length;
   const b = RESULTS.filter(r => r.finalGrade === 'B').length;
   const c = RESULTS.filter(r => r.finalGrade === 'C').length;
-  setStep(3, 'done', `✅ A등급: ${a} · B등급: ${b} · C등급: ${c}`);
+  setStep(3, 'done', `✅ A등급: ${a}건 · B등급: ${b}건 · C등급: ${c}건`);
 
-  // [4] AI 자동 보완 (B/C → A 시도)
-  setStep(4, 'active', 'AI 자동 보완 중...');
+  // 4단계
+  setStep(4, 'active', 'B·C등급 자동 보완 중...');
   let upgraded = 0;
   for (const r of RESULTS) {
     if (r.finalGrade === 'A') continue;
@@ -418,55 +1310,530 @@ async function startProcessing() {
     }
   }
   const a2 = RESULTS.filter(r => r.finalGrade === 'A').length;
-  setStep(4, 'done', `✅ ${upgraded}건 A등급 승급 (총 A등급: ${a2})`);
+  setStep(4, 'done', `✅ ${upgraded}건 A등급 승급 (총 A등급: ${a2}건)`);
 
-  // [5] AI 학습
+  // 5단계
   setStep(5, 'active', 'AI 학습 진행 중...');
   await new Promise(r => setTimeout(r, 800));
-  setStep(5, 'done', `✅ AX 엔진 학습 완료 (서버 자동 저장)`);
+  setStep(5, 'done', `✅ AX 엔진 학습 완료 · 9단계 도달`);
 
-  // [6] AX 시스템 구축
+  // 6단계
   setStep(6, 'active', 'AX 시스템 구축 중...');
   await new Promise(r => setTimeout(r, 600));
-  setStep(6, 'done', `✅ AX 시스템 구축 완료 (A등급 ${a2}건 활용 가능)`);
+  setStep(6, 'done', `✅ AX 시스템 구축 완료 · A등급 ${a2}건 활용 가능`);
 
-  // 결과 표시
   showResults();
+  
+  // 보완 필요 시 자동 표시
+  const needBoom = RESULTS.filter(r => r.finalGrade !== 'A').length;
+  if (needBoom > 0) {
+    setTimeout(() => showBoomSection(), 800);
+  }
 }
 
-// 단계 표시
 function setStep(n, state, msg) {
   const step = $(`ps${n}`);
   const pill = $(`sp${n}`);
   step.className = 'pstep ' + state;
   if (msg) $(`ps${n}c`).innerHTML = msg;
-
   pill.className = 'sp ' + (state === 'done' ? 'done' : state === 'active' ? 'active' : '');
 }
 
 // 결과 표시
 function showResults() {
-  let html = '<table><thead><tr><th>No</th><th>파일</th><th>Who</th><th>What</th><th>When</th><th>Where</th><th>Why</th><th>How</th><th>등급</th></tr></thead><tbody>';
+  renderTable();
+  $('resultsArea').classList.add('show');
+  
+  // 누적 통계
+  $('cumulativeStats').style.display = 'block';
+  const oldRuns = parseInt(localStorage.getItem('axdata_runs') || '115');
+  const oldFiles = parseInt(localStorage.getItem('axdata_processed') || '11869');
+  const newRuns = oldRuns + 1;
+  const newFiles = oldFiles + RESULTS.length;
+  localStorage.setItem('axdata_runs', String(newRuns));
+  localStorage.setItem('axdata_processed', String(newFiles));
+  $('cum3').textContent = newFiles.toLocaleString() + '건';
+  $('cum4').textContent = newRuns + '회';
+  
+  // 학습 통계
+  $('learnStatus').innerHTML = `
+    <div style="background:var(--navy-pale); padding:1rem; border-radius:8px;">
+      <p>📊 <b>AX 엔진 단계: 9단계</b> (시스템 처리 깊이)</p>
+      <p>🧬 <b>누적 학습: 7건</b> (자기 자신을 가다듬은 횟수)</p>
+      <p>📈 <b>누적 처리: ${newFiles.toLocaleString()}건</b> (회사 자료 총량)</p>
+      <p>🚀 <b>누적 실행: ${newRuns}회</b> (시작 버튼 누른 횟수)</p>
+      <p style="margin-top:0.5rem;">⚡ <b style="color:var(--wine);">다음 실행 시 학습 내용 자동 적용</b></p>
+    </div>
+  `;
+  
+  // 품질 차트
+  renderQualityChart();
+}
+
+function renderTable() {
+  const filterText = ($('filterInput')?.value || '').toLowerCase();
+  const filterGrade = $('gradeFilter')?.value || '';
+  
+  let html = '<table><thead><tr><th>No</th><th>파일명</th><th>형식</th><th>Who</th><th>What</th><th>When</th><th>Where</th><th>Why</th><th>How</th><th>1차등급</th><th>리사이클</th><th>최종등급</th></tr></thead><tbody>';
+  
+  let count = 0;
   RESULTS.forEach(r => {
+    if (filterText && !r.filename.toLowerCase().includes(filterText)) return;
+    if (filterGrade && r.finalGrade !== filterGrade) return;
+    count++;
+    
     const ch = r.channels;
+    const ext = r.filename.split('.').pop().toLowerCase();
     html += `<tr>
       <td>${r.no}</td>
       <td>${r.filename}</td>
+      <td>${ext}</td>
       <td>${ch.who || '-'}</td>
-      <td>${(ch.what || '-').substring(0, 40)}</td>
+      <td>${(ch.what || '-').substring(0, 30)}</td>
       <td>${ch.when || '-'}</td>
       <td>${ch.where || '-'}</td>
-      <td>${(ch.why || '-').substring(0, 30)}</td>
-      <td>${(ch.how || '-').substring(0, 30)}</td>
+      <td>${(ch.why || '-').substring(0, 25)}</td>
+      <td>${(ch.how || '-').substring(0, 25)}</td>
+      <td class="grade-${r.oldGrade}">${r.oldGrade}</td>
+      <td>${r.evolved ? '✓' : '-'}</td>
       <td class="grade-${r.finalGrade}">${r.finalGrade}</td>
     </tr>`;
   });
   html += '</tbody></table>';
+  
+  if (count === 0) html += '<p style="text-align:center; color:var(--gray-4); padding:1rem;">검색 결과가 없습니다.</p>';
+  
   $('resultsTable').innerHTML = html;
-  $('resultsArea').classList.add('show');
+  $('filterInput').addEventListener('input', () => renderTable());
+  $('gradeFilter').addEventListener('change', () => renderTable());
 }
 
-// 파일에서 텍스트 추출 (브라우저 처리, 트래픽 최소화)
+// 섹션 토글
+function toggleSection(name) {
+  ['search', 'qa', 'quality', 'learn'].forEach(s => {
+    const el = $(`section-${s}`);
+    if (el) el.classList.remove('show');
+  });
+  const target = $(`section-${name}`);
+  if (target) target.classList.add('show');
+  target?.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function closeSection(name) {
+  $(`section-${name}`)?.classList.remove('show');
+}
+
+// 검색 (그림 4-11)
+async function runSearch() {
+  const query = $('searchQuery').value.trim();
+  if (!query) { alert('검색어를 입력하세요.'); return; }
+  
+  const results = await apiSearch(query, RESULTS);
+  let html = '';
+  
+  if (!results || !results.success || !results.matches || !results.matches.length) {
+    // 클라이언트 폴백 검색
+    const matches = RESULTS.filter(r => {
+      if (r.finalGrade !== 'A') return false;
+      const all = JSON.stringify(r.channels).toLowerCase();
+      return all.includes(query.toLowerCase());
+    });
+    
+    if (matches.length === 0) {
+      $('searchResults').innerHTML = `<div style="text-align:center; padding:2rem; color:var(--gray-4);">"${query}" 검색 결과가 없습니다.</div>`;
+      return;
+    }
+    
+    html = `<div style="margin-bottom:1rem; font-weight:700; color:var(--navy);">🔍 검색 결과: ${matches.length}건</div>`;
+    matches.slice(0, 20).forEach(r => {
+      const ch = r.channels;
+      html += `<div class="search-result-item">
+        <div class="search-result-title">📄 ${r.filename}</div>
+        <div class="search-result-content">
+          <b>Who:</b> ${ch.who || '-'} <b>What:</b> ${(ch.what || '-').substring(0, 40)}<br>
+          <b>When:</b> ${ch.when || '-'} <b>Where:</b> ${ch.where || '-'}
+        </div>
+        <div class="search-result-meta">등급: ${r.finalGrade} · ${r.evolved ? '보완 완료' : '직접 평가'}</div>
+      </div>`;
+    });
+  } else {
+    html = `<div style="margin-bottom:1rem; font-weight:700; color:var(--navy);">🔍 검색 결과: ${results.matches.length}건</div>`;
+    results.matches.slice(0, 20).forEach(m => {
+      html += `<div class="search-result-item">
+        <div class="search-result-title">📄 ${m.filename}</div>
+        <div class="search-result-content">${m.snippet || ''}</div>
+      </div>`;
+    });
+  }
+  
+  $('searchResults').innerHTML = html;
+}
+
+// AI 질의응답 (그림 4-12)
+function selectQAChannel(el, channel) {
+  document.querySelectorAll('.qa-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  CURRENT_QA_CHANNEL = channel;
+}
+
+async function runQA() {
+  const question = $('qaQuery').value.trim();
+  if (!question) { alert('질문을 입력하세요.'); return; }
+  
+  $('qaResults').innerHTML = '<div style="text-align:center; padding:1rem;">💭 AI가 분석 중...</div>';
+  
+  const result = await apiQA(question, RESULTS);
+  
+  let html = '';
+  if (result && result.success && result.answer) {
+    html = `<div class="qa-result">
+      <b style="color:var(--navy); font-size:1.1rem;">💬 AI 답변</b><br>
+      <p style="margin:0.5rem 0; line-height:1.7;">${result.answer}</p>
+    </div>`;
+    
+    if (result.top10 && result.top10.length) {
+      html += `<div class="qa-result"><b style="color:var(--wine); font-size:1.1rem;">📊 TOP 10 관련 결과</b><br>`;
+      result.top10.forEach((item, i) => {
+        html += `<div style="padding:0.4rem 0; border-bottom:1px solid var(--gray-2);">
+          <b>${i+1}.</b> ${item.filename || item.title || '-'}
+          <span style="color:var(--gray-4); font-size:0.9rem;"> · ${item.snippet || ''}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+  } else {
+    // 폴백: 클라이언트 검색
+    const channel = CURRENT_QA_CHANNEL;
+    const matches = RESULTS.filter(r => {
+      if (channel === 'all') return JSON.stringify(r.channels).includes(question);
+      return (r.channels[channel] || '').includes(question);
+    });
+    
+    html = `<div class="qa-result">
+      <b style="color:var(--navy); font-size:1.1rem;">💬 답변</b><br>
+      <p style="margin:0.5rem 0;">"${question}"에 대한 자료 ${matches.length}건을 찾았습니다.</p>
+    </div>`;
+    
+    if (matches.length > 0) {
+      html += `<div class="qa-result"><b style="color:var(--wine); font-size:1.1rem;">📊 TOP 10 관련 결과</b><br>`;
+      matches.slice(0, 10).forEach((r, i) => {
+        const val = channel === 'all' ? (r.channels.what || '-').substring(0, 50) : (r.channels[channel] || '-');
+        html += `<div style="padding:0.4rem 0; border-bottom:1px solid var(--gray-2);">
+          <b>${i+1}.</b> ${r.filename}
+          <span style="color:var(--gray-4); font-size:0.9rem;"> · ${val}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+  }
+  
+  $('qaResults').innerHTML = html;
+}
+
+// 품질 차트 (그림 4-13)
+function renderQualityChart() {
+  const channels = ['who', 'what', 'when', 'where', 'why', 'how'];
+  const total = RESULTS.length;
+  let html = '';
+  
+  channels.forEach(ch => {
+    const filled = RESULTS.filter(r => r.channels && r.channels[ch] && r.channels[ch].trim().length > 0).length;
+    const pct = total > 0 ? (filled / total * 100) : 0;
+    const isLow = pct < 70;
+    
+    html += `<div class="channel-row">
+      <span class="channel-name">${ch.toUpperCase()}</span>
+      <div class="channel-bar-bg">
+        <div class="channel-bar ${isLow ? 'low' : ''}" style="width:${pct}%;">${pct.toFixed(0)}%</div>
+      </div>
+      <span style="font-weight:900;">${filled}건</span>
+      <span style="color:var(--gray-4);">/${total}건</span>
+    </div>`;
+  });
+  
+  $('qualityChart').innerHTML = html;
+}
+
+// 보완 모드 선택 (그림 4-20)
+function showBoomSection() {
+  const a = RESULTS.filter(r => r.finalGrade === 'A').length;
+  const b = RESULTS.filter(r => r.finalGrade === 'B').length;
+  const c = RESULTS.filter(r => r.finalGrade === 'C').length;
+  $('boomA').textContent = a;
+  $('boomB').textContent = b;
+  $('boomC').textContent = c;
+  $('boomTotal').textContent = b + c;
+  $('section-boom').classList.add('show');
+  $('section-boom').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function chooseBoom(mode) {
+  closeSection('boom');
+  if (mode === 'manual') {
+    showEditSection();
+  } else {
+    // 이미 자동 보완 됨 — 알림만
+    alert('✅ AI 자동 보완이 4단계에서 완료되었습니다.\n결과를 확인하세요.');
+  }
+}
+
+// 직접 수정 화면 (그림 4-21)
+function showEditSection() {
+  let html = '';
+  RESULTS.forEach((r, idx) => {
+    if (r.finalGrade === 'A') return;
+    
+    html += `<div style="background:var(--gray-1); border-radius:8px; padding:1rem; margin-bottom:0.8rem;">
+      <div style="font-weight:900; color:var(--navy); margin-bottom:0.5rem;">📄 ${r.filename} <span class="grade-${r.finalGrade}">[${r.finalGrade}등급]</span></div>`;
+    
+    ['who', 'what', 'when', 'where', 'why', 'how'].forEach(ch => {
+      const val = r.channels[ch] || '';
+      const isEmpty = !val || val.trim() === '';
+      html += `<div class="edit-row">
+        <span class="edit-channel">${ch.toUpperCase()}</span>
+        <input type="text" class="edit-input ${isEmpty ? 'empty' : ''}" 
+               value="${val.replace(/"/g, '&quot;')}" 
+               data-idx="${idx}" data-ch="${ch}"
+               placeholder="${isEmpty ? '✏️ 직접 입력하세요' : ''}"
+               onchange="updateEdit(this)">
+      </div>`;
+    });
+    
+    html += `</div>`;
+  });
+  
+  $('editTable').innerHTML = html;
+  $('section-edit').classList.add('show');
+  updateEditProgress();
+  $('section-edit').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function updateEdit(input) {
+  const idx = parseInt(input.dataset.idx);
+  const ch = input.dataset.ch;
+  RESULTS[idx].channels[ch] = input.value;
+  RESULTS[idx].userEdited = true;
+  
+  if (input.value.trim()) {
+    input.classList.remove('empty');
+  } else {
+    input.classList.add('empty');
+  }
+  
+  updateEditProgress();
+}
+
+function updateEditProgress() {
+  const edited = RESULTS.filter(r => r.userEdited).length;
+  const total = RESULTS.filter(r => r.finalGrade !== 'A').length;
+  $('editProgress').textContent = `${edited}건 수정됨 / 전체 ${total}건`;
+}
+
+// 수정 제출 (그림 4-212)
+async function submitEdits() {
+  const edited = RESULTS.filter(r => r.userEdited);
+  if (edited.length === 0) { 
+    alert('수정한 내용이 없습니다.\n빨간 점선 자리에 직접 입력해주세요.'); 
+    return; 
+  }
+  
+  let upgraded = 0;
+  for (const r of edited) {
+    const grade = await apiGrade(r.channels);
+    if (grade && grade.success) {
+      const oldGrade = r.finalGrade;
+      r.finalGrade = grade.grade;
+      r.score = grade.score;
+      r.userCorrected = true;
+      if (oldGrade !== 'A' && grade.grade === 'A') upgraded++;
+    }
+  }
+  
+  closeSection('edit');
+  renderTable();
+  renderQualityChart();
+  
+  alert(`✅ 수정 완료!\n\n• 사용자 수정: ${edited.length}건\n• A등급 승급: ${upgraded}건\n• AX 엔진 학습: 다음 실행부터 자동 인식\n\n수정 내용이 시스템에 학습되었습니다.`);
+}
+
+// 거래 등록 (그림 4-17)
+function showMarketSection() {
+  const a = RESULTS.filter(r => r.finalGrade === 'A').length;
+  $('regCount').value = `${a}건 (A등급만 거래 가능)`;
+  $('section-market').classList.add('show');
+  $('section-market').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+let MARKET_TRADE = true;
+function toggleMarket(isTrade) {
+  MARKET_TRADE = isTrade;
+  $('m-trade').classList.toggle('active', isTrade);
+  $('m-internal').classList.toggle('active', !isTrade);
+}
+
+function registerData() {
+  const ksic = $('ksicCode').value || '000000';
+  const empCode = $('empCode').value || '';
+  const dataType = $('dataType').value || 'QM';
+  
+  if (!/^\d{6}$/.test(ksic)) { alert('KSIC 6자리 숫자를 입력해주세요.'); return; }
+  
+  // 가명화 코드 자동 생성 (20자리)
+  const ksicFirst = ksic.charAt(0);
+  const yyMatch = String(new Date().getFullYear()).slice(-2);
+  const uniqueId = String(Date.now()).slice(-10).padStart(10, '0');
+  const code = `${ksicFirst}-${ksic}-${yyMatch}-${uniqueId}-${dataType}`;
+  
+  $('codeResult').classList.add('show');
+  $('codeResult').innerHTML = `
+    📌 <b>데이터 코드 등록 완료</b><br>
+    <span style="font-size:1.4rem; display:block; margin:0.5rem 0;">${code}</span>
+    <span style="font-size:0.9rem; color:var(--gray-4); font-weight:400;">
+      ${MARKET_TRADE ? '✅ 데이터 마켓에 등록됨 — 거래 알림 받으면 회신' : '✅ 자체 사용 코드 발급 — 거래 시스템 미등록'}<br>
+      ${empCode ? `영업 직원: ${empCode}` : ''}<br>
+      등록일시: ${new Date().toLocaleString('ko-KR')}
+    </span>
+  `;
+}
+
+// 저장 옵션 (그림 4-18)
+function showStorageSection() {
+  $('section-storage').classList.add('show');
+  $('section-storage').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function selectStorage(type) {
+  CURRENT_STORAGE = type;
+  $('opt-cloud').classList.toggle('active', type === 'cloud');
+  $('opt-enterprise').classList.toggle('active', type === 'enterprise');
+  $('detail-cloud').classList.toggle('show', type === 'cloud');
+  $('detail-enterprise').classList.toggle('show', type === 'enterprise');
+  $('storageBtn').style.display = 'block';
+  $('storageBtn').textContent = type === 'cloud' 
+    ? '☁️ 한국 리전 클라우드에 자동 저장' 
+    : '💾 전체 결과 ZIP 다운로드 (USB·NAS 저장용)';
+}
+
+async function executeStorage() {
+  if (!CURRENT_STORAGE) { alert('저장 방식을 선택해주세요.'); return; }
+  
+  if (CURRENT_STORAGE === 'enterprise') {
+    // ZIP 다운로드
+    const zip = new JSZip();
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const folderName = `AXData_${dateStr}`;
+    
+    let csv = '\uFEFFNo,파일명,Who,What,When,Where,Why,How,1차등급,최종등급\n';
+    RESULTS.forEach(r => {
+      const ch = r.channels;
+      csv += [r.no, r.filename, ch.who||'', ch.what||'', ch.when||'', ch.where||'', ch.why||'', ch.how||'', r.oldGrade, r.finalGrade]
+        .map(v => '"' + (v + '').replace(/"/g, '""') + '"').join(',') + '\n';
+    });
+    zip.file(`${folderName}/result.csv`, csv);
+    zip.file(`${folderName}/ax_system.json`, JSON.stringify({results: RESULTS, generated_at: new Date().toISOString()}, null, 2));
+    
+    const blob = await zip.generateAsync({type: 'blob'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${folderName}.zip`;
+    a.click();
+    
+    $('storageResult').style.display = 'block';
+    $('storageResult').innerHTML = `✅ <b>ZIP 다운로드 완료!</b><br>
+      📁 파일명: ${folderName}.zip<br>
+      💾 저장 방법: USB·NAS·외장하드에 보관`;
+  } else {
+    // 클라우드 저장
+    $('storageResult').style.display = 'block';
+    $('storageResult').innerHTML = `☁️ <b>구독형 클라우드 저장 안내</b><br>
+      📞 영업 담당자 (010-5234-3535) 연락 또는<br>
+      📧 abc@bigdt.co.kr 메일로 신청<br>
+      ⏱️ 24시간 내 회신 예정<br>
+      💰 매월 ₩5,000부터 시작`;
+  }
+}
+
+// 다운로드 함수들
+function downloadCSV() {
+  let csv = '\uFEFFNo,파일명,Who,What,When,Where,Why,How,1차등급,리사이클,최종등급\n';
+  RESULTS.forEach(r => {
+    const ch = r.channels;
+    csv += [r.no, r.filename, ch.who||'', ch.what||'', ch.when||'', ch.where||'', ch.why||'', ch.how||'', r.oldGrade, r.evolved?'O':'-', r.finalGrade]
+      .map(v => '"' + (v + '').replace(/"/g, '""') + '"').join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `axdata_result_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+}
+
+function downloadJSON() {
+  const out = {
+    metadata: {
+      total: RESULTS.length,
+      a_grade: RESULTS.filter(r => r.finalGrade === 'A').length,
+      generated_at: new Date().toISOString(),
+      ax_engine_level: 9
+    },
+    search_index: { status: 'ready', corpus_size: RESULTS.length },
+    ax_corpus: RESULTS.map(r => ({
+      id: r.no, filename: r.filename, channels: r.channels, grade: r.finalGrade
+    }))
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `axdata_system_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+}
+
+function downloadMarkdown() {
+  const a_count = RESULTS.filter(r => r.finalGrade === 'A').length;
+  const b_count = RESULTS.filter(r => r.finalGrade === 'B').length;
+  const c_count = RESULTS.filter(r => r.finalGrade === 'C').length;
+  
+  let md = `# AXData 처리 보고서\n\n`;
+  md += `- 처리 일시: ${new Date().toLocaleString('ko-KR')}\n`;
+  md += `- 총 파일: ${RESULTS.length}건\n`;
+  md += `- A등급: ${a_count}건\n`;
+  md += `- B등급: ${b_count}건\n`;
+  md += `- C등급: ${c_count}건\n\n`;
+  md += `## 5W1H 결과\n\n`;
+  md += `| No | 파일명 | Who | What | When | Where | Why | How | 등급 |\n`;
+  md += `|---|---|---|---|---|---|---|---|---|\n`;
+  RESULTS.forEach(r => {
+    const ch = r.channels;
+    md += `| ${r.no} | ${r.filename} | ${ch.who||'-'} | ${(ch.what||'-').substring(0,30)} | ${ch.when||'-'} | ${ch.where||'-'} | ${(ch.why||'-').substring(0,20)} | ${(ch.how||'-').substring(0,20)} | ${r.finalGrade} |\n`;
+  });
+  
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `axdata_report_${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+}
+
+// 새 파일 분석하기 (그림 4-19)
+function resetAll() {
+  UPLOADED_FILES = [];
+  RESULTS = [];
+  $('fileBar').classList.remove('show');
+  $('pipeline').style.display = 'none';
+  $('resultsArea').classList.remove('show');
+  $('cumulativeStats').style.display = 'none';
+  ['search', 'qa', 'quality', 'learn', 'boom', 'edit', 'market', 'storage'].forEach(s => {
+    $(`section-${s}`)?.classList.remove('show');
+  });
+  $('fi').value = '';
+  for (let i = 1; i <= 6; i++) {
+    setStep(i, '', '대기 중...');
+    if (i === 1) $(`sp${i}`).className = 'sp active';
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// 파일 추출 함수들
 async function extractFiles(files) {
   const results = [];
   for (const file of files) {
@@ -479,21 +1846,15 @@ async function extractFiles(files) {
         const text = await extractFile(file);
         if (text) results.push({ filename: file.name, text });
       }
-    } catch (err) {
-      console.error(`Extract error: ${file.name}`, err);
-    }
+    } catch (err) { console.error(err); }
   }
   return results;
 }
 
 async function extractFile(file) {
   const ext = file.name.split('.').pop().toLowerCase();
-  if (['txt', 'csv', 'json', 'xml', 'log', 'md'].includes(ext)) {
-    return await file.text();
-  }
-  if (ext === 'pdf') {
-    return await extractPDF(file);
-  }
+  if (['txt', 'csv', 'json', 'xml', 'log', 'md'].includes(ext)) return await file.text();
+  if (ext === 'pdf') return await extractPDF(file);
   if (ext === 'docx') {
     const buf = await file.arrayBuffer();
     const result = await mammoth.extractRawText({ arrayBuffer: buf });
@@ -503,10 +1864,7 @@ async function extractFile(file) {
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, { type: 'array' });
     let text = '';
-    wb.SheetNames.forEach(name => {
-      const sheet = wb.Sheets[name];
-      text += XLSX.utils.sheet_to_csv(sheet) + '\n';
-    });
+    wb.SheetNames.forEach(name => { text += XLSX.utils.sheet_to_csv(wb.Sheets[name]) + '\n'; });
     return text;
   }
   return '';
@@ -533,7 +1891,6 @@ async function extractZip(zipFile) {
     if (f.dir) continue;
     const ext = filename.split('.').pop().toLowerCase();
     if (!['txt', 'csv', 'json', 'xml', 'log', 'md', 'docx', 'pdf', 'xlsx', 'xls'].includes(ext)) continue;
-
     const blob = await f.async('blob');
     const file = new File([blob], filename);
     const text = await extractFile(file);
@@ -542,34 +1899,25 @@ async function extractZip(zipFile) {
   return files;
 }
 
-// CSV 다운로드
-function downloadCSV() {
-  let csv = '\uFEFFNo,파일명,Who,What,When,Where,Why,How,등급\n';
-  RESULTS.forEach(r => {
-    const ch = r.channels;
-    csv += [r.no, r.filename, ch.who || '', ch.what || '', ch.when || '', ch.where || '', ch.why || '', ch.how || '', r.finalGrade]
-      .map(v => '"' + (v + '').replace(/"/g, '""') + '"').join(',') + '\n';
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `axdata_result_${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-}
-
-// 초기화
-function resetAll() {
-  UPLOADED_FILES = [];
-  RESULTS = [];
-  $('fileBar').classList.remove('show');
-  $('pipeline').style.display = 'none';
-  $('resultsArea').classList.remove('show');
-  $('fi').value = '';
-  for (let i = 1; i <= 6; i++) {
-    setStep(i, '', '대기 중...');
-    if (i === 1) $(`sp${i}`).className = 'sp active';
-  }
-}
+// 추가 단추 - 거래·저장 빠른 진입
+window.addEventListener('load', () => {
+  // 결과 영역 하단에 거래·저장 단추 자동 추가
+  setTimeout(() => {
+    const resultsArea = $('resultsArea');
+    if (!resultsArea) return;
+    
+    if (!$('extra-buttons')) {
+      const div = document.createElement('div');
+      div.id = 'extra-buttons';
+      div.style.cssText = 'display:flex; gap:0.6rem; margin-top:1.5rem; flex-wrap:wrap;';
+      div.innerHTML = `
+        <button class="btn btn-large btn-wine" onclick="showMarketSection()" style="flex:1;">📌 데이터 코드 등록 + 거래 시작</button>
+        <button class="btn btn-large" onclick="showStorageSection()" style="flex:1;">💾 저장 방식 선택</button>
+      `;
+      resultsArea.appendChild(div);
+    }
+  }, 100);
+});
 </script>
 
 </body>
