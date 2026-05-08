@@ -2,15 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 2 - 파일 업로드 (v2 통합 박스 패턴)</title>
+<title>saas.html 화면 2 - 파일 업로드 (동작 버전)</title>
 <style>
-  /* ============================================
-     [3도 인쇄 색상]
-     NAVY  #1A237E
-     WINE  #7B1F2A
-     BLACK #000000
-     ============================================ */
-
   body {
     font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
     margin: 0;
@@ -18,7 +11,7 @@
     background: #ffffff;
   }
 
-  /* ===== 상단 NAVY 안내바 ===== */
+  /* 상단 NAVY 안내바 */
   .top-banner {
     background: #1A237E;
     color: #ffffff;
@@ -29,7 +22,7 @@
     margin: 0 0 36px 0;
   }
 
-  /* ===== 통합 NAVY 박스 (메인) ===== */
+  /* 통합 NAVY 박스 */
   .upload-wrapper {
     max-width: 1200px;
     margin: 0 auto 28px auto;
@@ -40,7 +33,6 @@
     box-sizing: border-box;
   }
 
-  /* 화면 제목 */
   .screen-title {
     color: #1A237E;
     font-size: 36px;
@@ -57,7 +49,7 @@
     margin: 0 0 30px 0;
   }
 
-  /* ===== 미니 진행 단계 표시 (현재 위치 강조) ===== */
+  /* 미니 진행 단계 */
   .mini-steps {
     display: flex;
     justify-content: space-between;
@@ -79,14 +71,26 @@
     border-radius: 999px;
     white-space: nowrap;
     flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s;
   }
 
-  /* 현재 단계 - WINE 강조 */
+  .mini-step:hover {
+    border-color: #1A237E;
+    color: #1A237E;
+  }
+
   .mini-step.active {
     background: #7B1F2A;
     color: #ffffff;
     border-color: #7B1F2A;
     transform: scale(1.05);
+  }
+
+  .mini-step.done {
+    background: #1A237E;
+    color: #ffffff;
+    border-color: #1A237E;
   }
 
   .mini-arrow {
@@ -97,7 +101,7 @@
     text-align: center;
   }
 
-  /* ===== 드롭존 영역 ===== */
+  /* 드롭존 */
   .drop-zone {
     border: 3px dashed #1A237E;
     border-radius: 14px;
@@ -105,6 +109,19 @@
     text-align: center;
     background: #ffffff;
     margin: 0 0 28px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .drop-zone:hover {
+    background: #f5f7ff;
+    border-color: #7B1F2A;
+  }
+
+  .drop-zone.drag-over {
+    background: #fff5f5;
+    border-color: #7B1F2A;
+    transform: scale(1.01);
   }
 
   .drop-icon {
@@ -137,15 +154,22 @@
     border: none;
     border-radius: 999px;
     cursor: pointer;
+    transition: all 0.2s;
   }
 
-  /* ===== 파일 목록 미리보기 ===== */
+  .browse-btn:hover {
+    background: #7B1F2A;
+    transform: translateY(-2px);
+  }
+
+  /* 파일 목록 */
   .file-list-box {
     border: 2px solid #000000;
     border-radius: 12px;
     padding: 20px 24px;
     margin: 0 0 28px 0;
     background: #ffffff;
+    min-height: 100px;
   }
 
   .file-list-title {
@@ -153,6 +177,13 @@
     font-size: 20px;
     font-weight: 900;
     margin: 0 0 14px 0;
+  }
+
+  .empty-msg {
+    color: #888;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px 0;
   }
 
   .file-row {
@@ -172,11 +203,16 @@
 
   .file-name {
     flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 16px;
   }
 
   .file-size {
     color: #000000;
     margin: 0 16px;
+    white-space: nowrap;
   }
 
   .file-status {
@@ -186,9 +222,24 @@
     font-weight: 700;
     padding: 4px 12px;
     border-radius: 999px;
+    margin-right: 8px;
   }
 
-  /* ===== AX 시작 버튼 (WINE) ===== */
+  .file-remove {
+    background: none;
+    border: none;
+    color: #7B1F2A;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    padding: 0 6px;
+  }
+
+  .file-remove:hover {
+    color: #000000;
+  }
+
+  /* AX 시작 버튼 */
   .ax-start-btn {
     display: block;
     width: 100%;
@@ -201,9 +252,21 @@
     border-radius: 12px;
     cursor: pointer;
     letter-spacing: 1px;
+    transition: all 0.2s;
   }
 
-  /* ===== 파일 형식 안내 박스 ===== */
+  .ax-start-btn:hover:not(:disabled) {
+    background: #1A237E;
+    transform: translateY(-2px);
+  }
+
+  .ax-start-btn:disabled {
+    background: #cccccc;
+    color: #888888;
+    cursor: not-allowed;
+  }
+
+  /* 파일 형식 안내 박스 */
   .file-types-bar {
     max-width: 1200px;
     margin: 0 auto;
@@ -229,61 +292,54 @@
   파일 · 폴더 · ZIP 모두 자동 처리
 </div>
 
-<!-- ============================================
-     [통합 박스] 화면 2 - 파일 업로드
-     ============================================ -->
+<!-- 통합 NAVY 박스 -->
 <section class="upload-wrapper">
 
   <h1 class="screen-title">파일 업로드</h1>
   <p class="screen-subtitle">파일을 끌어다 놓으면 AX 시스템이 자동으로 구축됩니다</p>
 
-  <!-- 미니 진행 단계 (현재: 업로드 → ① 압축해제 직전) -->
+  <!-- 미니 진행 단계 -->
   <div class="mini-steps">
-    <div class="mini-step active">📁 업로드</div>
+    <div class="mini-step active" data-step="upload">📁 업로드</div>
     <span class="mini-arrow">→</span>
-    <div class="mini-step">① 압축해제</div>
+    <div class="mini-step" data-step="1">① 압축해제</div>
     <span class="mini-arrow">→</span>
-    <div class="mini-step">② 구조화</div>
+    <div class="mini-step" data-step="2">② 구조화</div>
     <span class="mini-arrow">→</span>
-    <div class="mini-step">③ 평가</div>
+    <div class="mini-step" data-step="3">③ 평가</div>
     <span class="mini-arrow">→</span>
-    <div class="mini-step">④ 보완</div>
+    <div class="mini-step" data-step="4">④ 보완</div>
     <span class="mini-arrow">→</span>
-    <div class="mini-step">⑤ AI 학습</div>
+    <div class="mini-step" data-step="5">⑤ AI 학습</div>
     <span class="mini-arrow">→</span>
-    <div class="mini-step">⑥ AX 구축</div>
+    <div class="mini-step" data-step="6">⑥ AX 구축</div>
   </div>
 
-  <!-- 드롭존 -->
-  <div class="drop-zone">
+  <!-- 드롭존 (클릭하면 파일 선택, 끌어 놓아도 동작) -->
+  <div class="drop-zone" id="dropZone">
     <div class="drop-icon">⬆</div>
     <div class="drop-main-text">파일을 여기로 끌어다 놓으세요</div>
     <div class="drop-sub-text">또는 아래 버튼으로 선택하세요</div>
-    <button class="browse-btn">파일 선택</button>
+    <button class="browse-btn" id="browseBtn" type="button">파일 선택</button>
   </div>
 
-  <!-- 업로드된 파일 목록 (예시) -->
+  <!-- 숨겨진 파일 입력 -->
+  <input type="file" id="fileInput" multiple
+    accept=".pdf,.docx,.xlsx,.txt,.csv,.json,.xml,.zip"
+    style="display:none">
+
+  <!-- 업로드된 파일 목록 -->
   <div class="file-list-box">
-    <div class="file-list-title">📂 업로드된 파일 (3개)</div>
-    <div class="file-row">
-      <span class="file-name">제조공정_매뉴얼.docx</span>
-      <span class="file-size">2.4 MB</span>
-      <span class="file-status">대기</span>
-    </div>
-    <div class="file-row">
-      <span class="file-name">품질관리_보고서.pdf</span>
-      <span class="file-size">5.1 MB</span>
-      <span class="file-status">대기</span>
-    </div>
-    <div class="file-row">
-      <span class="file-name">설비_데이터.zip</span>
-      <span class="file-size">18.7 MB</span>
-      <span class="file-status">대기</span>
+    <div class="file-list-title" id="fileListTitle">📂 업로드된 파일 (0개)</div>
+    <div id="fileList">
+      <div class="empty-msg">아직 선택된 파일이 없습니다</div>
     </div>
   </div>
 
-  <!-- AX 시작 버튼 -->
-  <button class="ax-start-btn">AX 자동 구축 시작 →</button>
+  <!-- AX 시작 버튼 (파일 선택 전에는 비활성) -->
+  <button class="ax-start-btn" id="axStartBtn" disabled>
+    AX 자동 구축 시작 →
+  </button>
 
 </section>
 
@@ -293,6 +349,138 @@
     PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합 · 중첩 가능)
   </span>
 </div>
+
+<script>
+// ============================================
+// 파일 업로드 동작 처리
+// ============================================
+
+const dropZone = document.getElementById('dropZone');
+const browseBtn = document.getElementById('browseBtn');
+const fileInput = document.getElementById('fileInput');
+const fileList = document.getElementById('fileList');
+const fileListTitle = document.getElementById('fileListTitle');
+const axStartBtn = document.getElementById('axStartBtn');
+
+let selectedFiles = [];
+
+// [1] "파일 선택" 버튼 클릭 → 파일 다이얼로그
+browseBtn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  fileInput.click();
+});
+
+// [2] 드롭존 클릭 → 파일 다이얼로그
+dropZone.addEventListener('click', function() {
+  fileInput.click();
+});
+
+// [3] 파일 선택 시 처리
+fileInput.addEventListener('change', function(e) {
+  handleFiles(e.target.files);
+});
+
+// [4] 끌어다 놓기 - 들어옴
+dropZone.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+
+// [5] 끌어다 놓기 - 나감
+dropZone.addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+});
+
+// [6] 끌어다 놓기 - 놓음
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+
+// [7] 파일 처리 함수
+function handleFiles(files) {
+  for (let i = 0; i < files.length; i++) {
+    selectedFiles.push(files[i]);
+  }
+  renderFileList();
+  updateAXButton();
+}
+
+// [8] 파일 목록 렌더링
+function renderFileList() {
+  if (selectedFiles.length === 0) {
+    fileListTitle.textContent = '📂 업로드된 파일 (0개)';
+    fileList.innerHTML = '<div class="empty-msg">아직 선택된 파일이 없습니다</div>';
+    return;
+  }
+
+  fileListTitle.textContent = '📂 업로드된 파일 (' + selectedFiles.length + '개)';
+
+  let html = '';
+  selectedFiles.forEach((file, idx) => {
+    const sizeKB = (file.size / 1024).toFixed(1);
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+    const sizeStr = file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB';
+
+    html += '<div class="file-row">';
+    html += '<span class="file-name">' + file.name + '</span>';
+    html += '<span class="file-size">' + sizeStr + '</span>';
+    html += '<span class="file-status">대기</span>';
+    html += '<button class="file-remove" onclick="removeFile(' + idx + ')" title="제거">✕</button>';
+    html += '</div>';
+  });
+
+  fileList.innerHTML = html;
+}
+
+// [9] 파일 제거
+function removeFile(idx) {
+  selectedFiles.splice(idx, 1);
+  renderFileList();
+  updateAXButton();
+}
+
+// [10] AX 시작 버튼 활성/비활성
+function updateAXButton() {
+  axStartBtn.disabled = selectedFiles.length === 0;
+}
+
+// [11] AX 시작 버튼 클릭 → 다음 화면 (① 압축해제) 이동
+axStartBtn.addEventListener('click', function() {
+  if (selectedFiles.length === 0) return;
+
+  // [현재 단계 이동] 업로드 → ① 압축해제
+  document.querySelector('.mini-step[data-step="upload"]').classList.remove('active');
+  document.querySelector('.mini-step[data-step="upload"]').classList.add('done');
+  document.querySelector('.mini-step[data-step="1"]').classList.add('active');
+
+  // [실제 운영시 여기에 처리 호출 추가]
+  // → axdata 처리 시스템 호출 / 다음 화면으로 라우팅
+  alert('AX 자동 구축을 시작합니다.\n\n선택된 파일: ' + selectedFiles.length + '개\n\n다음 화면 (① 압축해제)으로 이동합니다.');
+
+  // 실제 환경에서는: window.location.href = 'step1.html';
+});
+
+// [12] 미니 진행단계 클릭 → 해당 화면 이동
+document.querySelectorAll('.mini-step').forEach(step => {
+  step.addEventListener('click', function() {
+    const stepNum = this.dataset.step;
+    if (stepNum === 'upload') return;
+
+    const labels = {
+      '1': '① 압축해제',
+      '2': '② 구조화',
+      '3': '③ 평가',
+      '4': '④ 보완',
+      '5': '⑤ AI 학습',
+      '6': '⑥ AX 구축'
+    };
+    alert(labels[stepNum] + ' 화면으로 이동합니다.\n\n(해당 화면 제작 후 연결됩니다)');
+  });
+});
+</script>
 
 </body>
 </html>
