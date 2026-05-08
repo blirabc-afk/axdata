@@ -2,27 +2,15 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 6 - 보고서 자동 생성</title>
+<title>saas.html 화면 6 v2 - 보고서 자동 생성 (저장 위치 선택)</title>
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
 
-  .top-banner {
-    background: #1A237E; color: #ffffff; text-align: center;
-    padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0;
-  }
+  .top-banner { background: #1A237E; color: #ffffff; text-align: center; padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0; }
 
-  .report-wrapper {
-    max-width: 1200px; margin: 0 auto 28px auto;
-    border: 3px solid #1A237E; border-radius: 16px;
-    padding: 36px 40px; background: #ffffff; box-sizing: border-box;
-  }
+  .report-wrapper { max-width: 1200px; margin: 0 auto 28px auto; border: 3px solid #1A237E; border-radius: 16px; padding: 36px 40px; background: #ffffff; box-sizing: border-box; }
 
-  .sys-header {
-    display: flex; justify-content: space-between; align-items: center;
-    background: #f5f7ff; border: 2px solid #1A237E;
-    border-radius: 10px; padding: 12px 20px; margin: 0 0 24px 0;
-    font-size: 14px; font-weight: 700;
-  }
+  .sys-header { display: flex; justify-content: space-between; align-items: center; background: #f5f7ff; border: 2px solid #1A237E; border-radius: 10px; padding: 12px 20px; margin: 0 0 24px 0; font-size: 14px; font-weight: 700; }
   .sys-header-info { display: flex; gap: 20px; flex-wrap: wrap; }
   .sys-info-label { color: #555; margin-right: 6px; }
   .sys-info-value { color: #1A237E; font-family: 'Courier New', monospace; font-weight: 900; }
@@ -30,482 +18,237 @@
   .screen-title { color: #1A237E; font-size: 36px; font-weight: 900; text-align: center; margin: 0 0 14px 0; }
   .screen-subtitle { color: #000000; font-size: 18px; font-weight: 700; text-align: center; margin: 0 0 28px 0; }
 
-  .section-title {
-    color: #1A237E; font-size: 18px; font-weight: 900;
-    margin: 28px 0 14px 0;
-    padding: 0 0 0 10px;
-    border-left: 5px solid #7B1F2A;
-  }
+  .section-title { color: #1A237E; font-size: 18px; font-weight: 900; margin: 28px 0 14px 0; padding: 0 0 0 10px; border-left: 5px solid #7B1F2A; }
 
-  /* 보고서 종류 카드 */
-  .template-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    gap: 12px; margin: 0 0 8px 0;
-  }
-
-  .template-card {
-    border: 2px solid #cccccc;
-    border-radius: 12px;
-    padding: 20px 14px;
-    text-align: center;
-    background: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .template-card:hover {
-    border-color: #1A237E;
-    background: #f5f7ff;
-    transform: translateY(-3px);
-  }
-
-  .template-card.active {
-    border-color: #7B1F2A;
-    background: #fff5f5;
-    box-shadow: 0 0 0 3px rgba(123, 31, 42, 0.15);
-  }
-
+  .template-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .template-card { border: 2px solid #cccccc; border-radius: 12px; padding: 20px 14px; text-align: center; background: #ffffff; cursor: pointer; transition: all 0.2s; }
+  .template-card:hover { border-color: #1A237E; background: #f5f7ff; transform: translateY(-3px); }
+  .template-card.active { border-color: #7B1F2A; background: #fff5f5; box-shadow: 0 0 0 3px rgba(123, 31, 42, 0.15); }
   .template-icon { font-size: 36px; line-height: 1; margin: 0 0 10px 0; }
   .template-name { color: #1A237E; font-size: 15px; font-weight: 900; margin: 0 0 4px 0; }
   .template-desc { color: #555; font-size: 12px; font-weight: 700; }
-
   .template-card.active .template-name { color: #7B1F2A; }
 
-  /* 옵션 설정 */
-  .options-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
+  .options-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .option-card { border: 2px solid #1A237E; border-radius: 12px; padding: 18px 22px; background: #ffffff; }
+  .option-title { color: #1A237E; font-size: 15px; font-weight: 900; margin: 0 0 12px 0; }
 
-  .option-card {
-    border: 2px solid #1A237E;
-    border-radius: 12px;
-    padding: 18px 22px;
-    background: #ffffff;
-  }
-
-  .option-title {
-    color: #1A237E; font-size: 15px; font-weight: 900;
-    margin: 0 0 12px 0;
-  }
-
-  /* 기간 선택 */
-  .period-input-row {
-    display: flex; gap: 10px; align-items: center;
-  }
-
-  .date-input {
-    flex-grow: 1; padding: 10px 14px;
-    border: 2px solid #1A237E; border-radius: 8px;
-    font-size: 14px; font-weight: 700; color: #1A237E;
-    font-family: inherit;
-  }
-
+  .period-input-row { display: flex; gap: 10px; align-items: center; }
+  .date-input { flex-grow: 1; padding: 10px 14px; border: 2px solid #1A237E; border-radius: 8px; font-size: 14px; font-weight: 700; color: #1A237E; font-family: inherit; }
   .date-input:focus { outline: none; border-color: #7B1F2A; }
 
-  .period-quick {
-    display: flex; gap: 6px; margin: 10px 0 0 0;
-    flex-wrap: wrap;
-  }
-
-  .period-quick-btn {
-    background: #ffffff; color: #1A237E;
-    border: 2px solid #1A237E;
-    font-size: 12px; font-weight: 900;
-    padding: 6px 12px; border-radius: 999px;
-    cursor: pointer; transition: all 0.2s;
-  }
-
+  .period-quick { display: flex; gap: 6px; margin: 10px 0 0 0; flex-wrap: wrap; }
+  .period-quick-btn { background: #ffffff; color: #1A237E; border: 2px solid #1A237E; font-size: 12px; font-weight: 900; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all 0.2s; }
   .period-quick-btn:hover { background: #1A237E; color: #ffffff; }
   .period-quick-btn.active { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; }
 
-  /* 체크박스 */
-  .check-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .check-item {
-    display: flex; align-items: center;
-    gap: 8px; padding: 8px 12px;
-    background: #f5f7ff; border-radius: 8px;
-    cursor: pointer; user-select: none;
-    border: 2px solid transparent;
-    transition: all 0.2s;
-  }
-
+  .check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .check-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f5f7ff; border-radius: 8px; cursor: pointer; user-select: none; border: 2px solid transparent; transition: all 0.2s; }
   .check-item:hover { border-color: #1A237E; }
-
-  .check-item.checked {
-    background: #1A237E; color: #ffffff; border-color: #1A237E;
-  }
-
-  .check-item input { display: none; }
-
-  .check-item-icon {
-    font-size: 16px;
-  }
-
-  .check-item-label {
-    font-size: 13px; font-weight: 900; color: #000000;
-  }
-
+  .check-item.checked { background: #1A237E; color: #ffffff; border-color: #1A237E; }
+  .check-item-icon { font-size: 16px; }
+  .check-item-label { font-size: 13px; font-weight: 900; color: #000000; }
   .check-item.checked .check-item-label { color: #ffffff; }
 
-  /* 형식 라디오 */
-  .format-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  .format-card {
-    border: 2px solid #1A237E;
-    border-radius: 10px;
-    padding: 14px 10px;
-    text-align: center;
-    background: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
+  .format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .format-card { border: 2px solid #1A237E; border-radius: 10px; padding: 14px 10px; text-align: center; background: #ffffff; cursor: pointer; transition: all 0.2s; }
   .format-card:hover { background: #f5f7ff; }
-
-  .format-card.active {
-    background: #7B1F2A; color: #ffffff;
-    border-color: #7B1F2A;
-  }
-
+  .format-card.active { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; }
   .format-icon { font-size: 24px; line-height: 1; margin: 0 0 6px 0; }
   .format-name { font-size: 13px; font-weight: 900; }
 
-  /* 미리보기 */
-  .preview-card {
-    border: 2px solid #1A237E;
+  /* [v2 신규] 파일명 + 저장 위치 옵션 */
+  .save-options-card {
+    border: 3px solid #7B1F2A;
     border-radius: 12px;
+    padding: 22px 24px;
+    background: #fff5f5;
+    margin: 28px 0 16px 0;
+  }
+
+  .save-options-title {
+    color: #7B1F2A; font-size: 16px; font-weight: 900;
+    margin: 0 0 14px 0;
+  }
+
+  .filename-row {
+    display: flex; gap: 10px; align-items: center;
+    margin: 0 0 14px 0;
+  }
+
+  .filename-label {
+    color: #1A237E; font-size: 14px; font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .filename-input {
+    flex-grow: 1;
+    padding: 10px 14px;
+    border: 2px solid #1A237E;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #1A237E;
+  }
+
+  .filename-input:focus {
+    outline: none; border-color: #7B1F2A;
+  }
+
+  .filename-ext {
+    color: #555; font-size: 14px; font-weight: 900;
+    font-family: 'Courier New', monospace;
+  }
+
+  .save-method-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .save-method-card {
+    border: 2px solid #cccccc;
+    border-radius: 10px;
+    padding: 14px 16px;
     background: #ffffff;
-    padding: 28px;
-    margin: 0;
+    cursor: pointer;
+    transition: all 0.2s;
   }
 
-  .preview-paper {
-    background: #ffffff;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    box-shadow: 0 4px 0 0 rgba(0,0,0,0.06);
-    padding: 36px;
-    max-width: 640px;
-    margin: 0 auto;
-    font-size: 13px;
+  .save-method-card:hover { border-color: #1A237E; transform: translateY(-2px); }
+
+  .save-method-card.active {
+    border-color: #7B1F2A; background: #fff5f5;
   }
 
-  .preview-cover {
-    text-align: center;
-    padding: 30px 0;
-    border-bottom: 3px solid #1A237E;
-    margin: 0 0 24px 0;
+  .save-method-card.disabled {
+    opacity: 0.6; cursor: not-allowed;
   }
+  .save-method-card.disabled:hover { transform: none; }
 
-  .preview-stamp {
-    display: inline-block;
-    background: #1A237E; color: #ffffff;
-    font-size: 12px; font-weight: 900;
-    padding: 4px 14px; border-radius: 999px;
-    margin: 0 0 12px 0;
-  }
-
-  .preview-title {
-    color: #1A237E; font-size: 26px; font-weight: 900;
-    margin: 0 0 8px 0;
-  }
-
-  .preview-period {
-    color: #000000; font-size: 14px; font-weight: 700;
-    margin: 0 0 8px 0;
-  }
-
-  .preview-meta {
-    color: #555; font-size: 12px; font-weight: 700;
-    display: flex; justify-content: center; gap: 14px;
-  }
-
-  .preview-section {
-    margin: 0 0 20px 0;
-  }
-
-  .preview-section-title {
-    color: #1A237E; font-size: 15px; font-weight: 900;
-    padding: 0 0 6px 0; border-bottom: 2px solid #1A237E;
-    margin: 0 0 10px 0;
-  }
-
-  .preview-kpi {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-
-  .preview-kpi-card {
-    border: 1px solid #1A237E;
-    border-radius: 6px;
-    padding: 8px 6px;
-    text-align: center;
-    background: #f5f7ff;
-  }
-
-  .preview-kpi-value {
-    color: #1A237E; font-size: 18px; font-weight: 900;
-    line-height: 1;
-  }
-
-  .preview-kpi-label {
-    color: #000; font-size: 10px; font-weight: 700;
-    margin: 4px 0 0 0;
-  }
-
-  .preview-channel {
-    display: grid;
-    grid-template-columns: 60px 1fr 50px;
-    gap: 8px; align-items: center;
+  .save-method-header {
+    display: flex; align-items: center; gap: 8px;
     margin: 0 0 6px 0;
-    font-size: 12px; font-weight: 700;
   }
 
+  .save-method-icon { font-size: 20px; }
+
+  .save-method-name {
+    color: #1A237E; font-size: 14px; font-weight: 900;
+  }
+
+  .save-method-card.active .save-method-name { color: #7B1F2A; }
+
+  .save-method-desc {
+    color: #555; font-size: 12px; font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .save-method-badge {
+    display: inline-block;
+    background: #b8860b; color: #ffffff;
+    font-size: 10px; font-weight: 900;
+    padding: 2px 8px; border-radius: 999px;
+    margin-left: 6px;
+  }
+
+  /* 미리보기 */
+  .preview-card { border: 2px solid #1A237E; border-radius: 12px; background: #ffffff; padding: 28px; }
+  .preview-paper { background: #ffffff; border: 1px solid #cccccc; border-radius: 4px; box-shadow: 0 4px 0 0 rgba(0,0,0,0.06); padding: 36px; max-width: 640px; margin: 0 auto; font-size: 13px; }
+  .preview-cover { text-align: center; padding: 30px 0; border-bottom: 3px solid #1A237E; margin: 0 0 24px 0; }
+  .preview-stamp { display: inline-block; background: #1A237E; color: #ffffff; font-size: 12px; font-weight: 900; padding: 4px 14px; border-radius: 999px; margin: 0 0 12px 0; }
+  .preview-title { color: #1A237E; font-size: 26px; font-weight: 900; margin: 0 0 8px 0; }
+  .preview-period { color: #000000; font-size: 14px; font-weight: 700; margin: 0 0 8px 0; }
+  .preview-meta { color: #555; font-size: 12px; font-weight: 700; display: flex; justify-content: center; gap: 14px; }
+  .preview-section { margin: 0 0 20px 0; }
+  .preview-section-title { color: #1A237E; font-size: 15px; font-weight: 900; padding: 0 0 6px 0; border-bottom: 2px solid #1A237E; margin: 0 0 10px 0; }
+  .preview-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .preview-kpi-card { border: 1px solid #1A237E; border-radius: 6px; padding: 8px 6px; text-align: center; background: #f5f7ff; }
+  .preview-kpi-value { color: #1A237E; font-size: 18px; font-weight: 900; line-height: 1; }
+  .preview-kpi-label { color: #000; font-size: 10px; font-weight: 700; margin: 4px 0 0 0; }
+  .preview-channel { display: grid; grid-template-columns: 60px 1fr 50px; gap: 8px; align-items: center; margin: 0 0 6px 0; font-size: 12px; font-weight: 700; }
   .preview-channel-label { color: #1A237E; font-weight: 900; }
-
-  .preview-channel-bar {
-    height: 14px;
-    background: #f0f0f0;
-    border-radius: 4px;
-    overflow: hidden;
-    display: flex;
-  }
-
+  .preview-channel-bar { height: 14px; background: #f0f0f0; border-radius: 4px; overflow: hidden; display: flex; }
   .preview-channel-bar .seg-a { background: #1A237E; height: 100%; }
   .preview-channel-bar .seg-b { background: #b8860b; height: 100%; }
   .preview-channel-bar .seg-c { background: #7B1F2A; height: 100%; }
-
   .preview-channel-num { color: #1A237E; font-weight: 900; text-align: right; }
-
   .preview-list { font-size: 12px; line-height: 1.7; color: #000; }
   .preview-list li { margin: 0 0 4px 0; }
+  .preview-rec { background: #fff5f5; border-left: 4px solid #7B1F2A; padding: 10px 14px; margin: 8px 0; font-size: 12px; font-weight: 700; color: #000; }
+  .preview-foot { text-align: center; padding: 16px 0 0 0; margin: 24px 0 0 0; border-top: 1px solid #cccccc; color: #888; font-size: 11px; font-weight: 700; }
 
-  .preview-rec {
-    background: #fff5f5;
-    border-left: 4px solid #7B1F2A;
-    padding: 10px 14px;
-    margin: 8px 0;
-    font-size: 12px; font-weight: 700; color: #000;
-  }
+  .generate-btn { display: block; width: 100%; background: #7B1F2A; color: #ffffff; font-size: 22px; font-weight: 900; padding: 20px; border: none; border-radius: 12px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
+  .generate-btn:hover:not(:disabled) { background: #1A237E; transform: translateY(-2px); }
+  .generate-btn:disabled { background: #cccccc; cursor: not-allowed; }
 
-  .preview-foot {
-    text-align: center;
-    padding: 16px 0 0 0;
-    margin: 24px 0 0 0;
-    border-top: 1px solid #cccccc;
-    color: #888; font-size: 11px; font-weight: 700;
-  }
-
-  /* 생성 버튼 */
-  .generate-btn {
-    display: block;
-    width: 100%;
-    background: #7B1F2A; color: #ffffff;
-    font-size: 22px; font-weight: 900;
-    padding: 20px; border: none; border-radius: 12px;
-    cursor: pointer; letter-spacing: 1px;
-    transition: all 0.2s;
-  }
-
-  .generate-btn:hover:not(:disabled) {
-    background: #1A237E; transform: translateY(-2px);
-  }
-
-  .generate-btn:disabled {
-    background: #cccccc; cursor: not-allowed;
-  }
-
-  /* 생성 진행 */
-  .gen-progress {
-    display: none;
-    border: 3px solid #7B1F2A;
-    border-radius: 12px;
-    padding: 24px;
-    background: #ffffff;
-    text-align: center;
-    margin: 16px 0 0 0;
-  }
+  .gen-progress { display: none; border: 3px solid #7B1F2A; border-radius: 12px; padding: 24px; background: #ffffff; text-align: center; margin: 16px 0 0 0; }
   .gen-progress.show { display: block; }
+  .gen-spinner { display: inline-block; width: 36px; height: 36px; border: 4px solid #f0f0f0; border-top: 4px solid #7B1F2A; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 0 12px 0; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .gen-text { color: #1A237E; font-size: 18px; font-weight: 900; margin: 0 0 6px 0; }
+  .gen-sub { color: #555; font-size: 14px; font-weight: 700; }
 
-  .gen-spinner {
-    display: inline-block; width: 36px; height: 36px;
-    border: 4px solid #f0f0f0;
-    border-top: 4px solid #7B1F2A;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-    margin: 0 0 12px 0;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  .gen-text {
-    color: #1A237E; font-size: 18px; font-weight: 900;
-    margin: 0 0 6px 0;
-  }
-
-  .gen-sub {
-    color: #555; font-size: 14px; font-weight: 700;
-  }
-
-  /* 최근 보고서 */
-  .recent-table {
-    border: 2px solid #1A237E; border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .recent-row {
-    display: grid;
-    grid-template-columns: 30px 1fr 120px 100px 90px 100px;
-    gap: 12px; align-items: center;
-    padding: 12px 18px;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 13px; font-weight: 700;
-    transition: all 0.2s;
-  }
-
+  .recent-table { border: 2px solid #1A237E; border-radius: 12px; overflow: hidden; }
+  .recent-row { display: grid; grid-template-columns: 30px 1fr 120px 100px 90px 100px; gap: 12px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #f0f0f0; font-size: 13px; font-weight: 700; transition: all 0.2s; }
   .recent-row:last-child { border-bottom: none; }
   .recent-row:hover { background: #f5f7ff; }
-
-  .recent-row.header {
-    background: #1A237E; color: #ffffff;
-    font-size: 13px; font-weight: 900;
-  }
-
+  .recent-row.header { background: #1A237E; color: #ffffff; font-size: 13px; font-weight: 900; }
   .recent-icon { font-size: 20px; text-align: center; }
   .recent-title { color: #000000; }
   .recent-period { color: #555; font-family: 'Courier New', monospace; font-size: 12px; }
-  .recent-format {
-    background: #f5f7ff; color: #1A237E;
-    border: 1px solid #1A237E;
-    font-size: 11px; font-weight: 900;
-    padding: 4px 10px; border-radius: 999px;
-    text-align: center;
-  }
-
-  .recent-status {
-    color: #1A237E; font-weight: 900;
-    text-align: center;
-  }
-
-  .recent-download {
-    background: #7B1F2A; color: #ffffff;
-    border: none; border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 12px; font-weight: 900;
-    cursor: pointer;
-  }
-
+  .recent-format { background: #f5f7ff; color: #1A237E; border: 1px solid #1A237E; font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 999px; text-align: center; }
+  .recent-status { color: #1A237E; font-weight: 900; text-align: center; }
+  .recent-download { background: #7B1F2A; color: #ffffff; border: none; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 900; cursor: pointer; }
   .recent-download:hover { background: #1A237E; }
 
   /* 모달 */
-  .modal-backdrop {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6); z-index: 1000;
-    align-items: center; justify-content: center; padding: 20px;
-  }
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
   .modal-backdrop.show { display: flex; }
-
-  .modal-box {
-    background: #ffffff;
-    border: 3px solid #1A237E;
-    border-radius: 16px;
-    padding: 36px;
-    max-width: 600px; width: 100%;
-    max-height: 85vh; overflow-y: auto;
-    box-sizing: border-box; text-align: center;
-  }
-
+  .modal-box { background: #ffffff; border: 3px solid #1A237E; border-radius: 16px; padding: 36px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; box-sizing: border-box; text-align: center; }
   .modal-icon { font-size: 64px; line-height: 1; margin: 0 0 12px 0; }
-
-  .modal-title {
-    color: #1A237E; font-size: 28px; font-weight: 900;
-    margin: 0 0 12px 0;
-  }
-
-  .modal-msg {
-    color: #000000; font-size: 16px; font-weight: 700;
-    margin: 0 0 24px 0; line-height: 1.6;
-  }
-
-  .modal-info {
-    background: #f5f7ff;
-    border: 2px solid #1A237E;
-    border-radius: 10px;
-    padding: 14px 20px;
-    margin: 0 0 20px 0;
-    text-align: left;
-    font-size: 14px; font-weight: 700;
-  }
-
-  .modal-info-row {
-    display: flex; justify-content: space-between;
-    padding: 4px 0;
-  }
-
+  .modal-title { color: #1A237E; font-size: 28px; font-weight: 900; margin: 0 0 12px 0; }
+  .modal-msg { color: #000000; font-size: 16px; font-weight: 700; margin: 0 0 24px 0; line-height: 1.6; }
+  .modal-info { background: #f5f7ff; border: 2px solid #1A237E; border-radius: 10px; padding: 14px 20px; margin: 0 0 20px 0; text-align: left; font-size: 14px; font-weight: 700; }
+  .modal-info-row { display: flex; justify-content: space-between; padding: 4px 0; }
   .modal-info-label { color: #555; }
   .modal-info-value { color: #1A237E; font-weight: 900; font-family: 'Courier New', monospace; }
-
-  .modal-actions {
-    display: flex; gap: 10px; justify-content: center;
-  }
-
-  .modal-btn {
-    background: #ffffff; color: #1A237E;
-    border: 2px solid #1A237E;
-    font-size: 15px; font-weight: 900;
-    padding: 12px 28px; border-radius: 10px;
-    cursor: pointer; transition: all 0.2s;
-  }
-
+  .modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .modal-btn { background: #ffffff; color: #1A237E; border: 2px solid #1A237E; font-size: 15px; font-weight: 900; padding: 12px 22px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
   .modal-btn:hover { background: #1A237E; color: #ffffff; }
-
-  .modal-btn.primary {
-    background: #7B1F2A; color: #ffffff; border-color: #7B1F2A;
-  }
-
+  .modal-btn.primary { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; }
   .modal-btn.primary:hover { background: #1A237E; border-color: #1A237E; }
 
-  /* 하단 */
-  .bottom-actions {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 10px; margin: 28px 0 0 0;
+  /* [v2 신규] 토스트 알림 */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #1A237E; color: #ffffff;
+    padding: 16px 28px; border-radius: 999px;
+    font-weight: 900; font-size: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    transition: transform 0.3s ease;
+    max-width: 90%;
+    display: flex; align-items: center; gap: 10px;
   }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: #7B1F2A; }
+  .toast .toast-icon { font-size: 20px; }
 
-  .bottom-btn {
-    background: #ffffff; color: #1A237E;
-    border: 2px solid #1A237E;
-    font-size: 14px; font-weight: 900;
-    padding: 14px 8px; border-radius: 10px;
-    cursor: pointer; transition: all 0.2s; text-align: center;
-  }
-
+  .bottom-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 28px 0 0 0; }
+  .bottom-btn { background: #ffffff; color: #1A237E; border: 2px solid #1A237E; font-size: 14px; font-weight: 900; padding: 14px 8px; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: center; }
   .bottom-btn:hover { background: #1A237E; color: #ffffff; transform: translateY(-2px); }
   .bottom-btn-icon { font-size: 22px; display: block; margin: 0 0 4px 0; }
   .bottom-btn.current { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; cursor: default; }
   .bottom-btn.current:hover { transform: none; }
 
-  .file-types-bar {
-    max-width: 1200px; margin: 0 auto;
-    background: #ffffff; border: 2px solid #000000;
-    border-radius: 12px; padding: 18px 40px;
-    text-align: center; box-sizing: border-box;
-  }
+  .file-types-bar { max-width: 1200px; margin: 0 auto; background: #ffffff; border: 2px solid #000000; border-radius: 12px; padding: 18px 40px; text-align: center; box-sizing: border-box; }
   .file-types-bar .label { color: #000000; font-size: 18px; font-weight: 700; }
 </style>
 </head>
 <body>
 
-<div class="top-banner">5W1H 6채널 데이터 기반 자동 보고서 생성</div>
+<div class="top-banner">5W1H 6채널 데이터 기반 자동 보고서 생성 - 저장 위치 선택 가능</div>
 
 <section class="report-wrapper">
 
@@ -519,43 +262,29 @@
   </div>
 
   <h1 class="screen-title">📑 보고서 자동 생성</h1>
-  <p class="screen-subtitle">학습된 데이터로 보고서를 자동 작성합니다 - 옵션을 선택하세요</p>
+  <p class="screen-subtitle">학습된 데이터로 보고서를 자동 작성하고 원하는 위치에 저장합니다</p>
 
-  <!-- 1. 보고서 종류 -->
   <div class="section-title">📋 보고서 종류 선택</div>
   <div class="template-grid">
     <div class="template-card active" data-tpl="daily">
-      <div class="template-icon">📅</div>
-      <div class="template-name">일일 보고서</div>
-      <div class="template-desc">하루 운영 현황</div>
+      <div class="template-icon">📅</div><div class="template-name">일일 보고서</div><div class="template-desc">하루 운영 현황</div>
     </div>
     <div class="template-card" data-tpl="weekly">
-      <div class="template-icon">📊</div>
-      <div class="template-name">주간 보고서</div>
-      <div class="template-desc">7일 종합 분석</div>
+      <div class="template-icon">📊</div><div class="template-name">주간 보고서</div><div class="template-desc">7일 종합 분석</div>
     </div>
     <div class="template-card" data-tpl="monthly">
-      <div class="template-icon">📈</div>
-      <div class="template-name">월간 보고서</div>
-      <div class="template-desc">월별 추이 분석</div>
+      <div class="template-icon">📈</div><div class="template-name">월간 보고서</div><div class="template-desc">월별 추이 분석</div>
     </div>
     <div class="template-card" data-tpl="quarterly">
-      <div class="template-icon">📆</div>
-      <div class="template-name">분기 보고서</div>
-      <div class="template-desc">분기 종합 평가</div>
+      <div class="template-icon">📆</div><div class="template-name">분기 보고서</div><div class="template-desc">분기 종합 평가</div>
     </div>
     <div class="template-card" data-tpl="custom">
-      <div class="template-icon">✏️</div>
-      <div class="template-name">사용자 정의</div>
-      <div class="template-desc">기간 직접 설정</div>
+      <div class="template-icon">✏️</div><div class="template-name">사용자 정의</div><div class="template-desc">기간 직접 설정</div>
     </div>
   </div>
 
-  <!-- 2. 옵션 설정 -->
   <div class="section-title">⚙️ 옵션 설정</div>
   <div class="options-row">
-
-    <!-- 기간 -->
     <div class="option-card">
       <div class="option-title">📅 기간 선택</div>
       <div class="period-input-row">
@@ -571,28 +300,17 @@
       </div>
     </div>
 
-    <!-- 출력 형식 -->
     <div class="option-card">
       <div class="option-title">📦 출력 형식</div>
       <div class="format-grid">
-        <div class="format-card active" data-format="pdf">
-          <div class="format-icon">📄</div>
-          <div class="format-name">PDF</div>
-        </div>
-        <div class="format-card" data-format="docx">
-          <div class="format-icon">📝</div>
-          <div class="format-name">Word (DOCX)</div>
-        </div>
-        <div class="format-card" data-format="pptx">
-          <div class="format-icon">📊</div>
-          <div class="format-name">PowerPoint</div>
-        </div>
+        <div class="format-card active" data-format="pdf"><div class="format-icon">📄</div><div class="format-name">PDF</div></div>
+        <div class="format-card" data-format="docx"><div class="format-icon">📝</div><div class="format-name">Word</div></div>
+        <div class="format-card" data-format="pptx"><div class="format-icon">📊</div><div class="format-name">PowerPoint</div></div>
       </div>
     </div>
   </div>
 
   <div class="options-row" style="margin-top:14px;">
-    <!-- 포함 분야 -->
     <div class="option-card">
       <div class="option-title">🏷️ 포함 분야</div>
       <div class="check-grid" id="categoryChecks">
@@ -604,8 +322,6 @@
         <div class="check-item" data-cat="other"><span class="check-item-icon">📌</span><span class="check-item-label">기타</span></div>
       </div>
     </div>
-
-    <!-- 포함 섹션 -->
     <div class="option-card">
       <div class="option-title">📋 포함 섹션</div>
       <div class="check-grid" id="sectionChecks">
@@ -619,42 +335,69 @@
     </div>
   </div>
 
-  <!-- 3. 미리보기 -->
-  <div class="section-title">👁️ 보고서 미리보기 (실시간)</div>
-  <div class="preview-card">
-    <div class="preview-paper" id="previewPaper">
-      <!-- 동적 생성 -->
+  <!-- [v2 신규] 저장 옵션 -->
+  <div class="save-options-card">
+    <div class="save-options-title">💾 저장 옵션</div>
+
+    <div class="filename-row">
+      <span class="filename-label">파일명:</span>
+      <input type="text" class="filename-input" id="customFileName"
+        placeholder="자동 생성됨" value="">
+      <span class="filename-ext" id="fileExt">.pdf</span>
+    </div>
+
+    <div class="save-method-row">
+      <div class="save-method-card active" data-method="picker" id="methodPicker">
+        <div class="save-method-header">
+          <span class="save-method-icon">📁</span>
+          <span class="save-method-name">위치 직접 선택</span>
+        </div>
+        <div class="save-method-desc">
+          파일 다이얼로그를 열어 저장 폴더와 파일명을 직접 지정합니다.
+        </div>
+      </div>
+
+      <div class="save-method-card" data-method="default" id="methodDefault">
+        <div class="save-method-header">
+          <span class="save-method-icon">⚡</span>
+          <span class="save-method-name">빠른 다운로드</span>
+        </div>
+        <div class="save-method-desc">
+          브라우저 기본 다운로드 폴더에 즉시 저장됩니다.
+        </div>
+      </div>
+    </div>
+    <div id="browserSupportNote" style="margin-top:10px;font-size:12px;font-weight:700;color:#7B1F2A;display:none;">
+      ⚠️ 이 브라우저는 위치 직접 선택을 지원하지 않습니다 (Firefox/Safari). Chrome/Edge에서 사용 가능합니다.
     </div>
   </div>
 
-  <!-- 4. 생성 버튼 -->
-  <button class="generate-btn" id="generateBtn">
-    📑 보고서 자동 생성 →
-  </button>
+  <div class="section-title">👁️ 보고서 미리보기 (실시간)</div>
+  <div class="preview-card">
+    <div class="preview-paper" id="previewPaper"></div>
+  </div>
 
-  <!-- 진행 표시 -->
+  <button class="generate-btn" id="generateBtn">📑 보고서 자동 생성 →</button>
+
   <div class="gen-progress" id="genProgress">
     <div class="gen-spinner"></div>
     <div class="gen-text" id="genText">보고서 생성 중...</div>
     <div class="gen-sub" id="genSub">데이터 수집 → 분석 → 작성</div>
   </div>
 
-  <!-- 5. 최근 생성 보고서 -->
   <div class="section-title">📂 최근 생성된 보고서</div>
   <div class="recent-table" id="recentTable"></div>
 
-  <!-- 하단 -->
   <div class="bottom-actions">
     <button class="bottom-btn" data-nav="search"><span class="bottom-btn-icon">🔍</span>검색</button>
     <button class="bottom-btn" data-nav="qa"><span class="bottom-btn-icon">💬</span>AI 질의응답</button>
     <button class="bottom-btn" data-nav="dashboard"><span class="bottom-btn-icon">📊</span>대시보드</button>
     <button class="bottom-btn current"><span class="bottom-btn-icon">📑</span>보고서 (현재)</button>
   </div>
-
 </section>
 
 <div class="file-types-bar">
-  <span class="label">5종 보고서 템플릿 · 다중 형식 출력 · 실시간 미리보기 · 자동 생성</span>
+  <span class="label">5종 보고서 템플릿 · 다중 형식 · 위치 직접 선택 저장 · 실시간 미리보기</span>
 </div>
 
 <!-- 완료 모달 -->
@@ -666,24 +409,28 @@
     <div class="modal-info" id="modalInfo"></div>
     <div class="modal-actions">
       <button class="modal-btn" id="modalPreview">👁️ 미리보기</button>
-      <button class="modal-btn primary" id="modalDownload">📥 다운로드</button>
+      <button class="modal-btn" id="modalSavePicker">📁 위치 선택 저장</button>
+      <button class="modal-btn primary" id="modalSaveDefault">⚡ 빠른 다운로드</button>
     </div>
   </div>
 </div>
 
+<!-- 토스트 -->
+<div class="toast" id="toast"><span class="toast-icon">✅</span><span id="toastText">저장 완료</span></div>
+
 <script>
 const TEMPLATES = {
-  'daily':     { name: '일일 보고서',   period: '하루',   sample: 1, kpiPrefix: '오늘' },
-  'weekly':    { name: '주간 보고서',   period: '7일',    sample: 7, kpiPrefix: '주간' },
-  'monthly':   { name: '월간 보고서',   period: '30일',   sample: 30, kpiPrefix: '월간' },
-  'quarterly': { name: '분기 보고서',   period: '90일',   sample: 90, kpiPrefix: '분기' },
-  'custom':    { name: '사용자 정의 보고서', period: '사용자 지정', sample: 7, kpiPrefix: '기간' }
+  'daily':     { name: '일일 보고서',   period: '하루',   kpiPrefix: '오늘' },
+  'weekly':    { name: '주간 보고서',   period: '7일',    kpiPrefix: '주간' },
+  'monthly':   { name: '월간 보고서',   period: '30일',   kpiPrefix: '월간' },
+  'quarterly': { name: '분기 보고서',   period: '90일',   kpiPrefix: '분기' },
+  'custom':    { name: '사용자 정의 보고서', period: '사용자 지정', kpiPrefix: '기간' }
 };
 
 const FORMAT_INFO = {
-  'pdf':  { name: 'PDF', ext: '.pdf',  icon: '📄' },
-  'docx': { name: 'Word', ext: '.docx', icon: '📝' },
-  'pptx': { name: 'PowerPoint', ext: '.pptx', icon: '📊' }
+  'pdf':  { name: 'PDF', ext: '.pdf', icon: '📄', mime: 'text/html' },
+  'docx': { name: 'Word', ext: '.docx', icon: '📝', mime: 'text/html' },
+  'pptx': { name: 'PowerPoint', ext: '.pptx', icon: '📊', mime: 'text/html' }
 };
 
 const CHANNELS = [
@@ -705,33 +452,42 @@ const CHANNEL_GRADES = {
 };
 
 const RECENT_REPORTS = [
-  { icon: '📄', title: '주간 안전 운영 보고서', period: '4/29 ~ 5/05', format: 'PDF',  status: '완료', time: '5/06 09:10' },
-  { icon: '📝', title: '4월 월간 품질 보고서', period: '4/01 ~ 4/30', format: 'DOCX', status: '완료', time: '5/01 14:25' },
-  { icon: '📊', title: '1분기 종합 보고서',     period: '1/01 ~ 3/31', format: 'PPTX', status: '완료', time: '4/02 16:48' },
-  { icon: '📄', title: '3월 일일 보고서 (5/8)', period: '5/08 (오늘)', format: 'PDF',  status: '완료', time: '5/08 08:30' },
-  { icon: '📄', title: '협력사 점검 결과 보고', period: '4/15 ~ 4/18', format: 'PDF',  status: '완료', time: '4/19 11:20' }
+  { icon: '📄', title: '주간 안전 운영 보고서', period: '4/29 ~ 5/05', format: 'PDF', status: '완료', time: '5/06 09:10', ext: '.pdf' },
+  { icon: '📝', title: '4월 월간 품질 보고서', period: '4/01 ~ 4/30', format: 'DOCX', status: '완료', time: '5/01 14:25', ext: '.docx' },
+  { icon: '📊', title: '1분기 종합 보고서', period: '1/01 ~ 3/31', format: 'PPTX', status: '완료', time: '4/02 16:48', ext: '.pptx' },
+  { icon: '📄', title: '3월 일일 보고서 (5/8)', period: '5/08 (오늘)', format: 'PDF', status: '완료', time: '5/08 08:30', ext: '.pdf' },
+  { icon: '📄', title: '협력사 점검 결과 보고', period: '4/15 ~ 4/18', format: 'PDF', status: '완료', time: '4/19 11:20', ext: '.pdf' }
 ];
 
-// 상태
 let selectedTemplate = 'daily';
 let selectedFormat = 'pdf';
+let selectedSaveMethod = 'picker';
 let selectedCategories = new Set(['safety', 'quality', 'facility', 'emergency']);
 let selectedSections = new Set(['summary', 'kpi', 'channel', 'trend', 'activity', 'rec']);
 let dateFrom = '';
 let dateTo = '';
 
+// File System Access API 지원 확인
+const supportsFilePicker = 'showSaveFilePicker' in window;
+
+if (!supportsFilePicker) {
+  document.getElementById('browserSupportNote').style.display = 'block';
+  document.getElementById('methodPicker').classList.add('disabled');
+  document.getElementById('methodPicker').classList.remove('active');
+  document.getElementById('methodDefault').classList.add('active');
+  selectedSaveMethod = 'default';
+}
+
 // 오늘 날짜
 function setTodayDates() {
   const today = new Date();
-  const todayStr = formatDate(today);
-  document.getElementById('todayDate').textContent = '📅 ' + todayStr;
-
+  document.getElementById('todayDate').textContent = '📅 ' + formatDate(today);
   const weekAgo = new Date(today);
   weekAgo.setDate(weekAgo.getDate() - 6);
-  document.getElementById('dateFrom').value = formatDateInput(weekAgo);
-  document.getElementById('dateTo').value = formatDateInput(today);
-  dateFrom = formatDateInput(weekAgo);
-  dateTo = formatDateInput(today);
+  document.getElementById('dateFrom').value = formatDate(weekAgo);
+  document.getElementById('dateTo').value = formatDate(today);
+  dateFrom = formatDate(weekAgo);
+  dateTo = formatDate(today);
 }
 
 function formatDate(d) {
@@ -741,15 +497,21 @@ function formatDate(d) {
   return y + '-' + m + '-' + dd;
 }
 
-function formatDateInput(d) {
-  return formatDate(d);
+function formatPeriod() {
+  return dateFrom && dateTo ? dateFrom + ' ~ ' + dateTo : '기간 미설정';
 }
 
-function formatPeriod() {
-  if (dateFrom && dateTo) {
-    return dateFrom + ' ~ ' + dateTo;
-  }
-  return '기간 미설정';
+// 자동 파일명 생성
+function generateAutoFileName() {
+  const tpl = TEMPLATES[selectedTemplate];
+  const dateStr = dateTo ? dateTo.replace(/-/g, '') : formatDate(new Date()).replace(/-/g, '');
+  return tpl.name.replace(/ /g, '_') + '_' + dateStr;
+}
+
+function getFinalFileName() {
+  const custom = document.getElementById('customFileName').value.trim();
+  const baseName = custom.length > 0 ? custom : generateAutoFileName();
+  return baseName + FORMAT_INFO[selectedFormat].ext;
 }
 
 // 템플릿 선택
@@ -758,24 +520,16 @@ document.querySelectorAll('.template-card').forEach(card => {
     document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
     selectedTemplate = card.dataset.tpl;
-
-    // 빠른 기간 자동 설정
     const today = new Date();
     let from = new Date(today);
-    if (selectedTemplate === 'daily') {
-      from = new Date(today);
-    } else if (selectedTemplate === 'weekly') {
-      from.setDate(from.getDate() - 6);
-    } else if (selectedTemplate === 'monthly') {
-      from.setDate(from.getDate() - 29);
-    } else if (selectedTemplate === 'quarterly') {
-      from.setDate(from.getDate() - 89);
-    }
-    document.getElementById('dateFrom').value = formatDateInput(from);
-    document.getElementById('dateTo').value = formatDateInput(today);
-    dateFrom = formatDateInput(from);
-    dateTo = formatDateInput(today);
-
+    if (selectedTemplate === 'weekly') from.setDate(from.getDate() - 6);
+    else if (selectedTemplate === 'monthly') from.setDate(from.getDate() - 29);
+    else if (selectedTemplate === 'quarterly') from.setDate(from.getDate() - 89);
+    document.getElementById('dateFrom').value = formatDate(from);
+    document.getElementById('dateTo').value = formatDate(today);
+    dateFrom = formatDate(from);
+    dateTo = formatDate(today);
+    document.getElementById('customFileName').placeholder = generateAutoFileName();
     renderPreview();
   });
 });
@@ -788,30 +542,23 @@ document.querySelectorAll('.period-quick-btn').forEach(btn => {
     const today = new Date();
     let from = new Date(today);
     const q = btn.dataset.quick;
-    if (q === 'today') from = new Date(today);
-    else if (q === '7d') from.setDate(from.getDate() - 6);
+    if (q === '7d') from.setDate(from.getDate() - 6);
     else if (q === '30d') from.setDate(from.getDate() - 29);
     else if (q === 'quarter') {
       const month = today.getMonth();
       const qStart = Math.floor(month / 3) * 3;
       from = new Date(today.getFullYear(), qStart, 1);
     }
-    document.getElementById('dateFrom').value = formatDateInput(from);
-    document.getElementById('dateTo').value = formatDateInput(today);
-    dateFrom = formatDateInput(from);
-    dateTo = formatDateInput(today);
+    document.getElementById('dateFrom').value = formatDate(from);
+    document.getElementById('dateTo').value = formatDate(today);
+    dateFrom = formatDate(from);
+    dateTo = formatDate(today);
     renderPreview();
   });
 });
 
-document.getElementById('dateFrom').addEventListener('change', e => {
-  dateFrom = e.target.value;
-  renderPreview();
-});
-document.getElementById('dateTo').addEventListener('change', e => {
-  dateTo = e.target.value;
-  renderPreview();
-});
+document.getElementById('dateFrom').addEventListener('change', e => { dateFrom = e.target.value; renderPreview(); });
+document.getElementById('dateTo').addEventListener('change', e => { dateTo = e.target.value; renderPreview(); });
 
 // 형식 선택
 document.querySelectorAll('.format-card').forEach(card => {
@@ -819,39 +566,42 @@ document.querySelectorAll('.format-card').forEach(card => {
     document.querySelectorAll('.format-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
     selectedFormat = card.dataset.format;
+    document.getElementById('fileExt').textContent = FORMAT_INFO[selectedFormat].ext;
   });
 });
 
-// 카테고리 체크
+// 저장 방식 선택
+document.querySelectorAll('.save-method-card').forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.classList.contains('disabled')) return;
+    document.querySelectorAll('.save-method-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    selectedSaveMethod = card.dataset.method;
+  });
+});
+
+// 카테고리/섹션 체크
 document.querySelectorAll('#categoryChecks .check-item').forEach(item => {
   item.addEventListener('click', () => {
     item.classList.toggle('checked');
-    const cat = item.dataset.cat;
-    if (item.classList.contains('checked')) selectedCategories.add(cat);
-    else selectedCategories.delete(cat);
+    if (item.classList.contains('checked')) selectedCategories.add(item.dataset.cat);
+    else selectedCategories.delete(item.dataset.cat);
     renderPreview();
   });
 });
 
-// 섹션 체크
 document.querySelectorAll('#sectionChecks .check-item').forEach(item => {
   item.addEventListener('click', () => {
     item.classList.toggle('checked');
-    const sec = item.dataset.sec;
-    if (item.classList.contains('checked')) selectedSections.add(sec);
-    else selectedSections.delete(sec);
+    if (item.classList.contains('checked')) selectedSections.add(item.dataset.sec);
+    else selectedSections.delete(item.dataset.sec);
     renderPreview();
   });
 });
 
-// 미리보기 렌더
 function renderPreview() {
   const tpl = TEMPLATES[selectedTemplate];
-  const paper = document.getElementById('previewPaper');
-
   let html = '';
-
-  // 표지
   html += '<div class="preview-cover">';
   html += '<div class="preview-stamp">AX-2026-0508 자동 생성</div>';
   html += '<h1 class="preview-title">' + tpl.name + '</h1>';
@@ -859,44 +609,30 @@ function renderPreview() {
   html += '<div class="preview-meta">';
   html += '<span>📅 ' + formatDate(new Date()) + ' 발행</span>';
   html += '<span>👤 AX-00000 작성</span>';
-  html += '<span>📦 ' + FORMAT_INFO[selectedFormat].name + ' 형식</span>';
-  html += '</div>';
-  html += '</div>';
+  html += '<span>📦 ' + FORMAT_INFO[selectedFormat].name + '</span>';
+  html += '</div></div>';
 
-  // 요약
   if (selectedSections.has('summary')) {
-    html += '<div class="preview-section">';
-    html += '<div class="preview-section-title">1. 요약</div>';
-    html += '<p style="font-size:12px;line-height:1.7;color:#000;">';
-    html += '본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. ';
-    html += '총 <strong>1,248개</strong> 데이터를 학습했으며, A 등급 비율이 <strong>78%</strong>로 안정적인 운영 상태를 보입니다. ';
-    html += '6채널 중 <strong>Who(누가)</strong> 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.';
-    html += '</p>';
+    html += '<div class="preview-section"><div class="preview-section-title">1. 요약</div>';
+    html += '<p style="font-size:12px;line-height:1.7;color:#000;">본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. 총 <strong>1,248개</strong> 데이터를 학습했으며, A 등급 비율이 <strong>78%</strong>로 안정적인 운영 상태를 보입니다. 6채널 중 <strong>Who(누가)</strong> 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.</p>';
     html += '</div>';
   }
 
-  // KPI
   if (selectedSections.has('kpi')) {
-    html += '<div class="preview-section">';
-    html += '<div class="preview-section-title">2. 핵심 지표 (KPI)</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">2. 핵심 지표 (KPI)</div>';
     html += '<div class="preview-kpi">';
     html += '<div class="preview-kpi-card"><div class="preview-kpi-value">1,248</div><div class="preview-kpi-label">총 데이터</div></div>';
     html += '<div class="preview-kpi-card"><div class="preview-kpi-value">78%</div><div class="preview-kpi-label">A 등급</div></div>';
     html += '<div class="preview-kpi-card"><div class="preview-kpi-value">0.82s</div><div class="preview-kpi-label">평균 응답</div></div>';
     html += '<div class="preview-kpi-card"><div class="preview-kpi-value">28명</div><div class="preview-kpi-label">사용자</div></div>';
-    html += '</div>';
-    html += '</div>';
+    html += '</div></div>';
   }
 
-  // 6채널 분석
   if (selectedSections.has('channel')) {
-    html += '<div class="preview-section">';
-    html += '<div class="preview-section-title">3. 5W1H 6채널 품질 분석</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">3. 5W1H 6채널 품질 분석</div>';
     CHANNELS.forEach(ch => {
       const g = CHANNEL_GRADES[ch.key];
-      const aPct = (g.a / g.total) * 100;
-      const bPct = (g.b / g.total) * 100;
-      const cPct = (g.c / g.total) * 100;
+      const aPct = (g.a/g.total)*100, bPct = (g.b/g.total)*100, cPct = (g.c/g.total)*100;
       html += '<div class="preview-channel">';
       html += '<span class="preview-channel-label">' + ch.label + '</span>';
       html += '<div class="preview-channel-bar">';
@@ -904,96 +640,197 @@ function renderPreview() {
       html += '<div class="seg-b" style="width:' + bPct + '%;"></div>';
       html += '<div class="seg-c" style="width:' + cPct + '%;"></div>';
       html += '</div>';
-      html += '<span class="preview-channel-num">' + g.total + '</span>';
-      html += '</div>';
+      html += '<span class="preview-channel-num">' + g.total + '</span></div>';
     });
     html += '</div>';
   }
 
-  // 추이 분석
   if (selectedSections.has('trend')) {
-    html += '<div class="preview-section">';
-    html += '<div class="preview-section-title">4. 처리 추이 분석</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">4. 처리 추이 분석</div>';
     html += '<svg viewBox="0 0 600 140" style="width:100%;height:140px;">';
-    html += '<line x1="0" y1="20" x2="600" y2="20" stroke="#f0f0f0"/>';
-    html += '<line x1="0" y1="60" x2="600" y2="60" stroke="#f0f0f0"/>';
-    html += '<line x1="0" y1="100" x2="600" y2="100" stroke="#f0f0f0"/>';
+    html += '<line x1="0" y1="20" x2="600" y2="20" stroke="#f0f0f0"/><line x1="0" y1="60" x2="600" y2="60" stroke="#f0f0f0"/><line x1="0" y1="100" x2="600" y2="100" stroke="#f0f0f0"/>';
     html += '<polyline points="40,100 130,80 220,90 310,68 400,82 490,62 580,55" fill="none" stroke="#7B1F2A" stroke-width="2.5"/>';
     html += '<polygon points="40,100 130,80 220,90 310,68 400,82 490,62 580,55 580,130 40,130" fill="rgba(123,31,42,0.1)"/>';
     [40,130,220,310,400,490,580].forEach((x,i) => {
-      const ys = [100,80,90,68,82,62,55];
+      const ys=[100,80,90,68,82,62,55];
       html += '<circle cx="'+x+'" cy="'+ys[i]+'" r="3" fill="#7B1F2A"/>';
     });
     html += '</svg>';
-    html += '<p style="font-size:11px;color:#555;text-align:center;margin:4px 0 0 0;">기간 내 일일 처리량 추이 (총 940건 처리)</p>';
-    html += '</div>';
+    html += '<p style="font-size:11px;color:#555;text-align:center;margin:4px 0 0 0;">기간 내 일일 처리량 추이</p></div>';
   }
 
-  // 활동 로그
   if (selectedSections.has('activity')) {
-    html += '<div class="preview-section">';
-    html += '<div class="preview-section-title">5. 주요 활동 내역</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">5. 주요 활동 내역</div>';
     html += '<ul class="preview-list">';
     html += '<li>품질 평가 정기 실행 - <strong>78% A 등급 달성</strong></li>';
     html += '<li>자동 보완 2회 실행 - C 등급 → B 등급 개선</li>';
     html += '<li>신규 매뉴얼 3건 학습 완료 (안전관리 분야)</li>';
     html += '<li>주간 안전 보고서 1건 자동 생성</li>';
     html += '<li>일일 검색·질의응답 175건 처리 (최고치 기록)</li>';
-    html += '</ul>';
-    html += '</div>';
+    html += '</ul></div>';
   }
 
-  // 권고사항
   if (selectedSections.has('rec')) {
-    html += '<div class="preview-section">';
-    html += '<div class="preview-section-title">6. 권고사항</div>';
-    html += '<div class="preview-rec">⚠️ <strong>Who 채널 보완 권장</strong>: 미흡 데이터 74개 잔존, 자동 보완 모드 실행 권장</div>';
-    html += '<div class="preview-rec">📚 <strong>교육·훈련 분야 강화</strong>: 데이터 128개로 다른 분야 대비 부족</div>';
-    html += '<div class="preview-rec">📈 <strong>사용량 증가 대응</strong>: 일일 검색량 12% 증가, 시스템 자원 모니터링 필요</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">6. 권고사항</div>';
+    html += '<div class="preview-rec">⚠️ <strong>Who 채널 보완 권장</strong>: 미흡 데이터 74개 잔존</div>';
+    html += '<div class="preview-rec">📚 <strong>교육·훈련 분야 강화</strong>: 데이터 128개로 부족</div>';
+    html += '<div class="preview-rec">📈 <strong>사용량 증가 대응</strong>: 일일 검색량 12% 증가</div>';
     html += '</div>';
   }
 
-  // 푸터
-  html += '<div class="preview-foot">';
-  html += '본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · 시스템 ID: AX-2026-0508';
-  html += '</div>';
-
-  paper.innerHTML = html;
+  html += '<div class="preview-foot">본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · 시스템 ID: AX-2026-0508</div>';
+  document.getElementById('previewPaper').innerHTML = html;
 }
 
-// 최근 보고서 렌더
 function renderRecentTable() {
   const el = document.getElementById('recentTable');
-  let html = '<div class="recent-row header">';
-  html += '<div></div>';
-  html += '<div>제목</div>';
-  html += '<div>대상 기간</div>';
-  html += '<div>형식</div>';
-  html += '<div>상태</div>';
-  html += '<div>작업</div>';
-  html += '</div>';
-
-  RECENT_REPORTS.forEach(r => {
+  let html = '<div class="recent-row header"><div></div><div>제목</div><div>대상 기간</div><div>형식</div><div>상태</div><div>작업</div></div>';
+  RECENT_REPORTS.forEach((r, idx) => {
     html += '<div class="recent-row">';
     html += '<div class="recent-icon">' + r.icon + '</div>';
     html += '<div class="recent-title">' + r.title + '<div style="color:#888;font-size:11px;font-weight:700;margin-top:2px;">' + r.time + ' 생성</div></div>';
     html += '<div class="recent-period">' + r.period + '</div>';
     html += '<div><span class="recent-format">' + r.format + '</span></div>';
     html += '<div class="recent-status">✓ ' + r.status + '</div>';
-    html += '<div><button class="recent-download" data-title="' + r.title + '">📥 다운로드</button></div>';
+    html += '<div><button class="recent-download" data-idx="' + idx + '">📥 다운로드</button></div>';
     html += '</div>';
   });
-
   el.innerHTML = html;
-
   el.querySelectorAll('.recent-download').forEach(btn => {
-    btn.addEventListener('click', () => {
-      alert('📥 ' + btn.dataset.title + '\n\n파일이 다운로드 폴더에 저장됩니다.');
+    btn.addEventListener('click', async () => {
+      const r = RECENT_REPORTS[btn.dataset.idx];
+      await downloadReport(r.title.replace(/[ \/]/g, '_') + r.ext, FORMAT_INFO[r.format.toLowerCase()] || FORMAT_INFO['pdf'], 'recent');
     });
   });
 }
 
+// ============================================
+// 보고서 콘텐츠 생성 (HTML)
+// ============================================
+function generateReportContent() {
+  const tpl = TEMPLATES[selectedTemplate];
+  const previewHtml = document.getElementById('previewPaper').innerHTML;
+  const styles = `
+    body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 40px; background: #fff; color: #000; }
+    .preview-paper { max-width: 800px; margin: 0 auto; padding: 40px; }
+    .preview-cover { text-align: center; padding: 30px 0; border-bottom: 3px solid #1A237E; margin-bottom: 24px; }
+    .preview-stamp { display: inline-block; background: #1A237E; color: #fff; font-size: 13px; font-weight: 900; padding: 5px 16px; border-radius: 999px; margin-bottom: 14px; }
+    .preview-title { color: #1A237E; font-size: 32px; font-weight: 900; margin: 0 0 10px 0; }
+    .preview-period { color: #000; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .preview-meta { color: #555; font-size: 13px; font-weight: 700; display: flex; justify-content: center; gap: 16px; }
+    .preview-section { margin: 0 0 24px 0; }
+    .preview-section-title { color: #1A237E; font-size: 18px; font-weight: 900; padding-bottom: 8px; border-bottom: 2px solid #1A237E; margin-bottom: 12px; }
+    .preview-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .preview-kpi-card { border: 1px solid #1A237E; border-radius: 8px; padding: 12px 8px; text-align: center; background: #f5f7ff; }
+    .preview-kpi-value { color: #1A237E; font-size: 22px; font-weight: 900; line-height: 1; }
+    .preview-kpi-label { color: #000; font-size: 12px; font-weight: 700; margin-top: 6px; }
+    .preview-channel { display: grid; grid-template-columns: 70px 1fr 60px; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 700; }
+    .preview-channel-label { color: #1A237E; font-weight: 900; }
+    .preview-channel-bar { height: 16px; background: #f0f0f0; border-radius: 4px; overflow: hidden; display: flex; }
+    .preview-channel-bar .seg-a { background: #1A237E; height: 100%; }
+    .preview-channel-bar .seg-b { background: #b8860b; height: 100%; }
+    .preview-channel-bar .seg-c { background: #7B1F2A; height: 100%; }
+    .preview-channel-num { color: #1A237E; font-weight: 900; text-align: right; }
+    .preview-list { font-size: 13px; line-height: 1.8; color: #000; padding-left: 20px; }
+    .preview-list li { margin-bottom: 6px; }
+    .preview-rec { background: #fff5f5; border-left: 4px solid #7B1F2A; padding: 12px 16px; margin: 10px 0; font-size: 13px; font-weight: 700; color: #000; }
+    .preview-foot { text-align: center; padding-top: 18px; margin-top: 30px; border-top: 1px solid #ccc; color: #888; font-size: 12px; font-weight: 700; }
+    @media print { body { padding: 0; } .preview-paper { box-shadow: none; border: none; } }
+  `;
+
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>${tpl.name} - ${formatPeriod()}</title>
+<style>${styles}</style>
+</head>
+<body>
+<div class="preview-paper">${previewHtml}</div>
+<script>
+// 자동으로 인쇄 다이얼로그 안내 (선택)
+console.log('보고서: ${tpl.name}');
+console.log('기간: ${formatPeriod()}');
+console.log('💡 PDF로 저장하시려면 Ctrl+P (Cmd+P) → 대상: PDF로 저장');
+<\/script>
+</body>
+</html>`;
+}
+
+// ============================================
+// 다운로드 - 위치 직접 선택 (File System Access API)
+// ============================================
+async function downloadWithPicker(fileName, fmt) {
+  if (!supportsFilePicker) {
+    showToast('이 브라우저는 위치 선택을 지원하지 않습니다', 'error');
+    return downloadDefault(fileName, fmt);
+  }
+
+  const content = generateReportContent();
+  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: fileName,
+      types: [
+        { description: '보고서 (HTML 형식 - 브라우저에서 인쇄 → PDF 가능)',
+          accept: { 'text/html': ['.html', '.htm', fmt.ext] } }
+      ]
+    });
+    const writable = await handle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+
+    showToast('✅ 저장 완료: ' + handle.name);
+    return { saved: true, name: handle.name };
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      showToast('저장이 취소되었습니다', 'error');
+      return { cancelled: true };
+    }
+    console.error('저장 오류:', e);
+    showToast('⚠️ 저장 중 오류: ' + e.message, 'error');
+    return { error: true };
+  }
+}
+
+// 기본 다운로드 폴더로 저장
+function downloadDefault(fileName, fmt) {
+  const content = generateReportContent();
+  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('✅ 다운로드 폴더에 저장: ' + fileName);
+  return { saved: true, name: fileName };
+}
+
+// 통합 다운로드 함수
+async function downloadReport(fileName, fmt, source) {
+  if (selectedSaveMethod === 'picker' && supportsFilePicker) {
+    return await downloadWithPicker(fileName, fmt);
+  }
+  return downloadDefault(fileName, fmt);
+}
+
+// 토스트
+function showToast(message, type) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastText').textContent = message;
+  toast.classList.toggle('error', type === 'error');
+  toast.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ============================================
 // 보고서 생성
+// ============================================
 const generateBtn = document.getElementById('generateBtn');
 const genProgress = document.getElementById('genProgress');
 const genText = document.getElementById('genText');
@@ -1001,21 +838,20 @@ const genSub = document.getElementById('genSub');
 
 generateBtn.addEventListener('click', async () => {
   if (selectedSections.size === 0) {
-    alert('⚠️ 포함할 섹션을 1개 이상 선택해 주세요.');
+    showToast('⚠️ 포함할 섹션을 1개 이상 선택해 주세요', 'error');
     return;
   }
   if (selectedCategories.size === 0) {
-    alert('⚠️ 포함할 분야를 1개 이상 선택해 주세요.');
+    showToast('⚠️ 포함할 분야를 1개 이상 선택해 주세요', 'error');
     return;
   }
 
   generateBtn.disabled = true;
   genProgress.classList.add('show');
 
-  // 단계별 시뮬레이션
   const stages = [
     { text: '데이터 수집 중...', sub: '대상 기간 데이터 추출' },
-    { text: '6채널 분석 중...', sub: 'Why·What·When·Where·Who·How 통계 산출' },
+    { text: '6채널 분석 중...', sub: 'Why·What·When·Where·Who·How 통계' },
     { text: '차트 생성 중...', sub: '시각화 자료 생성' },
     { text: '보고서 작성 중...', sub: FORMAT_INFO[selectedFormat].name + ' 형식으로 변환' },
     { text: '검증 및 마무리...', sub: '최종 품질 점검' }
@@ -1036,53 +872,76 @@ generateBtn.addEventListener('click', async () => {
 function showCompletionModal() {
   const tpl = TEMPLATES[selectedTemplate];
   const fmt = FORMAT_INFO[selectedFormat];
-  const fileName = tpl.name.replace(/ /g, '_') + '_' + dateTo.replace(/-/g, '') + fmt.ext;
+  const fileName = getFinalFileName();
   const fileSize = (Math.random() * 3 + 1.5).toFixed(1) + ' MB';
 
   document.getElementById('modalMsg').innerHTML =
-    tpl.name + '이(가) 성공적으로 생성되었습니다.<br>아래에서 다운로드하실 수 있습니다.';
+    tpl.name + '이(가) 성공적으로 생성되었습니다.<br>저장 방식을 선택하세요.';
 
   document.getElementById('modalInfo').innerHTML =
     '<div class="modal-info-row"><span class="modal-info-label">파일명</span><span class="modal-info-value">' + fileName + '</span></div>' +
     '<div class="modal-info-row"><span class="modal-info-label">형식</span><span class="modal-info-value">' + fmt.name + '</span></div>' +
     '<div class="modal-info-row"><span class="modal-info-label">파일 크기</span><span class="modal-info-value">' + fileSize + '</span></div>' +
     '<div class="modal-info-row"><span class="modal-info-label">대상 기간</span><span class="modal-info-value">' + formatPeriod() + '</span></div>' +
-    '<div class="modal-info-row"><span class="modal-info-label">포함 섹션</span><span class="modal-info-value">' + selectedSections.size + '개</span></div>' +
-    '<div class="modal-info-row"><span class="modal-info-label">포함 분야</span><span class="modal-info-value">' + selectedCategories.size + '개</span></div>';
+    '<div class="modal-info-row"><span class="modal-info-label">포함 섹션</span><span class="modal-info-value">' + selectedSections.size + '개</span></div>';
 
-  document.getElementById('modalDownload').onclick = () => {
-    alert('📥 ' + fileName + '\n\n파일이 다운로드 폴더에 저장됩니다.');
-    document.getElementById('modal').classList.remove('show');
-    // 새 보고서를 최근 목록 맨 위에 추가
-    const newReport = {
-      icon: fmt.icon,
-      title: tpl.name + ' (방금 생성)',
-      period: formatPeriod(),
-      format: fmt.name,
-      status: '완료',
-      time: '방금'
-    };
-    RECENT_REPORTS.unshift(newReport);
-    if (RECENT_REPORTS.length > 6) RECENT_REPORTS.pop();
-    renderRecentTable();
-  };
-
+  // 미리보기
   document.getElementById('modalPreview').onclick = () => {
     document.getElementById('modal').classList.remove('show');
     document.getElementById('previewPaper').scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
+  // 위치 선택 저장
+  const savePickerBtn = document.getElementById('modalSavePicker');
+  savePickerBtn.disabled = !supportsFilePicker;
+  savePickerBtn.style.opacity = supportsFilePicker ? '1' : '0.5';
+  savePickerBtn.style.cursor = supportsFilePicker ? 'pointer' : 'not-allowed';
+  savePickerBtn.onclick = async () => {
+    if (!supportsFilePicker) {
+      showToast('이 브라우저는 위치 선택을 지원하지 않습니다 (Chrome/Edge 사용)', 'error');
+      return;
+    }
+    const result = await downloadWithPicker(fileName, fmt);
+    if (result && result.saved) {
+      addToRecent(tpl, fmt, result.name);
+      document.getElementById('modal').classList.remove('show');
+    }
+  };
+
+  // 빠른 다운로드
+  document.getElementById('modalSaveDefault').onclick = () => {
+    const result = downloadDefault(fileName, fmt);
+    if (result && result.saved) {
+      addToRecent(tpl, fmt, fileName);
+      document.getElementById('modal').classList.remove('show');
+    }
+  };
+
   document.getElementById('modal').classList.add('show');
 }
 
-// 모달 닫기 (배경 클릭)
+function addToRecent(tpl, fmt, fileName) {
+  const newReport = {
+    icon: fmt.icon,
+    title: tpl.name + ' (방금 생성)',
+    period: formatPeriod(),
+    format: fmt.name.toUpperCase(),
+    status: '완료',
+    time: '방금',
+    ext: fmt.ext
+  };
+  RECENT_REPORTS.unshift(newReport);
+  if (RECENT_REPORTS.length > 6) RECENT_REPORTS.pop();
+  renderRecentTable();
+}
+
 document.getElementById('modal').addEventListener('click', e => {
   if (e.target === document.getElementById('modal')) {
     document.getElementById('modal').classList.remove('show');
   }
 });
 
-// 하단 이동
+// 하단
 document.querySelectorAll('.bottom-btn[data-nav]').forEach(btn => {
   btn.addEventListener('click', () => {
     const nav = btn.dataset.nav;
@@ -1093,6 +952,7 @@ document.querySelectorAll('.bottom-btn[data-nav]').forEach(btn => {
 
 // 초기화
 setTodayDates();
+document.getElementById('customFileName').placeholder = generateAutoFileName();
 renderRecentTable();
 renderPreview();
 </script>
