@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 2 - 파일 업로드 v3 (자동 6단계 진행)</title>
+<title>saas.html 화면 2 v4 - 평가 등급 + 보완 피드백 추가</title>
 <style>
   body {
     font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
@@ -73,7 +73,6 @@
     position: relative;
   }
 
-  /* 진행 중 - WINE 강조 + 펄스 */
   .mini-step.active {
     background: #7B1F2A;
     color: #ffffff;
@@ -82,7 +81,6 @@
     box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.2);
   }
 
-  /* 완료 - NAVY */
   .mini-step.done {
     background: #1A237E;
     color: #ffffff;
@@ -107,7 +105,6 @@
     border: 2px solid #ffffff;
   }
 
-  /* 건너뜀 - 회색 + 줄긋기 */
   .mini-step.skipped {
     background: #e0e0e0;
     color: #888888;
@@ -177,9 +174,7 @@
     cursor: pointer;
   }
 
-  .browse-btn:hover {
-    background: #7B1F2A;
-  }
+  .browse-btn:hover { background: #7B1F2A; }
 
   /* 파일 목록 */
   .file-list-box {
@@ -216,9 +211,7 @@
     color: #000000;
   }
 
-  .file-row:last-child {
-    border-bottom: none;
-  }
+  .file-row:last-child { border-bottom: none; }
 
   .file-name {
     flex-grow: 1;
@@ -228,11 +221,7 @@
     margin-right: 16px;
   }
 
-  .file-size {
-    color: #000000;
-    margin: 0 16px;
-    white-space: nowrap;
-  }
+  .file-size { margin: 0 16px; white-space: nowrap; }
 
   .file-status {
     background: #7B1F2A;
@@ -244,9 +233,7 @@
     margin-right: 8px;
   }
 
-  .file-status.done {
-    background: #1A237E;
-  }
+  .file-status.done { background: #1A237E; }
 
   .file-remove {
     background: none;
@@ -274,9 +261,7 @@
     transition: all 0.2s;
   }
 
-  .ax-start-btn:hover:not(:disabled) {
-    background: #1A237E;
-  }
+  .ax-start-btn:hover:not(:disabled) { background: #1A237E; }
 
   .ax-start-btn:disabled {
     background: #cccccc;
@@ -284,7 +269,7 @@
     cursor: not-allowed;
   }
 
-  /* ===== [신규] 진행 상태 박스 ===== */
+  /* 진행 상태 박스 */
   .progress-box {
     border: 3px solid #7B1F2A;
     border-radius: 14px;
@@ -295,9 +280,7 @@
     display: none;
   }
 
-  .progress-box.show {
-    display: block;
-  }
+  .progress-box.show { display: block; }
 
   .progress-step-num {
     color: #7B1F2A;
@@ -338,7 +321,215 @@
     transition: width 1.4s linear;
   }
 
-  /* ===== [신규] 완료 박스 ===== */
+  /* ===== [신규 v4] 평가 결과 표 ===== */
+  .eval-box {
+    border: 3px solid #1A237E;
+    border-radius: 14px;
+    padding: 28px 30px;
+    margin: 28px 0;
+    background: #ffffff;
+    display: none;
+  }
+  .eval-box.show { display: block; }
+
+  .eval-title {
+    color: #1A237E;
+    font-size: 26px;
+    font-weight: 900;
+    text-align: center;
+    margin: 0 0 8px 0;
+  }
+
+  .eval-subtitle {
+    color: #000000;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 22px 0;
+  }
+
+  .eval-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+  }
+
+  .eval-card {
+    border: 2px solid #cccccc;
+    border-radius: 10px;
+    padding: 16px 8px;
+    text-align: center;
+    background: #ffffff;
+  }
+
+  .eval-card.grade-a { border-color: #1A237E; background: #f5f7ff; }
+  .eval-card.grade-b { border-color: #b8860b; background: #fffbe6; }
+  .eval-card.grade-c { border-color: #7B1F2A; background: #fff5f5; }
+
+  .eval-channel {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 6px 0;
+  }
+
+  .eval-grade {
+    font-size: 32px;
+    font-weight: 900;
+    margin: 0 0 4px 0;
+    line-height: 1;
+  }
+
+  .eval-card.grade-a .eval-grade { color: #1A237E; }
+  .eval-card.grade-b .eval-grade { color: #b8860b; }
+  .eval-card.grade-c .eval-grade { color: #7B1F2A; }
+
+  .eval-detail {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000000;
+  }
+
+  /* ===== [신규 v4] 보완 피드백 박스 ===== */
+  .feedback-box {
+    border: 3px solid #7B1F2A;
+    border-radius: 14px;
+    padding: 32px 30px;
+    margin: 28px 0;
+    background: #fff5f5;
+    display: none;
+  }
+  .feedback-box.show { display: block; }
+
+  .fb-icon {
+    font-size: 48px;
+    text-align: center;
+    margin: 0 0 8px 0;
+    line-height: 1;
+  }
+
+  .fb-title {
+    color: #7B1F2A;
+    font-size: 28px;
+    font-weight: 900;
+    text-align: center;
+    margin: 0 0 10px 0;
+  }
+
+  .fb-message {
+    color: #000000;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+  }
+
+  .fb-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .fb-btn {
+    border: 2px solid #1A237E;
+    background: #ffffff;
+    color: #1A237E;
+    font-size: 18px;
+    font-weight: 900;
+    padding: 22px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .fb-btn:hover {
+    background: #1A237E;
+    color: #ffffff;
+    transform: translateY(-3px);
+  }
+
+  .fb-btn-icon {
+    font-size: 32px;
+    display: block;
+    margin: 0 0 8px 0;
+  }
+
+  .fb-btn-desc {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 6px 0 0 0;
+    color: #000000;
+  }
+
+  .fb-btn:hover .fb-btn-desc { color: #ffffff; }
+
+  /* 직접 수정 입력 박스 */
+  .manual-box {
+    border: 3px solid #1A237E;
+    border-radius: 14px;
+    padding: 28px 30px;
+    margin: 20px 0 0 0;
+    background: #ffffff;
+    display: none;
+  }
+  .manual-box.show { display: block; }
+
+  .manual-title {
+    color: #1A237E;
+    font-size: 22px;
+    font-weight: 900;
+    margin: 0 0 14px 0;
+  }
+
+  .manual-channels {
+    display: flex;
+    gap: 10px;
+    margin: 0 0 14px 0;
+    flex-wrap: wrap;
+  }
+
+  .manual-channel-tag {
+    background: #fff5f5;
+    color: #7B1F2A;
+    border: 2px solid #7B1F2A;
+    font-size: 15px;
+    font-weight: 900;
+    padding: 8px 16px;
+    border-radius: 999px;
+  }
+
+  .manual-textarea {
+    width: 100%;
+    min-height: 110px;
+    border: 2px solid #1A237E;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #000000;
+    box-sizing: border-box;
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .manual-submit {
+    margin: 16px 0 0 0;
+    background: #7B1F2A;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 900;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .manual-submit:hover { background: #1A237E; }
+
+  /* 완료 박스 */
   .complete-box {
     border: 3px solid #1A237E;
     background: #1A237E;
@@ -349,28 +540,11 @@
     text-align: center;
     display: none;
   }
+  .complete-box.show { display: block; }
 
-  .complete-box.show {
-    display: block;
-  }
-
-  .complete-icon {
-    font-size: 56px;
-    margin: 0 0 12px 0;
-    line-height: 1;
-  }
-
-  .complete-title {
-    font-size: 32px;
-    font-weight: 900;
-    margin: 0 0 14px 0;
-  }
-
-  .complete-summary {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0 0 22px 0;
-  }
+  .complete-icon { font-size: 56px; margin: 0 0 12px 0; line-height: 1; }
+  .complete-title { font-size: 32px; font-weight: 900; margin: 0 0 14px 0; }
+  .complete-summary { font-size: 20px; font-weight: 700; margin: 0 0 22px 0; }
 
   .reset-btn {
     background: #ffffff;
@@ -382,10 +556,7 @@
     border-radius: 999px;
     cursor: pointer;
   }
-
-  .reset-btn:hover {
-    background: #f0f0f0;
-  }
+  .reset-btn:hover { background: #f0f0f0; }
 
   /* 파일 형식 안내 */
   .file-types-bar {
@@ -408,9 +579,7 @@
 </head>
 <body>
 
-<div class="top-banner">
-  파일 · 폴더 · ZIP 모두 자동 처리
-</div>
+<div class="top-banner">파일 · 폴더 · ZIP 모두 자동 처리</div>
 
 <section class="upload-wrapper">
 
@@ -449,17 +618,13 @@
   <!-- 파일 목록 -->
   <div class="file-list-box" id="fileListBox">
     <div class="file-list-title" id="fileListTitle">📂 업로드된 파일 (0개)</div>
-    <div id="fileList">
-      <div class="empty-msg">아직 선택된 파일이 없습니다</div>
-    </div>
+    <div id="fileList"><div class="empty-msg">아직 선택된 파일이 없습니다</div></div>
   </div>
 
-  <!-- AX 시작 버튼 -->
-  <button class="ax-start-btn" id="axStartBtn" disabled>
-    AX 자동 구축 시작 →
-  </button>
+  <!-- AX 시작 -->
+  <button class="ax-start-btn" id="axStartBtn" disabled>AX 자동 구축 시작 →</button>
 
-  <!-- [신규] 진행 상태 박스 -->
+  <!-- 진행 박스 -->
   <div class="progress-box" id="progressBox">
     <div class="progress-step-num" id="progStepNum">①</div>
     <div class="progress-step-name" id="progStepName">압축해제</div>
@@ -469,25 +634,87 @@
     </div>
   </div>
 
-  <!-- [신규] 완료 박스 -->
+  <!-- [신규 v4] 평가 결과 박스 -->
+  <div class="eval-box" id="evalBox">
+    <div class="eval-title">③ 5W1H 6채널 품질 평가 결과</div>
+    <div class="eval-subtitle">정상 = A 등급 / 1채널 오류 = B 등급 / 2채널 오류 = C 등급</div>
+    <div class="eval-grid" id="evalGrid"></div>
+  </div>
+
+  <!-- [신규 v4] 보완 피드백 박스 -->
+  <div class="feedback-box" id="feedbackBox">
+    <div class="fb-icon">⚠️</div>
+    <div class="fb-title">④ 보완 모드 선택</div>
+    <div class="fb-message" id="fbMessage">
+      B/C 등급 채널이 발견됐습니다.<br>보완 방식을 선택해 주세요.
+    </div>
+    <div class="fb-buttons">
+      <button class="fb-btn" data-mode="auto">
+        <span class="fb-btn-icon">🤖</span>
+        자동 보완
+        <div class="fb-btn-desc">AI가 알아서 보완</div>
+      </button>
+      <button class="fb-btn" data-mode="manual">
+        <span class="fb-btn-icon">✍️</span>
+        직접 수정
+        <div class="fb-btn-desc">사용자가 직접 입력</div>
+      </button>
+      <button class="fb-btn" data-mode="skip">
+        <span class="fb-btn-icon">⏭️</span>
+        이대로 진행
+        <div class="fb-btn-desc">보완 없이 다음 단계</div>
+      </button>
+    </div>
+
+    <!-- 직접 수정 입력 영역 -->
+    <div class="manual-box" id="manualBox">
+      <div class="manual-title">✍️ 직접 수정할 채널 입력</div>
+      <div class="manual-channels" id="manualChannels"></div>
+      <textarea class="manual-textarea" id="manualText"
+        placeholder="보완할 내용을 직접 입력하세요. (예: 일자·담당자·장소 등 추가 정보)"></textarea>
+      <button class="manual-submit" id="manualSubmit">수정 완료 → ⑤ AI 학습 시작</button>
+    </div>
+  </div>
+
+  <!-- 완료 박스 -->
   <div class="complete-box" id="completeBox">
     <div class="complete-icon">🎯</div>
     <div class="complete-title">AX 시스템 구축 완료!</div>
-    <div class="complete-summary" id="completeSummary">
-      파일 0개 처리 · 6단계 자동 완료
-    </div>
+    <div class="complete-summary" id="completeSummary">파일 0개 처리 · 6단계 자동 완료</div>
     <button class="reset-btn" id="resetBtn">새 작업 시작</button>
   </div>
 
 </section>
 
 <div class="file-types-bar">
-  <span class="label">
-    PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합 · 중첩 가능)
-  </span>
+  <span class="label">PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합 · 중첩 가능)</span>
 </div>
 
 <script>
+// ============================================
+// 상수
+// ============================================
+const STEPS = [
+  { num: '①', name: '압축해제', msg: '압축파일을 자동으로 해제합니다' },
+  { num: '②', name: '5W1H 6채널 구조화', msg: '비정형 데이터를 6채널로 구조화합니다' },
+  { num: '③', name: '품질 평가', msg: '5W1H 6채널 등급을 평가합니다' },
+  { num: '④', name: '보완', msg: '미흡 채널을 보완합니다' },
+  { num: '⑤', name: 'AI 학습', msg: '학습 인덱스를 생성합니다' },
+  { num: '⑥', name: 'AX 시스템 구축', msg: 'AX 자동화 시스템을 구축합니다' }
+];
+
+const ARCHIVE_EXTS = ['zip', 'tar', 'gz', 'rar', '7z', 'tgz'];
+
+// 5W1H 6채널 정의
+const CHANNELS = [
+  { key: 'why',   label: 'Why',   ko: '왜' },
+  { key: 'what',  label: 'What',  ko: '무엇' },
+  { key: 'when',  label: 'When',  ko: '언제' },
+  { key: 'where', label: 'Where', ko: '어디' },
+  { key: 'who',   label: 'Who',   ko: '누가' },
+  { key: 'how',   label: 'How',   ko: '어떻게' }
+];
+
 // ============================================
 // 변수
 // ============================================
@@ -495,52 +722,31 @@ const dropZone = document.getElementById('dropZone');
 const browseBtn = document.getElementById('browseBtn');
 const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
-const fileListBox = document.getElementById('fileListBox');
 const fileListTitle = document.getElementById('fileListTitle');
 const axStartBtn = document.getElementById('axStartBtn');
 const progressBox = document.getElementById('progressBox');
+const evalBox = document.getElementById('evalBox');
+const evalGrid = document.getElementById('evalGrid');
+const feedbackBox = document.getElementById('feedbackBox');
+const fbMessage = document.getElementById('fbMessage');
+const manualBox = document.getElementById('manualBox');
+const manualChannels = document.getElementById('manualChannels');
+const manualText = document.getElementById('manualText');
+const manualSubmit = document.getElementById('manualSubmit');
 const completeBox = document.getElementById('completeBox');
 const resetBtn = document.getElementById('resetBtn');
 
 let selectedFiles = [];
-
-// ============================================
-// 6단계 정의
-// ============================================
-const STEPS = [
-  { num: '①', name: '압축해제', msg: '압축파일을 자동으로 해제합니다' },
-  { num: '②', name: '5W1H 6채널 구조화', msg: '비정형 데이터를 6채널로 구조화합니다' },
-  { num: '③', name: '품질 평가', msg: 'A/B/C 등급 자동 평가 중입니다' },
-  { num: '④', name: '보완', msg: '미흡 채널을 자동 보완합니다' },
-  { num: '⑤', name: 'AI 학습', msg: '학습 인덱스를 생성합니다' },
-  { num: '⑥', name: 'AX 시스템 구축', msg: 'AX 자동화 시스템을 구축합니다' }
-];
-
-// 압축파일 확장자
-const ARCHIVE_EXTS = ['zip', 'tar', 'gz', 'rar', '7z', 'tgz'];
+let evaluationResult = null;  // 평가 결과 저장
 
 // ============================================
 // 파일 선택
 // ============================================
-browseBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  fileInput.click();
-});
-
+browseBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
 dropZone.addEventListener('click', () => fileInput.click());
-
 fileInput.addEventListener('change', e => handleFiles(e.target.files));
-
-dropZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropZone.classList.add('drag-over');
-});
-
-dropZone.addEventListener('dragleave', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-});
-
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
 dropZone.addEventListener('drop', e => {
   e.preventDefault();
   dropZone.classList.remove('drag-over');
@@ -548,9 +754,7 @@ dropZone.addEventListener('drop', e => {
 });
 
 function handleFiles(files) {
-  for (let i = 0; i < files.length; i++) {
-    selectedFiles.push(files[i]);
-  }
+  for (let i = 0; i < files.length; i++) selectedFiles.push(files[i]);
   renderFileList();
   updateAXButton();
 }
@@ -587,60 +791,38 @@ function updateAXButton() {
   axStartBtn.disabled = selectedFiles.length === 0;
 }
 
-// ============================================
-// 압축파일 포함 여부 자동 판단
-// ============================================
 function hasArchiveFile() {
-  return selectedFiles.some(f => {
-    const ext = f.name.split('.').pop().toLowerCase();
-    return ARCHIVE_EXTS.includes(ext);
-  });
+  return selectedFiles.some(f => ARCHIVE_EXTS.includes(f.name.split('.').pop().toLowerCase()));
 }
 
 // ============================================
-// 단계 표시 갱신
+// 단계 표시
 // ============================================
 function setStepState(stepNum, state) {
-  // state: 'active' | 'done' | 'skipped' | ''
   const el = document.querySelector('.mini-step[data-step="' + stepNum + '"]');
   if (!el) return;
   el.classList.remove('active', 'done', 'skipped');
   if (state) el.classList.add(state);
 }
 
-// ============================================
-// 진행 박스 갱신
-// ============================================
 function showProgress(stepIdx) {
   const step = STEPS[stepIdx];
   document.getElementById('progStepNum').textContent = step.num;
   document.getElementById('progStepName').textContent = step.name;
   document.getElementById('progMessage').textContent = step.msg;
-
   const fill = document.getElementById('progBarFill');
   fill.style.width = '0%';
-  // 약간의 지연 후 100%로 (transition 작동)
   setTimeout(() => { fill.style.width = '100%'; }, 50);
-
   progressBox.classList.add('show');
-
-  // 파일 상태 "처리 중"으로 표시
-  document.querySelectorAll('.file-status').forEach(s => {
-    s.textContent = '처리 중';
-  });
+  document.querySelectorAll('.file-status').forEach(s => { s.textContent = '처리 중'; });
 }
 
-// ============================================
-// 단계 처리 (1.5초 시뮬레이션)
-// ============================================
 function processStep(stepIdx) {
   return new Promise(resolve => {
     const stepNum = stepIdx + 1;
     setStepState(stepNum, 'active');
     showProgress(stepIdx);
-
-    // [실제 운영시 여기에 처리 호출 - 1.5초는 시뮬레이션]
-    // → 각 단계별 axdata 처리 함수 호출
+    // [실제 운영시 여기에 처리 호출]
     setTimeout(() => {
       setStepState(stepNum, 'done');
       resolve();
@@ -649,30 +831,62 @@ function processStep(stepIdx) {
 }
 
 function skipStep(stepIdx) {
-  const stepNum = stepIdx + 1;
-  setStepState(stepNum, 'skipped');
+  setStepState(stepIdx + 1, 'skipped');
 }
 
 // ============================================
-// AX 자동 구축 시작 - 6단계 순차 자동 진행
+// [신규 v4] 평가 결과 생성 (시뮬레이션)
+// ============================================
+function generateEvaluation() {
+  // 실제로는 ② 구조화 결과를 분석해서 등급 산출
+  // 데모: Why·What·Where·How = A / When = B / Who = C
+  const result = {
+    why:   { grade: 'A', issues: 0 },
+    what:  { grade: 'A', issues: 0 },
+    when:  { grade: 'B', issues: 1 },
+    where: { grade: 'A', issues: 0 },
+    who:   { grade: 'C', issues: 2 },
+    how:   { grade: 'A', issues: 0 }
+  };
+  return result;
+}
+
+function renderEvaluation(result) {
+  let html = '';
+  CHANNELS.forEach(ch => {
+    const r = result[ch.key];
+    const cls = 'grade-' + r.grade.toLowerCase();
+    const detail = r.grade === 'A' ? '정상' : r.issues + '개 미흡';
+    html += '<div class="eval-card ' + cls + '">';
+    html += '<div class="eval-channel">' + ch.label + ' (' + ch.ko + ')</div>';
+    html += '<div class="eval-grade">' + r.grade + '</div>';
+    html += '<div class="eval-detail">' + detail + '</div>';
+    html += '</div>';
+  });
+  evalGrid.innerHTML = html;
+  evalBox.classList.add('show');
+}
+
+function getNonAChannels(result) {
+  return CHANNELS.filter(ch => result[ch.key].grade !== 'A');
+}
+
+// ============================================
+// AX 자동 구축 시작
 // ============================================
 axStartBtn.addEventListener('click', async () => {
   if (selectedFiles.length === 0) return;
 
-  // UI 잠금
   axStartBtn.disabled = true;
   dropZone.style.opacity = '0.5';
   dropZone.style.pointerEvents = 'none';
-
-  // 업로드 단계 완료 처리
   setStepState('upload', 'done');
 
-  // [① 압축해제] 압축파일 있으면 처리, 없으면 건너뜀
+  // ① 압축해제
   if (hasArchiveFile()) {
     await processStep(0);
   } else {
     skipStep(0);
-    // 건너뛴 단계는 진행 박스에 안내 표시
     document.getElementById('progStepNum').textContent = '①';
     document.getElementById('progStepName').textContent = '압축해제 (건너뜀)';
     document.getElementById('progMessage').textContent = '압축파일이 없어 다음 단계로 진행합니다';
@@ -681,53 +895,133 @@ axStartBtn.addEventListener('click', async () => {
     await new Promise(r => setTimeout(r, 800));
   }
 
-  // [② ~ ⑥] 나머지 5단계 순차 진행
-  for (let i = 1; i < 6; i++) {
-    await processStep(i);
-  }
+  // ② 구조화
+  await processStep(1);
 
-  // 모든 단계 완료 → 결과 박스 표시
-  showCompletion();
+  // ③ 평가 → 평가 결과 표시
+  await processStep(2);
+  evaluationResult = generateEvaluation();
+  renderEvaluation(evaluationResult);
+  await new Promise(r => setTimeout(r, 800));  // 결과 잠깐 보여줌
+
+  // ④ 보완 → 사용자 피드백 대기
+  setStepState(4, 'active');
+  showProgress(3);
+  await new Promise(r => setTimeout(r, 800));
+  progressBox.classList.remove('show');
+
+  const nonA = getNonAChannels(evaluationResult);
+  const bCount = nonA.filter(ch => evaluationResult[ch.key].grade === 'B').length;
+  const cCount = nonA.filter(ch => evaluationResult[ch.key].grade === 'C').length;
+  fbMessage.innerHTML =
+    'B 등급 ' + bCount + '개, C 등급 ' + cCount + '개 채널이 발견됐습니다.<br>' +
+    '보완 방식을 선택해 주세요.';
+  feedbackBox.classList.add('show');
+
+  // → 이후는 사용자 선택에 따라 진행 (handleFeedbackChoice)
 });
 
 // ============================================
-// 완료 처리
+// [신규 v4] 보완 피드백 처리
+// ============================================
+document.querySelectorAll('.fb-btn').forEach(btn => {
+  btn.addEventListener('click', () => handleFeedbackChoice(btn.dataset.mode));
+});
+
+async function handleFeedbackChoice(mode) {
+  if (mode === 'manual') {
+    // 직접 수정 입력 박스 표시
+    const nonA = getNonAChannels(evaluationResult);
+    let chHtml = '';
+    nonA.forEach(ch => {
+      chHtml += '<span class="manual-channel-tag">' + ch.label +
+        ' (' + evaluationResult[ch.key].grade + ')</span>';
+    });
+    manualChannels.innerHTML = chHtml;
+    manualBox.classList.add('show');
+    document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
+    return;  // 사용자가 입력 완료해야 진행
+  }
+
+  // 자동 / 건너뛰기 → 즉시 진행
+  feedbackBox.classList.remove('show');
+
+  if (mode === 'auto') {
+    showProgress(3);
+    document.getElementById('progMessage').textContent = '🤖 AI가 자동으로 보완 중입니다...';
+    await new Promise(r => setTimeout(r, 1500));
+  } else {
+    // skip
+    showProgress(3);
+    document.getElementById('progStepName').textContent = '보완 (건너뜀)';
+    document.getElementById('progMessage').textContent = '보완 없이 다음 단계로 진행합니다';
+    document.getElementById('progBarFill').style.width = '100%';
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  setStepState(4, 'done');
+  await continueAfterFeedback();
+}
+
+manualSubmit.addEventListener('click', async () => {
+  if (manualText.value.trim().length === 0) {
+    manualText.style.borderColor = '#7B1F2A';
+    manualText.placeholder = '⚠️ 내용을 입력해 주세요';
+    return;
+  }
+  feedbackBox.classList.remove('show');
+  manualBox.classList.remove('show');
+
+  showProgress(3);
+  document.getElementById('progMessage').textContent = '✍️ 직접 수정 내용 반영 중...';
+  await new Promise(r => setTimeout(r, 1200));
+
+  setStepState(4, 'done');
+  await continueAfterFeedback();
+});
+
+async function continueAfterFeedback() {
+  // ⑤ AI 학습
+  await processStep(4);
+  // ⑥ AX 구축
+  await processStep(5);
+  // 완료
+  showCompletion();
+}
+
+// ============================================
+// 완료
 // ============================================
 function showCompletion() {
   progressBox.classList.remove('show');
-
-  // 파일 상태 모두 "완료"로
   document.querySelectorAll('.file-status').forEach(s => {
     s.textContent = '완료';
     s.classList.add('done');
   });
-
-  // 완료 박스 표시
   document.getElementById('completeSummary').textContent =
     '파일 ' + selectedFiles.length + '개 처리 · 6단계 자동 완료';
   completeBox.classList.add('show');
-
-  // [실제 운영시 여기에 결과 화면 라우팅]
-  // → window.location.href = 'result.html';
 }
 
 // ============================================
-// 새 작업 시작 (리셋)
+// 리셋
 // ============================================
 resetBtn.addEventListener('click', () => {
   selectedFiles = [];
+  evaluationResult = null;
   renderFileList();
   updateAXButton();
-
-  // 단계 초기화
   ['1', '2', '3', '4', '5', '6'].forEach(n => setStepState(n, ''));
   setStepState('upload', 'active');
-
-  // 박스 숨김
   progressBox.classList.remove('show');
+  evalBox.classList.remove('show');
+  feedbackBox.classList.remove('show');
+  manualBox.classList.remove('show');
   completeBox.classList.remove('show');
-
-  // UI 복구
+  manualText.value = '';
+  manualText.style.borderColor = '#1A237E';
+  manualText.placeholder = '보완할 내용을 직접 입력하세요. (예: 일자·담당자·장소 등 추가 정보)';
+  document.querySelectorAll('.fb-btn').forEach(b => b.disabled = false);
   dropZone.style.opacity = '1';
   dropZone.style.pointerEvents = 'auto';
 });
