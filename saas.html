@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-<script src="https://unpkg.com/docx@9.5.0/build/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@9.5.0/dist/index.umd.cjs"></script>
 
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
@@ -637,6 +637,9 @@ async function generatePDFBlob() {
 // ============================================
 async function generateDOCXBlob() {
   const d = window.docx;
+  if (!d || !d.BorderStyle) {
+    throw new Error('docx 라이브러리 로드 실패 - 네트워크/CDN 차단 가능성');
+  }
   const tpl = TEMPLATES[selectedTemplate];
 
   const NAVY = '1A237E';
