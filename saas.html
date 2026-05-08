@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 히어로 영역 통합 박스 보완본 v2 (교육용)</title>
+<title>saas.html 화면 2 - 파일 업로드 (v2 통합 박스 패턴)</title>
 <style>
   /* ============================================
      [3도 인쇄 색상]
@@ -18,7 +18,7 @@
     background: #ffffff;
   }
 
-  /* ===== 상단 안내바 (NAVY 배경) ===== */
+  /* ===== 상단 NAVY 안내바 ===== */
   .top-banner {
     background: #1A237E;
     color: #ffffff;
@@ -29,83 +29,188 @@
     margin: 0 0 36px 0;
   }
 
-  /* ============================================
-     [핵심 보완] 통합 박스 - 좌우 기준선 정확히 일치
-     제목 + 부제 + 6단계 모두 하나의 NAVY 박스 안에
-     ============================================ */
-  .hero-wrapper {
+  /* ===== 통합 NAVY 박스 (메인) ===== */
+  .upload-wrapper {
     max-width: 1200px;
     margin: 0 auto 28px auto;
-    border: 3px solid #1A237E;        /* NAVY 통합 박스 */
+    border: 3px solid #1A237E;
     border-radius: 16px;
-    padding: 44px 40px;                /* 좌우 padding 통일 */
+    padding: 44px 40px;
     background: #ffffff;
-    text-align: center;
     box-sizing: border-box;
   }
 
-  /* 메인 제목 */
-  .hero-title {
+  /* 화면 제목 */
+  .screen-title {
     color: #1A237E;
-    font-size: 42px;
+    font-size: 36px;
     font-weight: 900;
-    margin: 0 0 18px 0;
-    letter-spacing: -1px;
-    line-height: 1.3;
+    text-align: center;
+    margin: 0 0 14px 0;
   }
 
-  /* 부제 (검정·22px Bold) */
-  .hero-subtitle {
+  .screen-subtitle {
     color: #000000;
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0 0 32px 0;
-    line-height: 1.5;
-  }
-
-  /* 박스 내부 구분선 (NAVY 얇은 선) */
-  .hero-divider {
-    border: none;
-    border-top: 1px solid #1A237E;
-    opacity: 0.25;
-    margin: 0 0 32px 0;
-  }
-
-  /* ===== 6단계 아이콘 - 별도 박스 없이 통합 박스 안에 평면 배치 ===== */
-  .step-flow {
-    display: flex;
-    justify-content: space-between;   /* 좌끝~우끝 균등 */
-    align-items: center;
-    gap: 6px;
-  }
-
-  .step-circle {
-    background: #7B1F2A;              /* WINE */
-    color: #ffffff;
     font-size: 20px;
     font-weight: 700;
-    padding: 18px 26px;
+    text-align: center;
+    margin: 0 0 30px 0;
+  }
+
+  /* ===== 미니 진행 단계 표시 (현재 위치 강조) ===== */
+  .mini-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 32px 0;
+    padding: 16px 20px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    gap: 4px;
+  }
+
+  .mini-step {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #cccccc;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 10px 14px;
     border-radius: 999px;
     white-space: nowrap;
     flex-shrink: 0;
   }
 
-  .step-arrow {
-    color: #000000;                   /* 흑백 */
-    font-size: 28px;
+  /* 현재 단계 - WINE 강조 */
+  .mini-step.active {
+    background: #7B1F2A;
+    color: #ffffff;
+    border-color: #7B1F2A;
+    transform: scale(1.05);
+  }
+
+  .mini-arrow {
+    color: #000000;
+    font-size: 18px;
     font-weight: 900;
-    flex-grow: 1;                     /* 화살표 영역이 늘어나며 균등 */
+    flex-grow: 1;
     text-align: center;
   }
 
-  /* ===== 파일 형식 안내바 - 통합 박스와 좌우 기준선 일치 ===== */
+  /* ===== 드롭존 영역 ===== */
+  .drop-zone {
+    border: 3px dashed #1A237E;
+    border-radius: 14px;
+    padding: 56px 30px;
+    text-align: center;
+    background: #ffffff;
+    margin: 0 0 28px 0;
+  }
+
+  .drop-icon {
+    font-size: 64px;
+    color: #1A237E;
+    margin: 0 0 16px 0;
+    line-height: 1;
+  }
+
+  .drop-main-text {
+    color: #1A237E;
+    font-size: 26px;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+  }
+
+  .drop-sub-text {
+    color: #000000;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 24px 0;
+  }
+
+  .browse-btn {
+    background: #1A237E;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  /* ===== 파일 목록 미리보기 ===== */
+  .file-list-box {
+    border: 2px solid #000000;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 0 0 28px 0;
+    background: #ffffff;
+  }
+
+  .file-list-title {
+    color: #1A237E;
+    font-size: 20px;
+    font-weight: 900;
+    margin: 0 0 14px 0;
+  }
+
+  .file-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #000000;
+  }
+
+  .file-row:last-child {
+    border-bottom: none;
+  }
+
+  .file-name {
+    flex-grow: 1;
+  }
+
+  .file-size {
+    color: #000000;
+    margin: 0 16px;
+  }
+
+  .file-status {
+    background: #7B1F2A;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+  }
+
+  /* ===== AX 시작 버튼 (WINE) ===== */
+  .ax-start-btn {
+    display: block;
+    width: 100%;
+    background: #7B1F2A;
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 900;
+    padding: 22px 40px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+
+  /* ===== 파일 형식 안내 박스 ===== */
   .file-types-bar {
-    max-width: 1200px;                /* 위 박스와 동일 width */
+    max-width: 1200px;
     margin: 0 auto;
     background: #ffffff;
     border: 2px solid #000000;
     border-radius: 12px;
-    padding: 18px 40px;                /* 좌우 padding 통일 */
+    padding: 18px 40px;
     text-align: center;
     box-sizing: border-box;
   }
@@ -125,41 +230,64 @@
 </div>
 
 <!-- ============================================
-     [통합 박스] 제목 + 부제 + 6단계
-     좌우 기준선 정확히 일치 → 교육시 한 묶음 설명 가능
+     [통합 박스] 화면 2 - 파일 업로드
      ============================================ -->
-<section class="hero-wrapper">
+<section class="upload-wrapper">
 
-  <h1 class="hero-title">
-    비정형 데이터 → AX 시스템 자동 구축
-  </h1>
+  <h1 class="screen-title">파일 업로드</h1>
+  <p class="screen-subtitle">파일을 끌어다 놓으면 AX 시스템이 자동으로 구축됩니다</p>
 
-  <p class="hero-subtitle">
-    파일 업로드 1번 → 5W1H 6채널 구조화 → 평가 → 보완 → AI 학습 → AX 완성
-  </p>
-
-  <hr class="hero-divider">
-
-  <!-- 6단계: 통합 박스 안에 평면 배치 (별도 박스 X) -->
-  <div class="step-flow">
-    <div class="step-circle">① 압축해제</div>
-    <span class="step-arrow">→</span>
-    <div class="step-circle">② 구조화</div>
-    <span class="step-arrow">→</span>
-    <div class="step-circle">③ 평가</div>
-    <span class="step-arrow">→</span>
-    <div class="step-circle">④ 보완</div>
-    <span class="step-arrow">→</span>
-    <div class="step-circle">⑤ AI 학습</div>
-    <span class="step-arrow">→</span>
-    <div class="step-circle">⑥ AX 구축</div>
+  <!-- 미니 진행 단계 (현재: 업로드 → ① 압축해제 직전) -->
+  <div class="mini-steps">
+    <div class="mini-step active">📁 업로드</div>
+    <span class="mini-arrow">→</span>
+    <div class="mini-step">① 압축해제</div>
+    <span class="mini-arrow">→</span>
+    <div class="mini-step">② 구조화</div>
+    <span class="mini-arrow">→</span>
+    <div class="mini-step">③ 평가</div>
+    <span class="mini-arrow">→</span>
+    <div class="mini-step">④ 보완</div>
+    <span class="mini-arrow">→</span>
+    <div class="mini-step">⑤ AI 학습</div>
+    <span class="mini-arrow">→</span>
+    <div class="mini-step">⑥ AX 구축</div>
   </div>
+
+  <!-- 드롭존 -->
+  <div class="drop-zone">
+    <div class="drop-icon">⬆</div>
+    <div class="drop-main-text">파일을 여기로 끌어다 놓으세요</div>
+    <div class="drop-sub-text">또는 아래 버튼으로 선택하세요</div>
+    <button class="browse-btn">파일 선택</button>
+  </div>
+
+  <!-- 업로드된 파일 목록 (예시) -->
+  <div class="file-list-box">
+    <div class="file-list-title">📂 업로드된 파일 (3개)</div>
+    <div class="file-row">
+      <span class="file-name">제조공정_매뉴얼.docx</span>
+      <span class="file-size">2.4 MB</span>
+      <span class="file-status">대기</span>
+    </div>
+    <div class="file-row">
+      <span class="file-name">품질관리_보고서.pdf</span>
+      <span class="file-size">5.1 MB</span>
+      <span class="file-status">대기</span>
+    </div>
+    <div class="file-row">
+      <span class="file-name">설비_데이터.zip</span>
+      <span class="file-size">18.7 MB</span>
+      <span class="file-status">대기</span>
+    </div>
+  </div>
+
+  <!-- AX 시작 버튼 -->
+  <button class="ax-start-btn">AX 자동 구축 시작 →</button>
 
 </section>
 
-<!-- ============================================
-     파일 형식 안내 - 별도 박스, 좌우 기준선은 위와 동일
-     ============================================ -->
+<!-- 파일 형식 안내 -->
 <div class="file-types-bar">
   <span class="label">
     PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합 · 중첩 가능)
