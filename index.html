@@ -166,6 +166,9 @@
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .card::before {
@@ -240,12 +243,13 @@
     background: var(--wine);
     color: var(--white);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 28px;
     font-weight: 900;
-    padding: 13px 32px;
-    border-radius: 8px;
+    padding: 16px 36px;
+    border-radius: 10px;
     transition: all 0.2s;
-    letter-spacing: 0.3px;
+    letter-spacing: -0.5px;
+    margin-top: auto;
   }
 
   .card-action:hover {
@@ -363,7 +367,7 @@
         <span class="tag">오프라인</span>
         <span class="tag">엔터프라이즈</span>
       </div>
-      <a href="ondevice.html" class="card-action">자세히 →</a>
+      <a href="ondevice.html" class="card-action">시작하기 →</a>
     </div>
 
     <!-- 클라우드 (PC 본체 - 하드웨어 시스템) -->
