@@ -28,9 +28,8 @@
 
   body {
     font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-    background: linear-gradient(135deg, #d6def5 0%, #dfdaf5 33%, #f5dde2 66%, #d6def5 100%);
-    background-size: 300% 300%;
-    animation: bgFlow 12s ease-in-out infinite;
+    background: transparent;
+    position: relative;
     color: var(--black);
     line-height: 1.6;
     min-height: 100vh;
@@ -38,17 +37,33 @@
     flex-direction: column;
   }
 
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(135deg,
+      #1A237E 0%,
+      #6878c4 18%,
+      #d8def5 35%,
+      #f5e8e8 55%,
+      #c87080 75%,
+      #7B1F2A 100%);
+    background-size: 250% 250%;
+    animation: bgFlow 16s ease-in-out infinite;
+    pointer-events: none;
+  }
+
   @keyframes bgFlow {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0%   { background-position: 0% 0%; }
+    50%  { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
   }
 
   /* 모션 줄이기 설정 사용자 - 정적 배경 */
   @media (prefers-reduced-motion: reduce) {
-    body {
+    body::before {
       animation: none;
-      background: #d6def5;
     }
   }
 
@@ -102,10 +117,30 @@
   }
 
   .hero-subtitle {
-    font-size: 30px;
+    font-size: 120px;
     font-weight: 700;
-    color: var(--black);
     letter-spacing: -0.3px;
+    background: linear-gradient(
+      90deg,
+      #1A237E 0%,
+      #1A237E 40%,
+      #ffd700 47%,
+      #fff8dc 50%,
+      #ffd700 53%,
+      #7B1F2A 60%,
+      #7B1F2A 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shimmerNavy 16s linear infinite;
+  }
+
+  @keyframes shimmerNavy {
+    0%   { background-position: 150% center; }
+    100% { background-position: -150% center; }
   }
 
   /* 4개 채널 카드 영역 */
@@ -272,7 +307,7 @@
     .header { padding: 18px 20px; }
     .hero { padding: 60px 20px 50px; }
     .hero-title { font-size: 36px; }
-    .hero-subtitle { font-size: 16px; }
+    .hero-subtitle { font-size: 32px; }
     .cards-grid { grid-template-columns: 1fr; }
     .cards-area { padding: 0 20px 60px; }
     .footer { flex-direction: column; text-align: center; padding: 18px 20px; }
@@ -296,7 +331,7 @@
 <!-- 히어로 -->
 <section class="hero">
   <h1 class="hero-title">AX 자동화 시스템 구축 · 활용</h1>
-  <p class="hero-subtitle">(비정형 데이터 5W1H 구조화)</p>
+  <p class="hero-subtitle">비정형 데이터 5W1H 구조화</p>
 </section>
 
 <!-- 4개 채널 카드 -->
