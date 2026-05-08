@@ -2,175 +2,83 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 2 v6 - 전체 A 등급 달성까지 보완 순환</title>
+<title>saas.html 화면 2 v7 - AI 학습 시각화</title>
 <style>
-  body {
-    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-    margin: 0;
-    padding: 40px 20px;
-    background: #ffffff;
-  }
+  body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
 
   .top-banner {
-    background: #1A237E;
-    color: #ffffff;
-    text-align: center;
-    padding: 14px 20px;
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0 0 36px 0;
+    background: #1A237E; color: #ffffff; text-align: center;
+    padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0;
   }
 
   .upload-wrapper {
-    max-width: 1200px;
-    margin: 0 auto 28px auto;
-    border: 3px solid #1A237E;
-    border-radius: 16px;
-    padding: 44px 40px;
-    background: #ffffff;
-    box-sizing: border-box;
+    max-width: 1200px; margin: 0 auto 28px auto;
+    border: 3px solid #1A237E; border-radius: 16px;
+    padding: 44px 40px; background: #ffffff; box-sizing: border-box;
   }
 
-  .screen-title {
-    color: #1A237E;
-    font-size: 36px;
-    font-weight: 900;
-    text-align: center;
-    margin: 0 0 14px 0;
-  }
-
-  .screen-subtitle {
-    color: #000000;
-    font-size: 20px;
-    font-weight: 700;
-    text-align: center;
-    margin: 0 0 30px 0;
-  }
+  .screen-title { color: #1A237E; font-size: 36px; font-weight: 900; text-align: center; margin: 0 0 14px 0; }
+  .screen-subtitle { color: #000000; font-size: 20px; font-weight: 700; text-align: center; margin: 0 0 30px 0; }
 
   /* 미니 진행 단계 */
   .mini-steps {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0 0 32px 0;
-    padding: 16px 20px;
-    background: #f5f5f5;
-    border-radius: 12px;
-    gap: 4px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 0 0 32px 0; padding: 16px 20px;
+    background: #f5f5f5; border-radius: 12px; gap: 4px;
   }
 
   .mini-step {
-    background: #ffffff;
-    color: #000000;
-    border: 2px solid #cccccc;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 10px 14px;
-    border-radius: 999px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: all 0.3s;
-    position: relative;
+    background: #ffffff; color: #000000; border: 2px solid #cccccc;
+    font-size: 15px; font-weight: 700; padding: 10px 14px;
+    border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+    transition: all 0.3s; position: relative;
   }
 
   .mini-step.active {
-    background: #7B1F2A;
-    color: #ffffff;
-    border-color: #7B1F2A;
-    transform: scale(1.08);
-    box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.2);
+    background: #7B1F2A; color: #ffffff; border-color: #7B1F2A;
+    transform: scale(1.08); box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.2);
   }
 
-  .mini-step.done {
-    background: #1A237E;
-    color: #ffffff;
-    border-color: #1A237E;
-  }
+  .mini-step.done { background: #1A237E; color: #ffffff; border-color: #1A237E; }
 
   .mini-step.done::after {
-    content: '✓';
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #1A237E;
-    color: #ffffff;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    font-size: 14px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    content: '✓'; position: absolute; top: -8px; right: -8px;
+    background: #1A237E; color: #ffffff; width: 22px; height: 22px;
+    border-radius: 50%; font-size: 14px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
     border: 2px solid #ffffff;
   }
 
   .mini-step.skipped {
-    background: #e0e0e0;
-    color: #888888;
-    border-color: #cccccc;
+    background: #e0e0e0; color: #888888; border-color: #cccccc;
     text-decoration: line-through;
   }
 
-  .mini-arrow {
-    color: #000000;
-    font-size: 18px;
-    font-weight: 900;
-    flex-grow: 1;
-    text-align: center;
-  }
+  .mini-arrow { color: #000000; font-size: 18px; font-weight: 900; flex-grow: 1; text-align: center; }
 
-  /* [v6 강화] 차수 카운터 - 더 크고 명확하게 */
   .iter-counter {
-    display: none;
-    text-align: center;
-    margin: 0 0 24px 0;
-    padding: 18px 24px;
-    background: #1A237E;
-    color: #ffffff;
-    border-radius: 12px;
-    font-size: 24px;
-    font-weight: 900;
-    letter-spacing: 1px;
-    border: 4px solid #7B1F2A;
+    display: none; text-align: center; margin: 0 0 24px 0;
+    padding: 18px 24px; background: #1A237E; color: #ffffff;
+    border-radius: 12px; font-size: 24px; font-weight: 900;
+    letter-spacing: 1px; border: 4px solid #7B1F2A;
   }
   .iter-counter.show { display: block; }
 
-  /* [v6 신규] 차수 변경 큰 알림 */
   .iter-alert {
-    display: none;
-    text-align: center;
-    margin: 28px 0;
-    padding: 32px 30px;
-    background: #7B1F2A;
-    color: #ffffff;
-    border-radius: 14px;
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.2);
+    display: none; text-align: center; margin: 28px 0;
+    padding: 32px 30px; background: #7B1F2A; color: #ffffff;
+    border-radius: 14px; font-size: 32px; font-weight: 900;
+    letter-spacing: 2px; box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.2);
   }
   .iter-alert.show { display: block; }
 
-  .iter-alert-sub {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 10px 0 0 0;
-    opacity: 0.9;
-  }
+  .iter-alert-sub { font-size: 18px; font-weight: 700; margin: 10px 0 0 0; opacity: 0.9; }
 
-  /* 드롭존 */
   .drop-zone {
-    border: 3px dashed #1A237E;
-    border-radius: 14px;
-    padding: 56px 30px;
-    text-align: center;
-    background: #ffffff;
-    margin: 0 0 28px 0;
-    cursor: pointer;
-    transition: all 0.2s;
+    border: 3px dashed #1A237E; border-radius: 14px;
+    padding: 56px 30px; text-align: center; background: #ffffff;
+    margin: 0 0 28px 0; cursor: pointer; transition: all 0.2s;
   }
-
   .drop-zone:hover { background: #f5f7ff; border-color: #7B1F2A; }
   .drop-zone.drag-over { background: #fff5f5; border-color: #7B1F2A; }
 
@@ -179,204 +87,93 @@
   .drop-sub-text { color: #000000; font-size: 18px; font-weight: 700; margin: 0 0 24px 0; }
 
   .browse-btn {
-    background: #1A237E;
-    color: #ffffff;
-    font-size: 18px;
-    font-weight: 700;
-    padding: 14px 36px;
-    border: none;
-    border-radius: 999px;
-    cursor: pointer;
+    background: #1A237E; color: #ffffff; font-size: 18px; font-weight: 700;
+    padding: 14px 36px; border: none; border-radius: 999px; cursor: pointer;
   }
   .browse-btn:hover { background: #7B1F2A; }
 
-  /* 파일 목록 */
   .file-list-box {
-    border: 2px solid #000000;
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin: 0 0 28px 0;
-    background: #ffffff;
-    min-height: 100px;
+    border: 2px solid #000000; border-radius: 12px;
+    padding: 20px 24px; margin: 0 0 28px 0;
+    background: #ffffff; min-height: 100px;
   }
 
-  .file-list-title {
-    color: #1A237E;
-    font-size: 20px;
-    font-weight: 900;
-    margin: 0 0 14px 0;
-  }
-
-  .empty-msg {
-    color: #888;
-    font-size: 16px;
-    text-align: center;
-    padding: 20px 0;
-  }
+  .file-list-title { color: #1A237E; font-size: 20px; font-weight: 900; margin: 0 0 14px 0; }
+  .empty-msg { color: #888; font-size: 16px; text-align: center; padding: 20px 0; }
 
   .file-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 17px;
-    font-weight: 700;
-    color: #000000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid #e0e0e0;
+    font-size: 17px; font-weight: 700; color: #000000;
   }
   .file-row:last-child { border-bottom: none; }
 
-  .file-name {
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-right: 16px;
-  }
-
+  .file-name { flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 16px; }
   .file-size { margin: 0 16px; white-space: nowrap; }
 
   .file-status {
-    background: #7B1F2A;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 999px;
-    margin-right: 8px;
+    background: #7B1F2A; color: #ffffff; font-size: 14px; font-weight: 700;
+    padding: 4px 12px; border-radius: 999px; margin-right: 8px;
   }
   .file-status.done { background: #1A237E; }
 
   .file-remove {
-    background: none;
-    border: none;
-    color: #7B1F2A;
-    font-size: 20px;
-    font-weight: 900;
-    cursor: pointer;
-    padding: 0 6px;
+    background: none; border: none; color: #7B1F2A;
+    font-size: 20px; font-weight: 900; cursor: pointer; padding: 0 6px;
   }
 
-  /* AX 시작 버튼 */
   .ax-start-btn {
-    display: block;
-    width: 100%;
-    background: #7B1F2A;
-    color: #ffffff;
-    font-size: 26px;
-    font-weight: 900;
-    padding: 22px 40px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
+    display: block; width: 100%; background: #7B1F2A; color: #ffffff;
+    font-size: 26px; font-weight: 900; padding: 22px 40px;
+    border: none; border-radius: 12px; cursor: pointer;
+    letter-spacing: 1px; transition: all 0.2s;
   }
   .ax-start-btn:hover:not(:disabled) { background: #1A237E; }
   .ax-start-btn:disabled { background: #cccccc; color: #888888; cursor: not-allowed; }
 
-  /* 진행 상태 박스 */
   .progress-box {
-    border: 3px solid #7B1F2A;
-    border-radius: 14px;
-    padding: 32px 30px;
-    margin: 28px 0;
-    background: #ffffff;
-    text-align: center;
-    display: none;
+    border: 3px solid #7B1F2A; border-radius: 14px;
+    padding: 32px 30px; margin: 28px 0; background: #ffffff;
+    text-align: center; display: none;
   }
   .progress-box.show { display: block; }
 
-  .progress-step-num {
-    color: #7B1F2A;
-    font-size: 48px;
-    font-weight: 900;
-    margin: 0 0 10px 0;
-    line-height: 1;
-  }
-
-  .progress-step-name {
-    color: #1A237E;
-    font-size: 30px;
-    font-weight: 900;
-    margin: 0 0 14px 0;
-  }
-
-  .progress-message {
-    color: #000000;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0 0 20px 0;
-  }
+  .progress-step-num { color: #7B1F2A; font-size: 48px; font-weight: 900; margin: 0 0 10px 0; line-height: 1; }
+  .progress-step-name { color: #1A237E; font-size: 30px; font-weight: 900; margin: 0 0 14px 0; }
+  .progress-message { color: #000000; font-size: 20px; font-weight: 700; margin: 0 0 20px 0; }
 
   .progress-bar-bg {
-    width: 100%;
-    height: 18px;
-    background: #f0f0f0;
-    border-radius: 999px;
-    overflow: hidden;
-    border: 1px solid #cccccc;
+    width: 100%; height: 18px; background: #f0f0f0;
+    border-radius: 999px; overflow: hidden; border: 1px solid #cccccc;
   }
 
   .progress-bar-fill {
-    height: 100%;
-    background: #7B1F2A;
-    border-radius: 999px;
-    width: 0%;
-    transition: width 1.4s linear;
+    height: 100%; background: #7B1F2A; border-radius: 999px;
+    width: 0%; transition: width 1.4s linear;
   }
 
   /* 평가 결과 박스 */
   .eval-box {
-    border: 3px solid #1A237E;
-    border-radius: 14px;
-    padding: 28px 30px;
-    margin: 28px 0;
-    background: #ffffff;
-    display: none;
+    border: 3px solid #1A237E; border-radius: 14px;
+    padding: 28px 30px; margin: 28px 0; background: #ffffff; display: none;
   }
   .eval-box.show { display: block; }
 
-  .eval-title {
-    color: #1A237E;
-    font-size: 28px;
-    font-weight: 900;
-    text-align: center;
-    margin: 0 0 8px 0;
-  }
+  .eval-title { color: #1A237E; font-size: 28px; font-weight: 900; text-align: center; margin: 0 0 8px 0; }
 
   .eval-iter-badge {
-    display: inline-block;
-    background: #7B1F2A;
-    color: #ffffff;
-    font-size: 22px;
-    font-weight: 900;
-    padding: 6px 18px;
-    border-radius: 999px;
-    margin: 0 8px;
+    display: inline-block; background: #7B1F2A; color: #ffffff;
+    font-size: 22px; font-weight: 900; padding: 6px 18px;
+    border-radius: 999px; margin: 0 8px;
   }
 
-  .eval-subtitle {
-    color: #000000;
-    font-size: 16px;
-    font-weight: 700;
-    text-align: center;
-    margin: 0 0 22px 0;
-  }
+  .eval-subtitle { color: #000000; font-size: 16px; font-weight: 700; text-align: center; margin: 0 0 22px 0; }
 
-  .eval-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px;
-    margin: 0 0 18px 0;
-  }
+  .eval-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin: 0 0 18px 0; }
 
   .eval-card {
-    border: 2px solid #cccccc;
-    border-radius: 10px;
-    padding: 16px 8px;
-    text-align: center;
-    background: #ffffff;
+    border: 2px solid #cccccc; border-radius: 10px;
+    padding: 16px 8px; text-align: center; background: #ffffff;
     transition: all 0.3s;
   }
 
@@ -384,209 +181,243 @@
   .eval-card.grade-b { border-color: #b8860b; background: #fffbe6; }
   .eval-card.grade-c { border-color: #7B1F2A; background: #fff5f5; }
 
-  .eval-channel {
-    font-size: 14px;
-    font-weight: 700;
-    color: #000000;
-    margin: 0 0 6px 0;
-  }
-
-  .eval-grade {
-    font-size: 32px;
-    font-weight: 900;
-    margin: 0 0 4px 0;
-    line-height: 1;
-  }
-
+  .eval-channel { font-size: 14px; font-weight: 700; color: #000000; margin: 0 0 6px 0; }
+  .eval-grade { font-size: 32px; font-weight: 900; margin: 0 0 4px 0; line-height: 1; }
   .eval-card.grade-a .eval-grade { color: #1A237E; }
   .eval-card.grade-b .eval-grade { color: #b8860b; }
   .eval-card.grade-c .eval-grade { color: #7B1F2A; }
-
-  .eval-detail {
-    font-size: 12px;
-    font-weight: 700;
-    color: #000000;
-  }
+  .eval-detail { font-size: 12px; font-weight: 700; color: #000000; }
 
   .eval-all-a {
-    text-align: center;
-    background: #1A237E;
-    color: #ffffff;
-    padding: 18px;
-    border-radius: 10px;
-    font-size: 22px;
-    font-weight: 900;
-    margin: 12px 0 0 0;
-    display: none;
+    text-align: center; background: #1A237E; color: #ffffff;
+    padding: 18px; border-radius: 10px; font-size: 22px;
+    font-weight: 900; margin: 12px 0 0 0; display: none;
   }
   .eval-all-a.show { display: block; }
 
-  /* 보완 피드백 박스 */
   .feedback-box {
-    border: 4px solid #7B1F2A;
-    border-radius: 14px;
-    padding: 32px 30px;
-    margin: 28px 0;
-    background: #fff5f5;
-    display: none;
-    box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.15);
+    border: 4px solid #7B1F2A; border-radius: 14px;
+    padding: 32px 30px; margin: 28px 0; background: #fff5f5;
+    display: none; box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.15);
   }
   .feedback-box.show { display: block; }
 
-  .fb-icon {
-    font-size: 48px;
-    text-align: center;
-    margin: 0 0 8px 0;
-    line-height: 1;
-  }
-
-  .fb-title {
-    color: #7B1F2A;
-    font-size: 30px;
-    font-weight: 900;
-    text-align: center;
-    margin: 0 0 10px 0;
-  }
+  .fb-icon { font-size: 48px; text-align: center; margin: 0 0 8px 0; line-height: 1; }
+  .fb-title { color: #7B1F2A; font-size: 30px; font-weight: 900; text-align: center; margin: 0 0 10px 0; }
 
   .fb-iter-badge {
-    display: inline-block;
-    background: #7B1F2A;
-    color: #ffffff;
-    font-size: 22px;
-    font-weight: 900;
-    padding: 6px 18px;
-    border-radius: 999px;
-    margin: 0 8px;
+    display: inline-block; background: #7B1F2A; color: #ffffff;
+    font-size: 22px; font-weight: 900; padding: 6px 18px;
+    border-radius: 999px; margin: 0 8px;
   }
 
-  .fb-message {
-    color: #000000;
-    font-size: 18px;
-    font-weight: 700;
-    text-align: center;
-    margin: 0 0 24px 0;
-    line-height: 1.5;
-  }
+  .fb-message { color: #000000; font-size: 18px; font-weight: 700; text-align: center; margin: 0 0 24px 0; line-height: 1.5; }
 
-  .fb-buttons {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
+  .fb-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 
   .fb-btn {
-    border: 2px solid #1A237E;
-    background: #ffffff;
-    color: #1A237E;
-    font-size: 18px;
-    font-weight: 900;
-    padding: 22px 14px;
-    border-radius: 12px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
+    border: 2px solid #1A237E; background: #ffffff; color: #1A237E;
+    font-size: 18px; font-weight: 900; padding: 22px 14px;
+    border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.2s;
   }
+  .fb-btn:hover:not(:disabled) { background: #1A237E; color: #ffffff; transform: translateY(-3px); }
+  .fb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .fb-btn:hover:not(:disabled) {
-    background: #1A237E;
-    color: #ffffff;
-    transform: translateY(-3px);
-  }
-
-  .fb-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .fb-btn-icon {
-    font-size: 32px;
-    display: block;
-    margin: 0 0 8px 0;
-  }
-
-  .fb-btn-desc {
-    font-size: 13px;
-    font-weight: 700;
-    margin: 6px 0 0 0;
-    color: #000000;
-  }
-
+  .fb-btn-icon { font-size: 32px; display: block; margin: 0 0 8px 0; }
+  .fb-btn-desc { font-size: 13px; font-weight: 700; margin: 6px 0 0 0; color: #000000; }
   .fb-btn:hover:not(:disabled) .fb-btn-desc { color: #ffffff; }
 
-  /* 직접 수정 박스 */
   .manual-box {
-    border: 3px solid #1A237E;
-    border-radius: 14px;
-    padding: 28px 30px;
-    margin: 20px 0 0 0;
-    background: #ffffff;
-    display: none;
+    border: 3px solid #1A237E; border-radius: 14px;
+    padding: 28px 30px; margin: 20px 0 0 0; background: #ffffff; display: none;
   }
   .manual-box.show { display: block; }
 
-  .manual-title {
-    color: #1A237E;
-    font-size: 22px;
-    font-weight: 900;
-    margin: 0 0 14px 0;
-  }
-
-  .manual-channels {
-    display: flex;
-    gap: 10px;
-    margin: 0 0 14px 0;
-    flex-wrap: wrap;
-  }
+  .manual-title { color: #1A237E; font-size: 22px; font-weight: 900; margin: 0 0 14px 0; }
+  .manual-channels { display: flex; gap: 10px; margin: 0 0 14px 0; flex-wrap: wrap; }
 
   .manual-channel-tag {
-    background: #fff5f5;
-    color: #7B1F2A;
-    border: 2px solid #7B1F2A;
-    font-size: 15px;
-    font-weight: 900;
-    padding: 8px 16px;
-    border-radius: 999px;
+    background: #fff5f5; color: #7B1F2A; border: 2px solid #7B1F2A;
+    font-size: 15px; font-weight: 900; padding: 8px 16px; border-radius: 999px;
   }
 
   .manual-textarea {
-    width: 100%;
-    min-height: 110px;
-    border: 2px solid #1A237E;
-    border-radius: 10px;
-    padding: 14px;
-    font-size: 16px;
-    font-weight: 700;
-    color: #000000;
-    box-sizing: border-box;
-    resize: vertical;
-    font-family: inherit;
+    width: 100%; min-height: 110px;
+    border: 2px solid #1A237E; border-radius: 10px; padding: 14px;
+    font-size: 16px; font-weight: 700; color: #000000;
+    box-sizing: border-box; resize: vertical; font-family: inherit;
   }
 
   .manual-submit {
-    margin: 16px 0 0 0;
-    background: #7B1F2A;
-    color: #ffffff;
-    font-size: 18px;
-    font-weight: 900;
-    padding: 14px 36px;
-    border: none;
-    border-radius: 999px;
-    cursor: pointer;
-    width: 100%;
+    margin: 16px 0 0 0; background: #7B1F2A; color: #ffffff;
+    font-size: 18px; font-weight: 900; padding: 14px 36px;
+    border: none; border-radius: 999px; cursor: pointer; width: 100%;
   }
-
   .manual-submit:hover { background: #1A237E; }
 
-  /* 완료 박스 */
+  /* ============================================
+     [v7 신규] AI 학습 시각화 박스
+     ============================================ */
+  .learning-box {
+    border: 3px solid #1A237E; border-radius: 14px;
+    padding: 32px 30px; margin: 28px 0; background: #ffffff; display: none;
+  }
+  .learning-box.show { display: block; }
+
+  .lb-title {
+    color: #1A237E; font-size: 28px; font-weight: 900;
+    text-align: center; margin: 0 0 8px 0;
+  }
+
+  .lb-subtitle {
+    color: #000000; font-size: 16px; font-weight: 700;
+    text-align: center; margin: 0 0 24px 0;
+  }
+
+  /* 전체 진행률 */
+  .lb-progress-wrap { margin: 0 0 28px 0; }
+
+  .lb-progress-label {
+    color: #000000; font-size: 18px; font-weight: 900;
+    margin: 0 0 8px 0; display: flex; justify-content: space-between;
+  }
+
+  .lb-progress-num { color: #7B1F2A; font-size: 24px; }
+
+  .lb-progress-bg {
+    width: 100%; height: 24px;
+    background: #f0f0f0; border-radius: 999px;
+    overflow: hidden; border: 2px solid #cccccc;
+  }
+
+  .lb-progress-fill {
+    height: 100%; background: #7B1F2A;
+    border-radius: 999px; width: 0%; transition: width 0.6s ease;
+  }
+
+  /* 5개 서브 단계 */
+  .lb-substeps {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 12px; margin: 0 0 28px 0;
+  }
+
+  .lb-substep {
+    border: 2px solid #cccccc; border-radius: 10px;
+    padding: 14px 12px; background: #ffffff; transition: all 0.3s;
+  }
+
+  .lb-substep.active {
+    border-color: #7B1F2A; background: #fff5f5;
+    box-shadow: 0 0 0 3px rgba(123, 31, 42, 0.15);
+  }
+
+  .lb-substep.done { border-color: #1A237E; background: #f5f7ff; }
+
+  .lb-substep-num {
+    display: inline-block; background: #cccccc; color: #ffffff;
+    width: 24px; height: 24px; border-radius: 50%;
+    text-align: center; line-height: 24px;
+    font-size: 14px; font-weight: 900; margin-right: 6px;
+  }
+
+  .lb-substep.active .lb-substep-num { background: #7B1F2A; }
+  .lb-substep.done .lb-substep-num { background: #1A237E; }
+
+  .lb-substep-name { color: #000000; font-size: 14px; font-weight: 900; }
+
+  .lb-substep-status {
+    color: #888; font-size: 12px; font-weight: 700;
+    margin: 6px 0 8px 0;
+  }
+  .lb-substep.active .lb-substep-status { color: #7B1F2A; }
+  .lb-substep.done .lb-substep-status { color: #1A237E; }
+
+  .lb-substep-bar {
+    width: 100%; height: 6px;
+    background: #f0f0f0; border-radius: 999px; overflow: hidden;
+  }
+
+  .lb-substep-fill {
+    height: 100%; background: #7B1F2A;
+    border-radius: 999px; width: 0%; transition: width 0.6s ease;
+  }
+
+  .lb-substep.done .lb-substep-fill { background: #1A237E; }
+
+  /* 6채널 카드 */
+  .lb-section-title {
+    color: #1A237E; font-size: 18px; font-weight: 900;
+    margin: 0 0 12px 0; padding: 0 0 0 8px;
+    border-left: 4px solid #7B1F2A;
+  }
+
+  .lb-channels {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    gap: 10px; margin: 0 0 28px 0;
+  }
+
+  .lb-channel {
+    border: 2px solid #cccccc; border-radius: 10px;
+    padding: 14px 8px; text-align: center;
+    background: #ffffff; transition: all 0.3s;
+  }
+
+  .lb-channel.active {
+    border-color: #7B1F2A; background: #fff5f5;
+    transform: scale(1.05);
+  }
+
+  .lb-channel.done { border-color: #1A237E; background: #f5f7ff; }
+
+  .lb-ch-label { color: #000000; font-size: 14px; font-weight: 900; margin: 0 0 6px 0; }
+
+  .lb-ch-icon {
+    font-size: 28px; line-height: 1; margin: 0 0 4px 0;
+  }
+
+  .lb-ch-status { color: #888; font-size: 11px; font-weight: 700; }
+  .lb-channel.active .lb-ch-status { color: #7B1F2A; }
+  .lb-channel.done .lb-ch-status { color: #1A237E; }
+
+  /* 통계 */
+  .lb-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin: 0 0 28px 0;
+  }
+
+  .lb-stat {
+    border: 2px solid #1A237E; border-radius: 10px;
+    padding: 14px 12px; text-align: center; background: #f5f7ff;
+  }
+
+  .lb-stat-label { color: #000000; font-size: 13px; font-weight: 700; margin: 0 0 6px 0; }
+  .lb-stat-value { color: #1A237E; font-size: 24px; font-weight: 900; line-height: 1; }
+  .lb-stat-unit { color: #1A237E; font-size: 14px; font-weight: 700; margin-left: 2px; }
+
+  /* 학습 로그 */
+  .lb-log {
+    border: 2px solid #000000; border-radius: 10px;
+    padding: 16px 20px; background: #ffffff;
+  }
+
+  .lb-log-title { color: #1A237E; font-size: 16px; font-weight: 900; margin: 0 0 10px 0; }
+
+  .lb-log-content {
+    max-height: 180px; overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 14px; font-weight: 700; color: #000000;
+    line-height: 1.7;
+  }
+
+  .lb-log-line { padding: 2px 0; }
+  .lb-log-time { color: #888; margin-right: 8px; }
+  .lb-log-line.start { color: #7B1F2A; }
+  .lb-log-line.done { color: #1A237E; }
+
   .complete-box {
-    border: 3px solid #1A237E;
-    background: #1A237E;
-    color: #ffffff;
-    border-radius: 14px;
-    padding: 36px 30px;
-    margin: 28px 0;
-    text-align: center;
-    display: none;
+    border: 3px solid #1A237E; background: #1A237E; color: #ffffff;
+    border-radius: 14px; padding: 36px 30px; margin: 28px 0;
+    text-align: center; display: none;
   }
   .complete-box.show { display: block; }
 
@@ -595,33 +426,20 @@
   .complete-summary { font-size: 20px; font-weight: 700; margin: 0 0 22px 0; }
 
   .reset-btn {
-    background: #ffffff;
-    color: #1A237E;
-    font-size: 18px;
-    font-weight: 900;
-    padding: 14px 36px;
-    border: none;
-    border-radius: 999px;
-    cursor: pointer;
+    background: #ffffff; color: #1A237E;
+    font-size: 18px; font-weight: 900; padding: 14px 36px;
+    border: none; border-radius: 999px; cursor: pointer;
   }
   .reset-btn:hover { background: #f0f0f0; }
 
   .file-types-bar {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: #ffffff;
-    border: 2px solid #000000;
-    border-radius: 12px;
-    padding: 18px 40px;
-    text-align: center;
-    box-sizing: border-box;
+    max-width: 1200px; margin: 0 auto;
+    background: #ffffff; border: 2px solid #000000;
+    border-radius: 12px; padding: 18px 40px;
+    text-align: center; box-sizing: border-box;
   }
 
-  .file-types-bar .label {
-    color: #000000;
-    font-size: 18px;
-    font-weight: 700;
-  }
+  .file-types-bar .label { color: #000000; font-size: 18px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -649,10 +467,8 @@
     <div class="mini-step" data-step="6">⑥ AX 구축</div>
   </div>
 
-  <!-- 차수 카운터 -->
   <div class="iter-counter" id="iterCounter">🔁 평가 ↔ 보완 1차 진행 중</div>
 
-  <!-- [v6 신규] 차수 변경 큰 알림 -->
   <div class="iter-alert" id="iterAlert">
     <div id="iterAlertMain">2차 평가 시작</div>
     <div class="iter-alert-sub" id="iterAlertSub">전체 A 등급 달성까지 계속됩니다</div>
@@ -731,6 +547,60 @@
     </div>
   </div>
 
+  <!-- ============================================
+       [v7 신규] AI 학습 시각화 박스
+       ============================================ -->
+  <div class="learning-box" id="learningBox">
+    <div class="lb-title">⑤ AI 학습 진행 중</div>
+    <div class="lb-subtitle">5W1H 6채널 데이터를 AI 엔진에 학습시킵니다</div>
+
+    <!-- 전체 진행률 -->
+    <div class="lb-progress-wrap">
+      <div class="lb-progress-label">
+        <span>전체 진행률</span>
+        <span class="lb-progress-num" id="lbProgressNum">0%</span>
+      </div>
+      <div class="lb-progress-bg">
+        <div class="lb-progress-fill" id="lbProgressFill"></div>
+      </div>
+    </div>
+
+    <!-- 5개 서브 단계 -->
+    <div class="lb-section-title">📊 학습 단계</div>
+    <div class="lb-substeps" id="lbSubsteps"></div>
+
+    <!-- 6채널 카드 -->
+    <div class="lb-section-title">🔗 5W1H 6채널 학습 상태</div>
+    <div class="lb-channels" id="lbChannels"></div>
+
+    <!-- 통계 -->
+    <div class="lb-section-title">📈 학습 통계</div>
+    <div class="lb-stats">
+      <div class="lb-stat">
+        <div class="lb-stat-label">처리 항목</div>
+        <div class="lb-stat-value"><span id="lbStatItems">0</span><span class="lb-stat-unit">개</span></div>
+      </div>
+      <div class="lb-stat">
+        <div class="lb-stat-label">생성 의미 벡터</div>
+        <div class="lb-stat-value"><span id="lbStatVectors">0</span><span class="lb-stat-unit">개</span></div>
+      </div>
+      <div class="lb-stat">
+        <div class="lb-stat-label">검색 인덱스</div>
+        <div class="lb-stat-value"><span id="lbStatIndex">0</span><span class="lb-stat-unit">MB</span></div>
+      </div>
+      <div class="lb-stat">
+        <div class="lb-stat-label">처리 속도</div>
+        <div class="lb-stat-value"><span id="lbStatSpeed">0</span><span class="lb-stat-unit">항목/초</span></div>
+      </div>
+    </div>
+
+    <!-- 학습 로그 -->
+    <div class="lb-log">
+      <div class="lb-log-title">📋 학습 진행 로그</div>
+      <div class="lb-log-content" id="lbLogContent"></div>
+    </div>
+  </div>
+
   <div class="complete-box" id="completeBox">
     <div class="complete-icon">🎯</div>
     <div class="complete-title">AX 시스템 구축 완료!</div>
@@ -765,7 +635,15 @@ const CHANNELS = [
   { key: 'how',   label: 'How',   ko: '어떻게' }
 ];
 
-// 차수별 평가 결과 - 점진적 개선, 3차에 100% A 보장
+// [v7] AI 학습 5개 서브 단계
+const LEARNING_SUBSTEPS = [
+  { name: '데이터 정제', icon: '🧹', duration: 1500 },
+  { name: '의미 분석', icon: '🔍', duration: 2000 },
+  { name: '검색 인덱스 구축', icon: '📚', duration: 1800 },
+  { name: '질의응답 학습', icon: '💬', duration: 2200 },
+  { name: '학습 검증', icon: '✓',  duration: 1200 }
+];
+
 const EVAL_BY_ITERATION = {
   1: {
     why:   { grade: 'A', issues: 0 },
@@ -818,19 +696,26 @@ const iterAlert = document.getElementById('iterAlert');
 const iterAlertMain = document.getElementById('iterAlertMain');
 const iterAlertSub = document.getElementById('iterAlertSub');
 
+// [v7] 학습 박스 요소
+const learningBox = document.getElementById('learningBox');
+const lbProgressNum = document.getElementById('lbProgressNum');
+const lbProgressFill = document.getElementById('lbProgressFill');
+const lbSubsteps = document.getElementById('lbSubsteps');
+const lbChannels = document.getElementById('lbChannels');
+const lbStatItems = document.getElementById('lbStatItems');
+const lbStatVectors = document.getElementById('lbStatVectors');
+const lbStatIndex = document.getElementById('lbStatIndex');
+const lbStatSpeed = document.getElementById('lbStatSpeed');
+const lbLogContent = document.getElementById('lbLogContent');
+
 let selectedFiles = [];
 let currentIteration = 1;
 let evaluationResult = null;
 let userChoiceResolver = null;
-let isProcessing = false;  // [v6] 디바운스 플래그
+let isProcessing = false;
 
-// ============================================
-// [v6] 자동 스크롤 헬퍼
-// ============================================
 function scrollToElement(el) {
-  setTimeout(() => {
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 200);
+  setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 200);
 }
 
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -881,10 +766,7 @@ function removeFile(idx) {
   updateAXButton();
 }
 
-function updateAXButton() {
-  axStartBtn.disabled = selectedFiles.length === 0;
-}
-
+function updateAXButton() { axStartBtn.disabled = selectedFiles.length === 0; }
 function hasArchiveFile() {
   return selectedFiles.some(f => ARCHIVE_EXTS.includes(f.name.split('.').pop().toLowerCase()));
 }
@@ -920,9 +802,7 @@ function processStep(stepIdx, customMsg) {
   });
 }
 
-function skipStep(stepIdx) {
-  setStepState(stepIdx + 1, 'skipped');
-}
+function skipStep(stepIdx) { setStepState(stepIdx + 1, 'skipped'); }
 
 function renderEvaluation(result, iteration) {
   evalIterBadge.textContent = iteration + '차';
@@ -938,24 +818,14 @@ function renderEvaluation(result, iteration) {
     html += '</div>';
   });
   evalGrid.innerHTML = html;
-
-  if (allGradeA(result)) {
-    evalAllA.classList.add('show');
-  } else {
-    evalAllA.classList.remove('show');
-  }
+  if (allGradeA(result)) evalAllA.classList.add('show');
+  else evalAllA.classList.remove('show');
   evalBox.classList.add('show');
-  scrollToElement(evalBox);  // [v6] 자동 스크롤
+  scrollToElement(evalBox);
 }
 
-function allGradeA(result) {
-  return CHANNELS.every(ch => result[ch.key].grade === 'A');
-}
-
-function getNonAChannels(result) {
-  return CHANNELS.filter(ch => result[ch.key].grade !== 'A');
-}
-
+function allGradeA(result) { return CHANNELS.every(ch => result[ch.key].grade === 'A'); }
+function getNonAChannels(result) { return CHANNELS.filter(ch => result[ch.key].grade !== 'A'); }
 function countGrades(result) {
   let b = 0, c = 0;
   CHANNELS.forEach(ch => {
@@ -981,12 +851,10 @@ function showFeedbackBox(iteration) {
       ' (' + evaluationResult[ch.key].grade + ')</span>';
   });
   manualChannels.innerHTML = chHtml;
-
   manualBox.classList.remove('show');
   manualText.value = '';
   manualText.style.borderColor = '#1A237E';
 
-  // [v6] 안전 지연 - 800ms 후 버튼 활성화
   document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
   feedbackBox.classList.add('show');
   scrollToElement(feedbackBox);
@@ -1002,7 +870,6 @@ function showIterCounter(iteration) {
   iterCounter.classList.add('show');
 }
 
-// [v6] 차수 변경 큰 알림
 async function showIterAlert(text, sub) {
   iterAlertMain.textContent = text;
   iterAlertSub.textContent = sub || '전체 A 등급 달성까지 계속됩니다';
@@ -1012,25 +879,20 @@ async function showIterAlert(text, sub) {
   iterAlert.classList.remove('show');
 }
 
-function waitForUserChoice() {
-  return new Promise(resolve => { userChoiceResolver = resolve; });
-}
+function waitForUserChoice() { return new Promise(resolve => { userChoiceResolver = resolve; }); }
 
 document.querySelectorAll('.fb-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    if (isProcessing) return;  // [v6] 디바운스
+    if (isProcessing) return;
     if (btn.disabled) return;
-
     if (btn.dataset.mode === 'manual') {
       manualBox.classList.add('show');
       document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
       scrollToElement(manualBox);
       return;
     }
-
     isProcessing = true;
     document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
-
     if (userChoiceResolver) {
       const r = userChoiceResolver;
       userChoiceResolver = null;
@@ -1054,32 +916,19 @@ manualSubmit.addEventListener('click', () => {
   }
 });
 
-// ============================================
-// [v6] 보완 순환 루프 - 전체 A 달성까지 무조건 반복
-// ============================================
 async function runFeedbackLoop() {
   while (true) {
     showIterCounter(currentIteration);
-    console.log('[보완 루프] ' + currentIteration + '차 진입, 평가:', evaluationResult);
-
-    // 모두 A이면 루프 종료
     if (allGradeA(evaluationResult)) {
-      console.log('[보완 루프] 전체 A 달성 → 루프 종료');
       setStepState(4, 'done');
       iterCounter.classList.remove('show');
       return;
     }
-
-    // ④ 보완 단계 활성화 + 피드백 박스 표시
     setStepState(4, 'active');
     showFeedbackBox(currentIteration);
-
-    // 사용자 선택 대기
     const choice = await waitForUserChoice();
     feedbackBox.classList.remove('show');
-    console.log('[보완 루프] ' + currentIteration + '차 사용자 선택:', choice);
 
-    // 건너뛰기 → 즉시 종료
     if (choice === 'skip') {
       showProgress(3, '보완 없이 다음 단계로 진행합니다');
       document.getElementById('progStepName').textContent = '보완 (건너뜀)';
@@ -1091,7 +940,6 @@ async function runFeedbackLoop() {
       return;
     }
 
-    // 자동/수동 보완 처리 (1.5초)
     const msg = choice === 'auto'
       ? '🤖 AI가 자동으로 보완 중입니다... (' + currentIteration + '차)'
       : '✍️ 직접 수정 내용 반영 중... (' + currentIteration + '차)';
@@ -1099,31 +947,182 @@ async function runFeedbackLoop() {
     await wait(1500);
     progressBox.classList.remove('show');
 
-    // 차수 증가
     currentIteration++;
-
-    // [v6] 다음 차수 큰 알림
     await showIterAlert(currentIteration + '차 재평가 시작',
       '전체 A 등급 달성까지 계속됩니다');
 
-    // ③ 재평가 실행
     showProgress(2, currentIteration + '차 재평가 진행 중...');
     setStepState(3, 'active');
     await wait(1500);
     setStepState(3, 'done');
     progressBox.classList.remove('show');
 
-    // 평가 결과 갱신 (3차 이후에도 100% A 보장)
     const evalData = EVAL_BY_ITERATION[currentIteration] || EVAL_BY_ITERATION[3];
     evaluationResult = JSON.parse(JSON.stringify(evalData));
-    console.log('[보완 루프] ' + currentIteration + '차 평가 결과:', evaluationResult);
     renderEvaluation(evaluationResult, currentIteration);
-
-    // 결과 충분히 보여주기 (1.8초)
     await wait(1800);
   }
 }
 
+// ============================================
+// [v7 신규] AI 학습 시각화
+// ============================================
+
+function initLearningBox() {
+  // 5개 서브 단계 카드 생성
+  let stepHtml = '';
+  LEARNING_SUBSTEPS.forEach((sub, idx) => {
+    stepHtml += '<div class="lb-substep" data-sub="' + idx + '">';
+    stepHtml += '<div><span class="lb-substep-num">' + (idx + 1) + '</span>';
+    stepHtml += '<span class="lb-substep-name">' + sub.icon + ' ' + sub.name + '</span></div>';
+    stepHtml += '<div class="lb-substep-status">대기</div>';
+    stepHtml += '<div class="lb-substep-bar"><div class="lb-substep-fill"></div></div>';
+    stepHtml += '</div>';
+  });
+  lbSubsteps.innerHTML = stepHtml;
+
+  // 6채널 카드 생성
+  let chHtml = '';
+  CHANNELS.forEach(ch => {
+    chHtml += '<div class="lb-channel" data-ch="' + ch.key + '">';
+    chHtml += '<div class="lb-ch-label">' + ch.label + ' (' + ch.ko + ')</div>';
+    chHtml += '<div class="lb-ch-icon">⏳</div>';
+    chHtml += '<div class="lb-ch-status">대기</div>';
+    chHtml += '</div>';
+  });
+  lbChannels.innerHTML = chHtml;
+
+  // 통계 초기화
+  lbStatItems.textContent = '0';
+  lbStatVectors.textContent = '0';
+  lbStatIndex.textContent = '0';
+  lbStatSpeed.textContent = '0';
+  lbProgressNum.textContent = '0%';
+  lbProgressFill.style.width = '0%';
+  lbLogContent.innerHTML = '';
+}
+
+function getTimeStr() {
+  const d = new Date();
+  return d.toTimeString().substring(0, 8);
+}
+
+function addLearningLog(text, type) {
+  const cls = type ? ' ' + type : '';
+  const html = '<div class="lb-log-line' + cls + '">';
+  const inner = '<span class="lb-log-time">[' + getTimeStr() + ']</span>' + text;
+  lbLogContent.insertAdjacentHTML('beforeend', html + inner + '</div>');
+  // 자동 스크롤
+  lbLogContent.scrollTop = lbLogContent.scrollHeight;
+}
+
+function setSubstepState(idx, state, statusText) {
+  const el = lbSubsteps.querySelector('[data-sub="' + idx + '"]');
+  if (!el) return;
+  el.classList.remove('active', 'done');
+  if (state) el.classList.add(state);
+  if (statusText) el.querySelector('.lb-substep-status').textContent = statusText;
+  const fill = el.querySelector('.lb-substep-fill');
+  if (state === 'active') {
+    fill.style.width = '0%';
+    setTimeout(() => { fill.style.width = '100%'; }, 50);
+  } else if (state === 'done') {
+    fill.style.width = '100%';
+  }
+}
+
+function setChannelState(key, state, iconText) {
+  const el = lbChannels.querySelector('[data-ch="' + key + '"]');
+  if (!el) return;
+  el.classList.remove('active', 'done');
+  if (state) el.classList.add(state);
+  if (iconText) el.querySelector('.lb-ch-icon').textContent = iconText;
+  const status = el.querySelector('.lb-ch-status');
+  if (state === 'active') status.textContent = '학습 중';
+  else if (state === 'done') status.textContent = '완료';
+  else status.textContent = '대기';
+}
+
+function animateNumber(el, from, to, durationMs, suffix) {
+  const start = Date.now();
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / durationMs, 1);
+    const value = Math.round(from + (to - from) * progress);
+    el.textContent = value.toLocaleString();
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = to.toLocaleString();
+  };
+  tick();
+}
+
+async function processSubstep(idx) {
+  const sub = LEARNING_SUBSTEPS[idx];
+  setSubstepState(idx, 'active', '진행 중');
+  addLearningLog('▶ ' + sub.icon + ' ' + sub.name + ' 시작', 'start');
+
+  // 6채널 순차 학습 시뮬레이션
+  const perChannelMs = sub.duration / 6;
+  for (let i = 0; i < CHANNELS.length; i++) {
+    const ch = CHANNELS[i];
+    setChannelState(ch.key, 'active', '🔄');
+    addLearningLog('  ↳ ' + ch.label + ' (' + ch.ko + ') ' + sub.name + ' 처리 중');
+    await wait(perChannelMs);
+    setChannelState(ch.key, 'done', '✓');
+
+    // 통계 점진 증가 - 단계별로 비례 증가
+    const baseItems = 200 + idx * 50;
+    const baseVectors = 1200 + idx * 300;
+    const baseIndex = 5 + idx * 5;
+    const baseSpeed = 380 + idx * 20;
+    const ratio = (i + 1) / CHANNELS.length;
+
+    lbStatItems.textContent = Math.round(baseItems + 1048 * ratio).toLocaleString();
+    lbStatVectors.textContent = Math.round(baseVectors + 6288 * ratio).toLocaleString();
+    lbStatIndex.textContent = Math.round(baseIndex + 27 * ratio).toString();
+    lbStatSpeed.textContent = Math.round(baseSpeed + 70 * ratio).toString();
+  }
+
+  setSubstepState(idx, 'done', '완료');
+  addLearningLog('✓ ' + sub.icon + ' ' + sub.name + ' 완료', 'done');
+
+  // 전체 진행률 갱신
+  const totalProgress = Math.round(((idx + 1) / LEARNING_SUBSTEPS.length) * 100);
+  lbProgressNum.textContent = totalProgress + '%';
+  lbProgressFill.style.width = totalProgress + '%';
+
+  // 다음 단계 준비를 위해 채널 카드 초기화 (마지막 단계 제외)
+  if (idx < LEARNING_SUBSTEPS.length - 1) {
+    await wait(400);
+    CHANNELS.forEach(ch => setChannelState(ch.key, '', '⏳'));
+  }
+}
+
+async function runAILearning() {
+  // ⑤ 단계 활성화
+  setStepState(5, 'active');
+
+  // 학습 박스 표시
+  initLearningBox();
+  learningBox.classList.add('show');
+  scrollToElement(learningBox);
+
+  await wait(500);
+  addLearningLog('🚀 AI 학습 시작 - 파일 ' + selectedFiles.length + '개, 5W1H 6채널 데이터');
+
+  // 5개 서브 단계 순차 진행
+  for (let i = 0; i < LEARNING_SUBSTEPS.length; i++) {
+    await processSubstep(i);
+  }
+
+  addLearningLog('🎯 AI 학습 완료 - 모든 채널 학습 인덱스 생성', 'done');
+  setStepState(5, 'done');
+  await wait(1500);
+}
+
+// ============================================
+// AX 시작
+// ============================================
 axStartBtn.addEventListener('click', async () => {
   if (selectedFiles.length === 0) return;
 
@@ -1132,7 +1131,6 @@ axStartBtn.addEventListener('click', async () => {
   dropZone.style.pointerEvents = 'none';
   setStepState('upload', 'done');
 
-  // ① 압축해제
   if (hasArchiveFile()) {
     await processStep(0);
   } else {
@@ -1145,24 +1143,22 @@ axStartBtn.addEventListener('click', async () => {
     await wait(800);
   }
 
-  // ② 구조화
   await processStep(1);
 
-  // ③ 1차 평가
   await processStep(2);
   evaluationResult = JSON.parse(JSON.stringify(EVAL_BY_ITERATION[1]));
   renderEvaluation(evaluationResult, 1);
   progressBox.classList.remove('show');
   await wait(1800);
 
-  // ④ 보완 순환 루프 (전체 A 달성까지)
   await runFeedbackLoop();
 
   progressBox.classList.remove('show');
   iterAlert.classList.remove('show');
 
-  // ⑤ AI 학습
-  await processStep(4);
+  // ⑤ AI 학습 - 시각화 버전
+  await runAILearning();
+
   // ⑥ AX 구축
   await processStep(5);
 
@@ -1199,6 +1195,7 @@ resetBtn.addEventListener('click', () => {
   evalBox.classList.remove('show');
   feedbackBox.classList.remove('show');
   manualBox.classList.remove('show');
+  learningBox.classList.remove('show');
   completeBox.classList.remove('show');
   iterCounter.classList.remove('show');
   iterAlert.classList.remove('show');
