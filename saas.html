@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 2 - 파일 업로드 (동작 버전)</title>
+<title>saas.html 화면 2 - 파일 업로드 v3 (자동 6단계 진행)</title>
 <style>
   body {
     font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
@@ -11,7 +11,6 @@
     background: #ffffff;
   }
 
-  /* 상단 NAVY 안내바 */
   .top-banner {
     background: #1A237E;
     color: #ffffff;
@@ -22,7 +21,6 @@
     margin: 0 0 36px 0;
   }
 
-  /* 통합 NAVY 박스 */
   .upload-wrapper {
     max-width: 1200px;
     margin: 0 auto 28px auto;
@@ -71,26 +69,50 @@
     border-radius: 999px;
     white-space: nowrap;
     flex-shrink: 0;
-    cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    position: relative;
   }
 
-  .mini-step:hover {
-    border-color: #1A237E;
-    color: #1A237E;
-  }
-
+  /* 진행 중 - WINE 강조 + 펄스 */
   .mini-step.active {
     background: #7B1F2A;
     color: #ffffff;
     border-color: #7B1F2A;
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.2);
   }
 
+  /* 완료 - NAVY */
   .mini-step.done {
     background: #1A237E;
     color: #ffffff;
     border-color: #1A237E;
+  }
+
+  .mini-step.done::after {
+    content: '✓';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #1A237E;
+    color: #ffffff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+  }
+
+  /* 건너뜀 - 회색 + 줄긋기 */
+  .mini-step.skipped {
+    background: #e0e0e0;
+    color: #888888;
+    border-color: #cccccc;
+    text-decoration: line-through;
   }
 
   .mini-arrow {
@@ -121,7 +143,6 @@
   .drop-zone.drag-over {
     background: #fff5f5;
     border-color: #7B1F2A;
-    transform: scale(1.01);
   }
 
   .drop-icon {
@@ -154,12 +175,10 @@
     border: none;
     border-radius: 999px;
     cursor: pointer;
-    transition: all 0.2s;
   }
 
   .browse-btn:hover {
     background: #7B1F2A;
-    transform: translateY(-2px);
   }
 
   /* 파일 목록 */
@@ -225,6 +244,10 @@
     margin-right: 8px;
   }
 
+  .file-status.done {
+    background: #1A237E;
+  }
+
   .file-remove {
     background: none;
     border: none;
@@ -233,10 +256,6 @@
     font-weight: 900;
     cursor: pointer;
     padding: 0 6px;
-  }
-
-  .file-remove:hover {
-    color: #000000;
   }
 
   /* AX 시작 버튼 */
@@ -257,7 +276,6 @@
 
   .ax-start-btn:hover:not(:disabled) {
     background: #1A237E;
-    transform: translateY(-2px);
   }
 
   .ax-start-btn:disabled {
@@ -266,7 +284,110 @@
     cursor: not-allowed;
   }
 
-  /* 파일 형식 안내 박스 */
+  /* ===== [신규] 진행 상태 박스 ===== */
+  .progress-box {
+    border: 3px solid #7B1F2A;
+    border-radius: 14px;
+    padding: 32px 30px;
+    margin: 28px 0;
+    background: #ffffff;
+    text-align: center;
+    display: none;
+  }
+
+  .progress-box.show {
+    display: block;
+  }
+
+  .progress-step-num {
+    color: #7B1F2A;
+    font-size: 48px;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+    line-height: 1;
+  }
+
+  .progress-step-name {
+    color: #1A237E;
+    font-size: 30px;
+    font-weight: 900;
+    margin: 0 0 14px 0;
+  }
+
+  .progress-message {
+    color: #000000;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+  }
+
+  .progress-bar-bg {
+    width: 100%;
+    height: 18px;
+    background: #f0f0f0;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #cccccc;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: #7B1F2A;
+    border-radius: 999px;
+    width: 0%;
+    transition: width 1.4s linear;
+  }
+
+  /* ===== [신규] 완료 박스 ===== */
+  .complete-box {
+    border: 3px solid #1A237E;
+    background: #1A237E;
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 36px 30px;
+    margin: 28px 0;
+    text-align: center;
+    display: none;
+  }
+
+  .complete-box.show {
+    display: block;
+  }
+
+  .complete-icon {
+    font-size: 56px;
+    margin: 0 0 12px 0;
+    line-height: 1;
+  }
+
+  .complete-title {
+    font-size: 32px;
+    font-weight: 900;
+    margin: 0 0 14px 0;
+  }
+
+  .complete-summary {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 22px 0;
+  }
+
+  .reset-btn {
+    background: #ffffff;
+    color: #1A237E;
+    font-size: 18px;
+    font-weight: 900;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .reset-btn:hover {
+    background: #f0f0f0;
+  }
+
+  /* 파일 형식 안내 */
   .file-types-bar {
     max-width: 1200px;
     margin: 0 auto;
@@ -287,12 +408,10 @@
 </head>
 <body>
 
-<!-- 상단 NAVY 안내바 -->
 <div class="top-banner">
   파일 · 폴더 · ZIP 모두 자동 처리
 </div>
 
-<!-- 통합 NAVY 박스 -->
 <section class="upload-wrapper">
 
   <h1 class="screen-title">파일 업로드</h1>
@@ -315,7 +434,7 @@
     <div class="mini-step" data-step="6">⑥ AX 구축</div>
   </div>
 
-  <!-- 드롭존 (클릭하면 파일 선택, 끌어 놓아도 동작) -->
+  <!-- 드롭존 -->
   <div class="drop-zone" id="dropZone">
     <div class="drop-icon">⬆</div>
     <div class="drop-main-text">파일을 여기로 끌어다 놓으세요</div>
@@ -323,27 +442,45 @@
     <button class="browse-btn" id="browseBtn" type="button">파일 선택</button>
   </div>
 
-  <!-- 숨겨진 파일 입력 -->
   <input type="file" id="fileInput" multiple
     accept=".pdf,.docx,.xlsx,.txt,.csv,.json,.xml,.zip"
     style="display:none">
 
-  <!-- 업로드된 파일 목록 -->
-  <div class="file-list-box">
+  <!-- 파일 목록 -->
+  <div class="file-list-box" id="fileListBox">
     <div class="file-list-title" id="fileListTitle">📂 업로드된 파일 (0개)</div>
     <div id="fileList">
       <div class="empty-msg">아직 선택된 파일이 없습니다</div>
     </div>
   </div>
 
-  <!-- AX 시작 버튼 (파일 선택 전에는 비활성) -->
+  <!-- AX 시작 버튼 -->
   <button class="ax-start-btn" id="axStartBtn" disabled>
     AX 자동 구축 시작 →
   </button>
 
+  <!-- [신규] 진행 상태 박스 -->
+  <div class="progress-box" id="progressBox">
+    <div class="progress-step-num" id="progStepNum">①</div>
+    <div class="progress-step-name" id="progStepName">압축해제</div>
+    <div class="progress-message" id="progMessage">압축파일 자동 해제 중...</div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progBarFill"></div>
+    </div>
+  </div>
+
+  <!-- [신규] 완료 박스 -->
+  <div class="complete-box" id="completeBox">
+    <div class="complete-icon">🎯</div>
+    <div class="complete-title">AX 시스템 구축 완료!</div>
+    <div class="complete-summary" id="completeSummary">
+      파일 0개 처리 · 6단계 자동 완료
+    </div>
+    <button class="reset-btn" id="resetBtn">새 작업 시작</button>
+  </div>
+
 </section>
 
-<!-- 파일 형식 안내 -->
 <div class="file-types-bar">
   <span class="label">
     PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합 · 중첩 가능)
@@ -352,54 +489,64 @@
 
 <script>
 // ============================================
-// 파일 업로드 동작 처리
+// 변수
 // ============================================
-
 const dropZone = document.getElementById('dropZone');
 const browseBtn = document.getElementById('browseBtn');
 const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
+const fileListBox = document.getElementById('fileListBox');
 const fileListTitle = document.getElementById('fileListTitle');
 const axStartBtn = document.getElementById('axStartBtn');
+const progressBox = document.getElementById('progressBox');
+const completeBox = document.getElementById('completeBox');
+const resetBtn = document.getElementById('resetBtn');
 
 let selectedFiles = [];
 
-// [1] "파일 선택" 버튼 클릭 → 파일 다이얼로그
-browseBtn.addEventListener('click', function(e) {
+// ============================================
+// 6단계 정의
+// ============================================
+const STEPS = [
+  { num: '①', name: '압축해제', msg: '압축파일을 자동으로 해제합니다' },
+  { num: '②', name: '5W1H 6채널 구조화', msg: '비정형 데이터를 6채널로 구조화합니다' },
+  { num: '③', name: '품질 평가', msg: 'A/B/C 등급 자동 평가 중입니다' },
+  { num: '④', name: '보완', msg: '미흡 채널을 자동 보완합니다' },
+  { num: '⑤', name: 'AI 학습', msg: '학습 인덱스를 생성합니다' },
+  { num: '⑥', name: 'AX 시스템 구축', msg: 'AX 자동화 시스템을 구축합니다' }
+];
+
+// 압축파일 확장자
+const ARCHIVE_EXTS = ['zip', 'tar', 'gz', 'rar', '7z', 'tgz'];
+
+// ============================================
+// 파일 선택
+// ============================================
+browseBtn.addEventListener('click', e => {
   e.stopPropagation();
   fileInput.click();
 });
 
-// [2] 드롭존 클릭 → 파일 다이얼로그
-dropZone.addEventListener('click', function() {
-  fileInput.click();
-});
+dropZone.addEventListener('click', () => fileInput.click());
 
-// [3] 파일 선택 시 처리
-fileInput.addEventListener('change', function(e) {
-  handleFiles(e.target.files);
-});
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
-// [4] 끌어다 놓기 - 들어옴
-dropZone.addEventListener('dragover', function(e) {
+dropZone.addEventListener('dragover', e => {
   e.preventDefault();
   dropZone.classList.add('drag-over');
 });
 
-// [5] 끌어다 놓기 - 나감
-dropZone.addEventListener('dragleave', function(e) {
+dropZone.addEventListener('dragleave', e => {
   e.preventDefault();
   dropZone.classList.remove('drag-over');
 });
 
-// [6] 끌어다 놓기 - 놓음
-dropZone.addEventListener('drop', function(e) {
+dropZone.addEventListener('drop', e => {
   e.preventDefault();
   dropZone.classList.remove('drag-over');
   handleFiles(e.dataTransfer.files);
 });
 
-// [7] 파일 처리 함수
 function handleFiles(files) {
   for (let i = 0; i < files.length; i++) {
     selectedFiles.push(files[i]);
@@ -408,22 +555,18 @@ function handleFiles(files) {
   updateAXButton();
 }
 
-// [8] 파일 목록 렌더링
 function renderFileList() {
   if (selectedFiles.length === 0) {
     fileListTitle.textContent = '📂 업로드된 파일 (0개)';
     fileList.innerHTML = '<div class="empty-msg">아직 선택된 파일이 없습니다</div>';
     return;
   }
-
   fileListTitle.textContent = '📂 업로드된 파일 (' + selectedFiles.length + '개)';
-
   let html = '';
   selectedFiles.forEach((file, idx) => {
-    const sizeKB = (file.size / 1024).toFixed(1);
-    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-    const sizeStr = file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB';
-
+    const sizeStr = file.size > 1024 * 1024
+      ? (file.size / 1024 / 1024).toFixed(1) + ' MB'
+      : (file.size / 1024).toFixed(1) + ' KB';
     html += '<div class="file-row">';
     html += '<span class="file-name">' + file.name + '</span>';
     html += '<span class="file-size">' + sizeStr + '</span>';
@@ -431,54 +574,162 @@ function renderFileList() {
     html += '<button class="file-remove" onclick="removeFile(' + idx + ')" title="제거">✕</button>';
     html += '</div>';
   });
-
   fileList.innerHTML = html;
 }
 
-// [9] 파일 제거
 function removeFile(idx) {
   selectedFiles.splice(idx, 1);
   renderFileList();
   updateAXButton();
 }
 
-// [10] AX 시작 버튼 활성/비활성
 function updateAXButton() {
   axStartBtn.disabled = selectedFiles.length === 0;
 }
 
-// [11] AX 시작 버튼 클릭 → 다음 화면 (① 압축해제) 이동
-axStartBtn.addEventListener('click', function() {
+// ============================================
+// 압축파일 포함 여부 자동 판단
+// ============================================
+function hasArchiveFile() {
+  return selectedFiles.some(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    return ARCHIVE_EXTS.includes(ext);
+  });
+}
+
+// ============================================
+// 단계 표시 갱신
+// ============================================
+function setStepState(stepNum, state) {
+  // state: 'active' | 'done' | 'skipped' | ''
+  const el = document.querySelector('.mini-step[data-step="' + stepNum + '"]');
+  if (!el) return;
+  el.classList.remove('active', 'done', 'skipped');
+  if (state) el.classList.add(state);
+}
+
+// ============================================
+// 진행 박스 갱신
+// ============================================
+function showProgress(stepIdx) {
+  const step = STEPS[stepIdx];
+  document.getElementById('progStepNum').textContent = step.num;
+  document.getElementById('progStepName').textContent = step.name;
+  document.getElementById('progMessage').textContent = step.msg;
+
+  const fill = document.getElementById('progBarFill');
+  fill.style.width = '0%';
+  // 약간의 지연 후 100%로 (transition 작동)
+  setTimeout(() => { fill.style.width = '100%'; }, 50);
+
+  progressBox.classList.add('show');
+
+  // 파일 상태 "처리 중"으로 표시
+  document.querySelectorAll('.file-status').forEach(s => {
+    s.textContent = '처리 중';
+  });
+}
+
+// ============================================
+// 단계 처리 (1.5초 시뮬레이션)
+// ============================================
+function processStep(stepIdx) {
+  return new Promise(resolve => {
+    const stepNum = stepIdx + 1;
+    setStepState(stepNum, 'active');
+    showProgress(stepIdx);
+
+    // [실제 운영시 여기에 처리 호출 - 1.5초는 시뮬레이션]
+    // → 각 단계별 axdata 처리 함수 호출
+    setTimeout(() => {
+      setStepState(stepNum, 'done');
+      resolve();
+    }, 1500);
+  });
+}
+
+function skipStep(stepIdx) {
+  const stepNum = stepIdx + 1;
+  setStepState(stepNum, 'skipped');
+}
+
+// ============================================
+// AX 자동 구축 시작 - 6단계 순차 자동 진행
+// ============================================
+axStartBtn.addEventListener('click', async () => {
   if (selectedFiles.length === 0) return;
 
-  // [현재 단계 이동] 업로드 → ① 압축해제
-  document.querySelector('.mini-step[data-step="upload"]').classList.remove('active');
-  document.querySelector('.mini-step[data-step="upload"]').classList.add('done');
-  document.querySelector('.mini-step[data-step="1"]').classList.add('active');
+  // UI 잠금
+  axStartBtn.disabled = true;
+  dropZone.style.opacity = '0.5';
+  dropZone.style.pointerEvents = 'none';
 
-  // [실제 운영시 여기에 처리 호출 추가]
-  // → axdata 처리 시스템 호출 / 다음 화면으로 라우팅
-  alert('AX 자동 구축을 시작합니다.\n\n선택된 파일: ' + selectedFiles.length + '개\n\n다음 화면 (① 압축해제)으로 이동합니다.');
+  // 업로드 단계 완료 처리
+  setStepState('upload', 'done');
 
-  // 실제 환경에서는: window.location.href = 'step1.html';
+  // [① 압축해제] 압축파일 있으면 처리, 없으면 건너뜀
+  if (hasArchiveFile()) {
+    await processStep(0);
+  } else {
+    skipStep(0);
+    // 건너뛴 단계는 진행 박스에 안내 표시
+    document.getElementById('progStepNum').textContent = '①';
+    document.getElementById('progStepName').textContent = '압축해제 (건너뜀)';
+    document.getElementById('progMessage').textContent = '압축파일이 없어 다음 단계로 진행합니다';
+    progressBox.classList.add('show');
+    document.getElementById('progBarFill').style.width = '100%';
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  // [② ~ ⑥] 나머지 5단계 순차 진행
+  for (let i = 1; i < 6; i++) {
+    await processStep(i);
+  }
+
+  // 모든 단계 완료 → 결과 박스 표시
+  showCompletion();
 });
 
-// [12] 미니 진행단계 클릭 → 해당 화면 이동
-document.querySelectorAll('.mini-step').forEach(step => {
-  step.addEventListener('click', function() {
-    const stepNum = this.dataset.step;
-    if (stepNum === 'upload') return;
+// ============================================
+// 완료 처리
+// ============================================
+function showCompletion() {
+  progressBox.classList.remove('show');
 
-    const labels = {
-      '1': '① 압축해제',
-      '2': '② 구조화',
-      '3': '③ 평가',
-      '4': '④ 보완',
-      '5': '⑤ AI 학습',
-      '6': '⑥ AX 구축'
-    };
-    alert(labels[stepNum] + ' 화면으로 이동합니다.\n\n(해당 화면 제작 후 연결됩니다)');
+  // 파일 상태 모두 "완료"로
+  document.querySelectorAll('.file-status').forEach(s => {
+    s.textContent = '완료';
+    s.classList.add('done');
   });
+
+  // 완료 박스 표시
+  document.getElementById('completeSummary').textContent =
+    '파일 ' + selectedFiles.length + '개 처리 · 6단계 자동 완료';
+  completeBox.classList.add('show');
+
+  // [실제 운영시 여기에 결과 화면 라우팅]
+  // → window.location.href = 'result.html';
+}
+
+// ============================================
+// 새 작업 시작 (리셋)
+// ============================================
+resetBtn.addEventListener('click', () => {
+  selectedFiles = [];
+  renderFileList();
+  updateAXButton();
+
+  // 단계 초기화
+  ['1', '2', '3', '4', '5', '6'].forEach(n => setStepState(n, ''));
+  setStepState('upload', 'active');
+
+  // 박스 숨김
+  progressBox.classList.remove('show');
+  completeBox.classList.remove('show');
+
+  // UI 복구
+  dropZone.style.opacity = '1';
+  dropZone.style.pointerEvents = 'auto';
 });
 </script>
 
