@@ -28,12 +28,28 @@
 
   body {
     font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-    background: var(--white);
+    background: linear-gradient(135deg, #d6def5 0%, #dfdaf5 33%, #f5dde2 66%, #d6def5 100%);
+    background-size: 300% 300%;
+    animation: bgFlow 12s ease-in-out infinite;
     color: var(--black);
     line-height: 1.6;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+  }
+
+  @keyframes bgFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* 모션 줄이기 설정 사용자 - 정적 배경 */
+  @media (prefers-reduced-motion: reduce) {
+    body {
+      animation: none;
+      background: #d6def5;
+    }
   }
 
   /* 헤더 */
@@ -73,7 +89,7 @@
   .hero {
     padding: 90px 40px 70px;
     text-align: center;
-    background: var(--white);
+    background: transparent;
   }
 
   .hero-title {
@@ -86,7 +102,7 @@
   }
 
   .hero-subtitle {
-    font-size: 22px;
+    font-size: 30px;
     font-weight: 700;
     color: var(--black);
     letter-spacing: -0.3px;
@@ -279,7 +295,7 @@
 
 <!-- 히어로 -->
 <section class="hero">
-  <h1 class="hero-title">AX 자동화 시스템 구축. 활용</h1>
+  <h1 class="hero-title">AX 자동화 시스템 구축 · 활용</h1>
   <p class="hero-subtitle">(비정형 데이터 5W1H 구조화)</p>
 </section>
 
