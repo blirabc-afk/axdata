@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 4 - AI 질의응답 (5W1H 6채널 기반)</title>
+<title>saas.html 화면 5 - 품질 관리 대시보드</title>
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
 
@@ -11,19 +11,19 @@
     padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0;
   }
 
-  .qa-wrapper {
+  .dash-wrapper {
     max-width: 1200px; margin: 0 auto 28px auto;
     border: 3px solid #1A237E; border-radius: 16px;
     padding: 40px; background: #ffffff; box-sizing: border-box;
   }
 
+  /* 시스템 헤더 */
   .sys-header {
     display: flex; justify-content: space-between; align-items: center;
     background: #f5f7ff; border: 2px solid #1A237E;
     border-radius: 10px; padding: 12px 20px; margin: 0 0 24px 0;
     font-size: 14px; font-weight: 700; color: #000000;
   }
-
   .sys-header-info { display: flex; gap: 20px; flex-wrap: wrap; }
   .sys-info-label { color: #555; margin-right: 6px; }
   .sys-info-value { color: #1A237E; font-family: 'Courier New', monospace; font-weight: 900; }
@@ -32,298 +32,275 @@
     color: #1A237E; font-size: 36px; font-weight: 900;
     text-align: center; margin: 0 0 14px 0;
   }
-
   .screen-subtitle {
     color: #000000; font-size: 20px; font-weight: 700;
-    text-align: center; margin: 0 0 28px 0;
+    text-align: center; margin: 0 0 30px 0;
   }
 
-  /* 채팅 영역 */
-  .chat-box {
-    border: 2px solid #1A237E; border-radius: 12px;
-    background: #fafafa;
-    height: 520px; overflow-y: auto;
-    padding: 24px; margin: 0 0 16px 0;
-    display: flex; flex-direction: column; gap: 16px;
+  .section-title {
+    color: #1A237E; font-size: 18px; font-weight: 900;
+    margin: 28px 0 14px 0;
+    padding: 0 0 0 10px;
+    border-left: 5px solid #7B1F2A;
   }
 
-  /* 안내 메시지 (초기) */
-  .welcome-msg {
-    text-align: center; padding: 20px;
-    color: #555; font-size: 15px; font-weight: 700;
+  /* KPI 카드 */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin: 0 0 8px 0;
   }
 
-  .welcome-icon { font-size: 56px; margin: 0 0 12px 0; line-height: 1; }
-  .welcome-title { color: #1A237E; font-size: 22px; font-weight: 900; margin: 0 0 8px 0; }
-
-  .welcome-quick-title {
-    color: #7B1F2A; font-size: 15px; font-weight: 900;
-    margin: 24px 0 12px 0; text-align: center;
-  }
-
-  .welcome-quick-list {
-    display: flex; flex-direction: column; gap: 8px;
-    max-width: 500px; margin: 0 auto;
-  }
-
-  .welcome-quick-btn {
-    background: #ffffff; color: #1A237E;
-    border: 2px solid #1A237E;
-    font-size: 15px; font-weight: 700;
-    padding: 12px 18px; border-radius: 10px;
-    cursor: pointer; text-align: left;
-    transition: all 0.2s; font-family: inherit;
-  }
-
-  .welcome-quick-btn:hover {
-    background: #1A237E; color: #ffffff; transform: translateX(4px);
-  }
-
-  /* 메시지 풍선 */
-  .msg {
-    display: flex; gap: 10px; max-width: 85%;
-    animation: fadeIn 0.3s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .msg.user {
-    align-self: flex-end; flex-direction: row-reverse;
-  }
-
-  .msg.ai {
-    align-self: flex-start;
-  }
-
-  .msg-avatar {
-    flex-shrink: 0;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; font-weight: 900;
-    color: #ffffff;
-  }
-
-  .msg.user .msg-avatar { background: #1A237E; }
-  .msg.ai .msg-avatar { background: #7B1F2A; }
-
-  .msg-bubble {
-    padding: 14px 18px; border-radius: 12px;
-    font-size: 16px; line-height: 1.6;
-    word-wrap: break-word; word-break: break-word;
-  }
-
-  .msg.user .msg-bubble {
-    background: #1A237E; color: #ffffff;
-    font-weight: 700;
-    border-top-right-radius: 4px;
-  }
-
-  .msg.ai .msg-bubble {
-    background: #ffffff; color: #000000;
-    border: 2px solid #7B1F2A;
-    font-weight: 500;
-    border-top-left-radius: 4px;
-  }
-
-  .msg-time {
-    font-size: 11px; color: #888;
-    margin: 4px 0 0 0; font-weight: 700;
-  }
-
-  .msg.user .msg-time { text-align: right; }
-
-  /* AI 답변 본문 */
-  .ai-answer-title {
-    color: #1A237E; font-size: 17px; font-weight: 900;
-    margin: 0 0 10px 0;
-  }
-
-  .ai-answer-channels {
-    display: flex; flex-direction: column; gap: 6px;
-    margin: 0 0 12px 0;
-  }
-
-  .ai-channel-line {
-    color: #000000; font-size: 15px; font-weight: 700;
-    line-height: 1.5;
-  }
-
-  .ai-channel-icon {
-    color: #7B1F2A; font-weight: 900; margin-right: 6px;
-  }
-
-  /* 출처 카드 */
-  .ai-sources {
-    margin: 12px 0 0 0;
-    padding: 12px 14px;
-    background: #f5f7ff;
-    border-radius: 8px;
-    border-left: 3px solid #1A237E;
-  }
-
-  .ai-sources-title {
-    color: #1A237E; font-size: 13px; font-weight: 900;
-    margin: 0 0 8px 0;
-  }
-
-  .ai-source-item {
-    display: flex; gap: 8px; align-items: center;
-    padding: 6px 10px; margin: 4px 0;
+  .kpi-card {
+    border: 3px solid #1A237E;
+    border-radius: 12px;
+    padding: 22px 20px;
     background: #ffffff;
-    border: 1px solid #1A237E;
-    border-radius: 6px;
-    font-size: 13px; color: #000000; font-weight: 700;
-    cursor: pointer; transition: all 0.2s;
-  }
-
-  .ai-source-item:hover {
-    background: #1A237E; color: #ffffff;
-  }
-
-  .ai-source-item:hover .ai-source-grade { background: #ffffff; color: #1A237E; }
-
-  .ai-source-name { flex-grow: 1; }
-
-  .ai-source-grade {
-    background: #1A237E; color: #ffffff;
-    font-size: 11px; font-weight: 900;
-    padding: 2px 8px; border-radius: 999px;
-    flex-shrink: 0;
-  }
-
-  .ai-source-grade.b { background: #b8860b; }
-  .ai-source-grade.c { background: #7B1F2A; }
-
-  /* 후속 질문 */
-  .ai-followups {
-    margin: 12px 0 0 0;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-
-  .ai-followups-title {
-    color: #7B1F2A; font-size: 13px; font-weight: 900;
-    margin: 0 0 4px 0;
-  }
-
-  .ai-followup-btn {
-    background: #ffffff; color: #1A237E;
-    border: 2px solid #1A237E;
-    font-size: 13px; font-weight: 700;
-    padding: 8px 14px; border-radius: 999px;
-    cursor: pointer; text-align: left;
-    transition: all 0.2s; font-family: inherit;
-  }
-
-  .ai-followup-btn:hover {
-    background: #1A237E; color: #ffffff;
-  }
-
-  /* 만족도 */
-  .ai-feedback {
-    display: flex; gap: 6px; margin: 10px 0 0 0;
-    padding: 8px 0 0 0;
-    border-top: 1px solid #e0e0e0;
-  }
-
-  .ai-feedback-label {
-    font-size: 12px; color: #555; font-weight: 700;
-    margin-right: 4px; align-self: center;
-  }
-
-  .ai-feedback-btn {
-    background: none; border: 1px solid #cccccc;
-    width: 28px; height: 28px; border-radius: 50%;
-    cursor: pointer; font-size: 14px;
+    text-align: center;
     transition: all 0.2s;
   }
 
-  .ai-feedback-btn:hover {
-    border-color: #1A237E; transform: scale(1.1);
+  .kpi-card:hover {
+    background: #f5f7ff; transform: translateY(-3px);
+    box-shadow: 0 4px 0 0 rgba(26, 35, 126, 0.15);
   }
 
-  .ai-feedback-btn.selected.up {
-    background: #1A237E; border-color: #1A237E; color: #ffffff;
+  .kpi-icon {
+    font-size: 36px; line-height: 1; margin: 0 0 8px 0;
   }
 
-  .ai-feedback-btn.selected.down {
-    background: #7B1F2A; border-color: #7B1F2A; color: #ffffff;
+  .kpi-label {
+    color: #000000; font-size: 14px; font-weight: 700;
+    margin: 0 0 6px 0;
   }
 
-  /* 타이핑 인디케이터 */
-  .typing {
-    display: flex; gap: 4px; padding: 6px 0;
+  .kpi-value {
+    color: #1A237E; font-size: 36px; font-weight: 900;
+    line-height: 1;
   }
 
-  .typing-dot {
-    width: 8px; height: 8px;
-    background: #7B1F2A;
-    border-radius: 50%;
-    animation: typing 1.2s infinite;
+  .kpi-unit {
+    color: #1A237E; font-size: 16px; font-weight: 700;
+    margin-left: 2px;
   }
 
-  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-  @keyframes typing {
-    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-    30% { opacity: 1; transform: translateY(-4px); }
+  .kpi-trend {
+    color: #7B1F2A; font-size: 13px; font-weight: 700;
+    margin: 8px 0 0 0;
   }
 
-  /* 입력 영역 */
-  .input-wrap {
-    display: flex; gap: 10px;
+  .kpi-trend.up { color: #1A237E; }
+  .kpi-trend.warn { color: #b8860b; }
+
+  /* 차트 행 */
+  .chart-row {
+    display: grid; grid-template-columns: 1.4fr 1fr;
+    gap: 16px; margin: 0 0 8px 0;
   }
 
-  .qa-input {
-    flex-grow: 1; padding: 16px 20px;
-    border: 3px solid #1A237E; border-radius: 12px;
-    font-size: 17px; font-weight: 700; color: #000000;
-    box-sizing: border-box; font-family: inherit;
-    resize: none;
+  .chart-row.half {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .qa-input:focus {
-    outline: none; border-color: #7B1F2A;
-    box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.15);
+  .chart-card {
+    border: 2px solid #1A237E;
+    border-radius: 12px;
+    padding: 24px;
+    background: #ffffff;
   }
 
-  .qa-input:disabled {
-    background: #f0f0f0; color: #888;
+  .chart-card-title {
+    color: #1A237E; font-size: 17px; font-weight: 900;
+    margin: 0 0 16px 0;
+    padding: 0 0 10px 0;
+    border-bottom: 2px solid #f0f0f0;
   }
 
-  .send-btn {
-    background: #7B1F2A; color: #ffffff;
-    font-size: 18px; font-weight: 900;
-    padding: 14px 28px; border: none; border-radius: 12px;
-    cursor: pointer; white-space: nowrap;
-    transition: all 0.2s; flex-shrink: 0;
+  /* 가로 막대 차트 (채널 등급, 카테고리) */
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 60px;
+    gap: 10px;
+    align-items: center;
   }
 
-  .send-btn:hover:not(:disabled) {
-    background: #1A237E; transform: translateY(-2px);
+  .bar-label {
+    color: #000000; font-size: 14px; font-weight: 900;
+    text-align: right;
   }
 
-  .send-btn:disabled {
-    background: #cccccc; cursor: not-allowed;
+  .bar-track {
+    height: 24px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
   }
 
-  .clear-btn {
-    background: #ffffff; color: #1A237E;
+  .bar-segment {
+    height: 100%; transition: all 0.6s ease;
+  }
+
+  .bar-segment.a { background: #1A237E; }
+  .bar-segment.b { background: #b8860b; }
+  .bar-segment.c { background: #7B1F2A; }
+  .bar-segment.solid { background: #1A237E; }
+
+  .bar-value {
+    color: #1A237E; font-size: 14px; font-weight: 900;
+    text-align: left;
+  }
+
+  .bar-legend {
+    display: flex; gap: 14px; justify-content: center;
+    margin: 16px 0 0 0;
+    padding: 12px 0 0 0;
+    border-top: 1px solid #f0f0f0;
+    font-size: 13px; font-weight: 700;
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+
+  .legend-dot {
+    width: 14px; height: 14px; border-radius: 3px;
+  }
+
+  .legend-dot.a { background: #1A237E; }
+  .legend-dot.b { background: #b8860b; }
+  .legend-dot.c { background: #7B1F2A; }
+
+  /* 도넛 차트 */
+  .donut-wrap {
+    display: flex; align-items: center; gap: 24px;
+    justify-content: center;
+  }
+
+  .donut-svg {
+    flex-shrink: 0;
+  }
+
+  .donut-center {
+    position: absolute;
+    text-align: center;
+  }
+
+  .donut-stats {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  .donut-stat-row {
+    display: flex; align-items: center; gap: 10px;
     font-size: 14px; font-weight: 700;
-    padding: 14px 18px; border: 2px solid #1A237E;
-    border-radius: 12px; cursor: pointer;
-    transition: all 0.2s; flex-shrink: 0;
   }
 
-  .clear-btn:hover {
-    background: #1A237E; color: #ffffff;
+  .donut-stat-dot {
+    width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
   }
 
-  /* 하단 화면 이동 */
+  .donut-stat-label {
+    color: #000000; min-width: 60px;
+  }
+
+  .donut-stat-value {
+    color: #1A237E; font-weight: 900;
+    margin-left: auto;
+  }
+
+  /* 라인 차트 */
+  .line-chart-wrap {
+    position: relative;
+  }
+
+  .line-svg {
+    width: 100%;
+    height: 200px;
+  }
+
+  .line-x-labels {
+    display: flex; justify-content: space-between;
+    margin: 4px 0 0 0;
+    font-size: 12px; font-weight: 700; color: #555;
+    padding: 0 12px;
+  }
+
+  /* 활동 로그 */
+  .activity-log {
+    border: 2px solid #1A237E;
+    border-radius: 12px;
+    padding: 20px 24px;
+    background: #ffffff;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  .activity-row {
+    display: grid;
+    grid-template-columns: 80px 30px 1fr 80px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px; font-weight: 700;
+  }
+
+  .activity-row:last-child { border-bottom: none; }
+
+  .activity-time {
+    color: #555; font-family: 'Courier New', monospace;
+  }
+
+  .activity-icon {
+    font-size: 20px; text-align: center;
+  }
+
+  .activity-text { color: #000000; }
+  .activity-text strong { color: #1A237E; }
+
+  .activity-tag {
+    background: #f5f7ff; color: #1A237E;
+    border: 1px solid #1A237E;
+    font-size: 12px; font-weight: 900;
+    padding: 4px 10px; border-radius: 999px;
+    text-align: center;
+  }
+
+  /* 알림/이슈 */
+  .alerts-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .alert-card {
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid;
+    background: #ffffff;
+  }
+
+  .alert-card.warning { border-color: #b8860b; background: #fffbe6; }
+  .alert-card.success { border-color: #1A237E; background: #f5f7ff; }
+  .alert-card.info { border-color: #7B1F2A; background: #fff5f5; }
+
+  .alert-icon {
+    font-size: 32px; line-height: 1; margin: 0 0 10px 0;
+  }
+
+  .alert-title {
+    font-size: 16px; font-weight: 900;
+    margin: 0 0 6px 0;
+  }
+
+  .alert-card.warning .alert-title { color: #b8860b; }
+  .alert-card.success .alert-title { color: #1A237E; }
+  .alert-card.info .alert-title { color: #7B1F2A; }
+
+  .alert-msg {
+    color: #000000; font-size: 14px; font-weight: 700;
+    line-height: 1.5;
+  }
+
+  /* 하단 */
   .bottom-actions {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 10px; margin: 28px 0 0 0;
@@ -361,68 +338,210 @@
 </head>
 <body>
 
-<div class="top-banner">5W1H 6채널 기반 AI 질의응답 시스템</div>
+<div class="top-banner">AX 시스템 품질 관리 대시보드 - 실시간 모니터링</div>
 
-<section class="qa-wrapper">
+<section class="dash-wrapper">
 
   <div class="sys-header">
     <div class="sys-header-info">
-      <span class="sys-info-item">
-        <span class="sys-info-label">시스템 ID</span>
-        <span class="sys-info-value">AX-2026-0508</span>
-      </span>
-      <span class="sys-info-item">
-        <span class="sys-info-label">사용자</span>
-        <span class="sys-info-value">AX-00000</span>
-      </span>
-      <span class="sys-info-item">
-        <span class="sys-info-label">학습 인덱스</span>
-        <span class="sys-info-value">활성</span>
-      </span>
+      <span class="sys-info-item"><span class="sys-info-label">시스템 ID</span><span class="sys-info-value">AX-2026-0508</span></span>
+      <span class="sys-info-item"><span class="sys-info-label">사용자</span><span class="sys-info-value">AX-00000</span></span>
+      <span class="sys-info-item"><span class="sys-info-label">상태</span><span class="sys-info-value">정상 운영</span></span>
     </div>
     <div class="sys-info-item">
-      <span class="sys-info-label">총 데이터</span>
-      <span class="sys-info-value">1,248개</span>
+      <span class="sys-info-label">갱신</span>
+      <span class="sys-info-value" id="updateTime">-</span>
     </div>
   </div>
 
-  <h1 class="screen-title">💬 AI 질의응답</h1>
-  <p class="screen-subtitle">5W1H 6채널 데이터 기반으로 자연어 답변을 제공합니다</p>
+  <h1 class="screen-title">📊 품질 관리 대시보드</h1>
+  <p class="screen-subtitle">AX 시스템 운영 현황 한눈에 보기</p>
 
-  <!-- 채팅 영역 -->
-  <div class="chat-box" id="chatBox">
-    <div class="welcome-msg" id="welcomeMsg">
-      <div class="welcome-icon">💬</div>
-      <div class="welcome-title">무엇이든 물어보세요</div>
-      <div>회사의 모든 자료를 학습한 AI가 답변해 드립니다.</div>
+  <!-- KPI 카드 -->
+  <div class="section-title">📈 핵심 지표</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">📚</div>
+      <div class="kpi-label">총 학습 데이터</div>
+      <div class="kpi-value">1,248<span class="kpi-unit">개</span></div>
+      <div class="kpi-trend up">▲ 전주 대비 +84개</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-label">A 등급 비율</div>
+      <div class="kpi-value">78<span class="kpi-unit">%</span></div>
+      <div class="kpi-trend up">▲ 전주 대비 +5%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-label">평균 응답 시간</div>
+      <div class="kpi-value">0.82<span class="kpi-unit">초</span></div>
+      <div class="kpi-trend up">▼ 전주 대비 -0.18초</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-label">일일 사용자</div>
+      <div class="kpi-value">28<span class="kpi-unit">명</span></div>
+      <div class="kpi-trend up">▲ 전주 대비 +12%</div>
+    </div>
+  </div>
 
-      <div class="welcome-quick-title">📋 빠른 질문 예시</div>
-      <div class="welcome-quick-list">
-        <button class="welcome-quick-btn" data-q="화재 발생시 어떻게 대피해야 하나요?">
-          🔥 화재 발생시 어떻게 대피해야 하나요?
-        </button>
-        <button class="welcome-quick-btn" data-q="품질 점검은 누가 어떻게 하나요?">
-          ✅ 품질 점검은 누가 어떻게 하나요?
-        </button>
-        <button class="welcome-quick-btn" data-q="응급 상황이 생기면 어디로 연락해야 하나요?">
-          🚨 응급 상황이 생기면 어디로 연락해야 하나요?
-        </button>
-        <button class="welcome-quick-btn" data-q="작업장 안전 수칙은 무엇인가요?">
-          🛡️ 작업장 안전 수칙은 무엇인가요?
-        </button>
-        <button class="welcome-quick-btn" data-q="설비 점검은 언제 하나요?">
-          🔧 설비 점검은 언제 하나요?
-        </button>
+  <!-- 차트 행 1: 6채널 분포 + 등급 비율 -->
+  <div class="section-title">🔗 5W1H 6채널 품질 분포</div>
+  <div class="chart-row">
+    <!-- 6채널 등급 분포 -->
+    <div class="chart-card">
+      <div class="chart-card-title">채널별 A/B/C 등급 분포</div>
+      <div class="bar-chart" id="channelBarChart"></div>
+      <div class="bar-legend">
+        <div class="legend-item"><span class="legend-dot a"></span>A 등급</div>
+        <div class="legend-item"><span class="legend-dot b"></span>B 등급</div>
+        <div class="legend-item"><span class="legend-dot c"></span>C 등급</div>
+      </div>
+    </div>
+
+    <!-- 등급 비율 도넛 -->
+    <div class="chart-card">
+      <div class="chart-card-title">전체 등급 비율</div>
+      <div class="donut-wrap" style="position:relative;">
+        <svg class="donut-svg" width="160" height="160" viewBox="0 0 160 160">
+          <!-- 배경 원 -->
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#f0f0f0" stroke-width="28"/>
+          <!-- A 등급 70% -->
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#1A237E" stroke-width="28"
+                  stroke-dasharray="263.76 376.8" transform="rotate(-90 80 80)"/>
+          <!-- B 등급 22% (시작점 70% = 263.76) -->
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#b8860b" stroke-width="28"
+                  stroke-dasharray="82.9 376.8" stroke-dashoffset="-263.76"
+                  transform="rotate(-90 80 80)"/>
+          <!-- C 등급 8% -->
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#7B1F2A" stroke-width="28"
+                  stroke-dasharray="30.14 376.8" stroke-dashoffset="-346.66"
+                  transform="rotate(-90 80 80)"/>
+          <!-- 중앙 텍스트 -->
+          <text x="80" y="78" text-anchor="middle" fill="#1A237E"
+                font-size="32" font-weight="900" font-family="Noto Sans KR">78%</text>
+          <text x="80" y="98" text-anchor="middle" fill="#000000"
+                font-size="11" font-weight="700" font-family="Noto Sans KR">A 등급</text>
+        </svg>
+        <div class="donut-stats">
+          <div class="donut-stat-row">
+            <span class="donut-stat-dot" style="background:#1A237E;"></span>
+            <span class="donut-stat-label">A 등급</span>
+            <span class="donut-stat-value">974개 (78%)</span>
+          </div>
+          <div class="donut-stat-row">
+            <span class="donut-stat-dot" style="background:#b8860b;"></span>
+            <span class="donut-stat-label">B 등급</span>
+            <span class="donut-stat-value">175개 (14%)</span>
+          </div>
+          <div class="donut-stat-row">
+            <span class="donut-stat-dot" style="background:#7B1F2A;"></span>
+            <span class="donut-stat-label">C 등급</span>
+            <span class="donut-stat-value">99개 (8%)</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 입력 영역 -->
-  <div class="input-wrap">
-    <button class="clear-btn" id="clearBtn" title="대화 초기화">🔄 새 대화</button>
-    <input type="text" class="qa-input" id="qaInput"
-      placeholder="질문을 입력하세요 (예: 화재 발생시 어떻게 대피해야 하나요?)" autofocus>
-    <button class="send-btn" id="sendBtn">전송 →</button>
+  <!-- 차트 행 2: 일별 추이 + 카테고리 -->
+  <div class="section-title">📅 처리 추이 및 분야별 분포</div>
+  <div class="chart-row half">
+    <!-- 일별 추이 라인 -->
+    <div class="chart-card">
+      <div class="chart-card-title">최근 7일 처리량 추이</div>
+      <div class="line-chart-wrap">
+        <svg class="line-svg" viewBox="0 0 600 200" preserveAspectRatio="none">
+          <!-- 격자선 -->
+          <line x1="0" y1="40"  x2="600" y2="40"  stroke="#f0f0f0" stroke-width="1"/>
+          <line x1="0" y1="80"  x2="600" y2="80"  stroke="#f0f0f0" stroke-width="1"/>
+          <line x1="0" y1="120" x2="600" y2="120" stroke="#f0f0f0" stroke-width="1"/>
+          <line x1="0" y1="160" x2="600" y2="160" stroke="#f0f0f0" stroke-width="1"/>
+
+          <!-- Y축 레이블 -->
+          <text x="6" y="44"  fill="#888" font-size="10" font-family="Noto Sans KR">200</text>
+          <text x="6" y="84"  fill="#888" font-size="10" font-family="Noto Sans KR">150</text>
+          <text x="6" y="124" fill="#888" font-size="10" font-family="Noto Sans KR">100</text>
+          <text x="6" y="164" fill="#888" font-size="10" font-family="Noto Sans KR">50</text>
+
+          <!-- 라인 (값: 120, 145, 132, 158, 142, 168, 175 / 200 max) -->
+          <!-- y = 200 - (val/200 * 160) -->
+          <!-- 120→104, 145→84, 132→94, 158→73.6, 142→86.4, 168→65.6, 175→60 -->
+          <polyline points="50,104 140,84 230,94 320,73.6 410,86.4 500,65.6 580,60"
+                    fill="none" stroke="#7B1F2A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- 영역 채우기 -->
+          <polygon points="50,104 140,84 230,94 320,73.6 410,86.4 500,65.6 580,60 580,180 50,180"
+                   fill="rgba(123, 31, 42, 0.1)"/>
+
+          <!-- 점 + 값 라벨 -->
+          <circle cx="50"  cy="104"  r="5" fill="#7B1F2A"/>
+          <circle cx="140" cy="84"   r="5" fill="#7B1F2A"/>
+          <circle cx="230" cy="94"   r="5" fill="#7B1F2A"/>
+          <circle cx="320" cy="73.6" r="5" fill="#7B1F2A"/>
+          <circle cx="410" cy="86.4" r="5" fill="#7B1F2A"/>
+          <circle cx="500" cy="65.6" r="5" fill="#7B1F2A"/>
+          <circle cx="580" cy="60"   r="6" fill="#1A237E" stroke="#ffffff" stroke-width="2"/>
+
+          <text x="50"  y="94"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">120</text>
+          <text x="140" y="74"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">145</text>
+          <text x="230" y="84"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">132</text>
+          <text x="320" y="63"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">158</text>
+          <text x="410" y="76"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">142</text>
+          <text x="500" y="55"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">168</text>
+          <text x="580" y="48"  text-anchor="middle" fill="#7B1F2A" font-size="13" font-weight="900" font-family="Noto Sans KR">175</text>
+        </svg>
+        <div class="line-x-labels">
+          <span>5/02</span>
+          <span>5/03</span>
+          <span>5/04</span>
+          <span>5/05</span>
+          <span>5/06</span>
+          <span>5/07</span>
+          <span>5/08</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 카테고리별 -->
+    <div class="chart-card">
+      <div class="chart-card-title">분야별 데이터 분포</div>
+      <div class="bar-chart" id="categoryBarChart"></div>
+    </div>
+  </div>
+
+  <!-- 활동 로그 -->
+  <div class="section-title">📋 최근 활동 로그</div>
+  <div class="activity-log" id="activityLog"></div>
+
+  <!-- 알림 -->
+  <div class="section-title">🔔 알림 및 이슈</div>
+  <div class="alerts-grid">
+    <div class="alert-card warning">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-title">C 등급 1건 보완 필요</div>
+      <div class="alert-msg">
+        품질 부적합 사례 분석 (2026Q1) 채널 보완 권장.
+        보완 모드 실행 시 자동 개선 가능합니다.
+      </div>
+    </div>
+    <div class="alert-card success">
+      <div class="alert-icon">✅</div>
+      <div class="alert-title">시스템 정상 운영</div>
+      <div class="alert-msg">
+        모든 6모듈 정상 작동 중입니다.
+        평균 응답 0.82초로 안정적 성능 유지 중.
+      </div>
+    </div>
+    <div class="alert-card info">
+      <div class="alert-icon">📈</div>
+      <div class="alert-title">사용량 증가</div>
+      <div class="alert-msg">
+        일일 검색·질의응답 횟수가 전주 대비 12% 증가했습니다.
+        시스템 활용도 상승 중.
+      </div>
+    </div>
   </div>
 
   <!-- 하단 화면 이동 -->
@@ -430,11 +549,11 @@
     <button class="bottom-btn" data-nav="search">
       <span class="bottom-btn-icon">🔍</span>검색
     </button>
-    <button class="bottom-btn current">
-      <span class="bottom-btn-icon">💬</span>AI 질의응답 (현재)
+    <button class="bottom-btn" data-nav="qa">
+      <span class="bottom-btn-icon">💬</span>AI 질의응답
     </button>
-    <button class="bottom-btn" data-nav="dashboard">
-      <span class="bottom-btn-icon">📊</span>대시보드
+    <button class="bottom-btn current">
+      <span class="bottom-btn-icon">📊</span>대시보드 (현재)
     </button>
     <button class="bottom-btn" data-nav="report">
       <span class="bottom-btn-icon">📑</span>보고서
@@ -444,364 +563,137 @@
 </section>
 
 <div class="file-types-bar">
-  <span class="label">자연어 대화 · 6채널 데이터 기반 · 출처 자동 표시 · 후속 질문 추천</span>
+  <span class="label">실시간 모니터링 · 6채널 품질 추적 · 시계열 분석 · 자동 알림</span>
 </div>
 
 <script>
 const CHANNELS = [
-  { key: 'why',   label: 'Why',   ko: '왜', icon: '🎯' },
-  { key: 'what',  label: 'What',  ko: '무엇', icon: '📋' },
-  { key: 'when',  label: 'When',  ko: '언제', icon: '⏰' },
-  { key: 'where', label: 'Where', ko: '어디', icon: '📍' },
-  { key: 'who',   label: 'Who',   ko: '누가', icon: '👤' },
-  { key: 'how',   label: 'How',   ko: '어떻게', icon: '🔧' }
+  { key: 'why',   label: 'Why',   ko: '왜' },
+  { key: 'what',  label: 'What',  ko: '무엇' },
+  { key: 'when',  label: 'When',  ko: '언제' },
+  { key: 'where', label: 'Where', ko: '어디' },
+  { key: 'who',   label: 'Who',   ko: '누가' },
+  { key: 'how',   label: 'How',   ko: '어떻게' }
 ];
 
-// 검색 화면과 동일한 샘플 데이터
-const SAMPLE_DATA = [
-  { id: 'doc-001', title: '화재 발생시 대피 경로 안내', why: '비상 상황 발생시 인명 보호', what: '제조동 대피 경로 매뉴얼', when: '화재 감지 즉시', where: '제조동 1층/2층 전 구역', who: '안전관리책임자, 작업자 전원', how: '비상등 경로 따라 옥외 집결지 이동', grade: 'A', source: '안전관리매뉴얼_v3.pdf', date: '2026-04-15', keywords: ['화재', '대피', '비상', '안전', '경로'] },
-  { id: 'doc-002', title: '제조 공정 품질 점검 절차', why: '제품 품질 표준 유지', what: '공정 단계별 품질 점검 항목', when: '매 작업 시작 및 종료 시', where: '제조 라인 1~3호기', who: '품질관리팀 조장', how: '점검표 기반 항목별 측정 후 기록', grade: 'A', source: '품질관리지침_v2.docx', date: '2026-04-08', keywords: ['품질', '점검', '공정', '관리', '측정'] },
-  { id: 'doc-003', title: '작업장 안전 수칙', why: '작업 중 사고 예방', what: '필수 안전 수칙 12항목', when: '모든 작업 시간', where: '전 작업장', who: '전 작업자', how: '교육 이수 후 현장 게시판 부착·준수', grade: 'A', source: '안전수칙고시_v1.pdf', date: '2026-03-22', keywords: ['안전', '수칙', '작업', '예방'] },
-  { id: 'doc-004', title: '화학물질 취급 절차', why: '화학물질 누출·오염 방지', what: '인화성·독성 화학물질 취급 매뉴얼', when: '화학물질 입출고 및 사용 시', where: '화학물질 저장고 및 작업장', who: '안전교육 이수자만 가능', how: '보호구 착용 후 지정된 절차 따라 취급', grade: 'B', source: '화학물질매뉴얼.pdf', date: '2026-03-15', keywords: ['화학', '취급', '안전', '보호'] },
-  { id: 'doc-005', title: '응급 상황 대응 매뉴얼', why: '응급 상황 시 신속 대응', what: '의료 응급·재난 응급 대응 절차', when: '응급 상황 발생 즉시', where: '전 사업장 및 인근 지역', who: '응급처치 자격자, 안전관리자', how: '119 신고 → 응급처치 → 후송 협조', grade: 'A', source: '응급대응매뉴얼.pdf', date: '2026-03-01', keywords: ['응급', '대응', '재난', '의료'] },
-  { id: 'doc-006', title: '설비 정기 점검 일지', why: '설비 고장 사전 예방', what: '주요 설비 점검 항목 및 결과', when: '매주 월요일 / 매월 1일', where: '제조 1~3호기, 보일러실', who: '설비관리팀 김민수 과장', how: '체크리스트 점검 후 일지 작성·보고', grade: 'A', source: '설비점검일지_2026Q1.xlsx', date: '2026-02-28', keywords: ['설비', '점검', '예방', '관리'] },
-  { id: 'doc-007', title: '비상 대응 훈련 결과', why: '비상 대응 역량 평가 및 향상', what: '연 2회 정기 대응 훈련 결과 보고', when: '2026년 상반기 (4월 진행)', where: '본사 사업장 전체', who: '전 임직원 참여', how: '시나리오 기반 실전 훈련 진행', grade: 'B', source: '훈련결과보고서.docx', date: '2026-04-22', keywords: ['훈련', '비상', '대응', '평가'] },
-  { id: 'doc-008', title: '안전 교육 이수 현황', why: '법정 의무 안전교육 이행', what: '신규 입사자·기존 직원 안전교육 현황', when: '분기별 갱신', where: '본사·지사 전체', who: '인사팀 + 안전관리팀 공동 관리', how: '온라인 LMS 시스템 + 오프라인 실습', grade: 'B', source: '교육이수현황_2026Q1.xlsx', date: '2026-03-31', keywords: ['교육', '이수', '안전', '인사'] },
-  { id: 'doc-009', title: '품질 부적합 사례 분석', why: '재발 방지 및 품질 향상', what: '2026년 1분기 부적합 사례 12건', when: '2026년 1월~3월', where: '제조 라인 2호기 집중 발생', who: '품질팀 + 생산팀 협업', how: '근본원인 분석(RCA) 후 시정조치', grade: 'C', source: '부적합분석_2026Q1.docx', date: '2026-04-05', keywords: ['품질', '부적합', '분석', '시정'] },
-  { id: 'doc-010', title: '협력사 안전 점검 결과', why: '협력사 안전 관리 수준 점검', what: '주요 협력사 12개사 안전 점검', when: '2026년 4월', where: '협력사 사업장', who: '본사 안전팀', how: '체크리스트 기반 현장 실사', grade: 'A', source: '협력사점검_2026Apr.pdf', date: '2026-04-18', keywords: ['협력사', '점검', '안전', '실사'] }
+// 6채널 등급 분포 데이터 (총 1248개 기준 × 6채널)
+const CHANNEL_GRADES = {
+  why:   { a: 230, b: 12, c: 0,   total: 242 },
+  what:  { a: 240, b: 8,  c: 0,   total: 248 },
+  when:  { a: 195, b: 38, c: 9,   total: 242 },
+  where: { a: 220, b: 18, c: 4,   total: 242 },
+  who:   { a: 168, b: 52, c: 22,  total: 242 },
+  how:   { a: 215, b: 22, c: 5,   total: 242 }
+};
+
+// 카테고리별 데이터
+const CATEGORIES = [
+  { name: '안전 관리',   count: 380, color: '#1A237E' },
+  { name: '품질 관리',   count: 312, color: '#1A237E' },
+  { name: '설비 관리',   count: 198, color: '#1A237E' },
+  { name: '응급 대응',   count: 142, color: '#1A237E' },
+  { name: '교육·훈련',   count: 128, color: '#1A237E' },
+  { name: '기타',        count: 88,  color: '#1A237E' }
 ];
 
-const chatBox = document.getElementById('chatBox');
-const welcomeMsg = document.getElementById('welcomeMsg');
-const qaInput = document.getElementById('qaInput');
-const sendBtn = document.getElementById('sendBtn');
-const clearBtn = document.getElementById('clearBtn');
+// 활동 로그
+const ACTIVITIES = [
+  { time: '09:18', icon: '🔍', text: '<strong>품질관리</strong> 검색 - 1건 매칭',           tag: '검색' },
+  { time: '09:15', icon: '💬', text: '<strong>화재 대피 방법</strong> 질의응답',              tag: '질의응답' },
+  { time: '09:10', icon: '📑', text: '<strong>주간 안전 보고서</strong> 자동 생성 완료',      tag: '보고서' },
+  { time: '09:05', icon: '📚', text: '신규 매뉴얼 <strong>3건 학습</strong> 완료',           tag: '학습' },
+  { time: '09:00', icon: '🚀', text: '<strong>시스템 시작</strong> - 모든 모듈 정상',         tag: '시스템' },
+  { time: '08:45', icon: '🔧', text: '<strong>설비 점검</strong> 데이터 자동 분류',          tag: '구조화' },
+  { time: '08:30', icon: '✅', text: '<strong>품질 평가</strong> 정기 실행 - 78% A 등급',     tag: '평가' },
+  { time: '08:00', icon: '🤖', text: '자동 보완 <strong>2회 실행</strong> 완료',             tag: '보완' }
+];
 
 // ============================================
-// 질문 분석 및 매칭
+// 6채널 등급 분포 차트
 // ============================================
+function renderChannelChart() {
+  const el = document.getElementById('channelBarChart');
+  let html = '';
+  CHANNELS.forEach(ch => {
+    const g = CHANNEL_GRADES[ch.key];
+    const aPct = (g.a / g.total) * 100;
+    const bPct = (g.b / g.total) * 100;
+    const cPct = (g.c / g.total) * 100;
 
-function findMatchingDocs(question) {
-  const q = question.toLowerCase();
-  const scored = SAMPLE_DATA.map(doc => {
-    let score = 0;
-    // 제목 매칭 (가장 강력)
-    if (doc.title.toLowerCase().includes(q)) score += 50;
-    // 키워드 매칭
-    doc.keywords.forEach(kw => {
-      if (q.includes(kw.toLowerCase())) score += 20;
-    });
-    // 6채널 텍스트 매칭
-    CHANNELS.forEach(ch => {
-      if (doc[ch.key].toLowerCase().includes(q)) score += 10;
-    });
-    // 부분 단어 매칭
-    const qWords = q.split(/\s+/).filter(w => w.length >= 2);
-    qWords.forEach(word => {
-      if (doc.title.toLowerCase().includes(word)) score += 8;
-      doc.keywords.forEach(kw => {
-        if (kw.toLowerCase().includes(word)) score += 5;
-      });
-      CHANNELS.forEach(ch => {
-        if (doc[ch.key].toLowerCase().includes(word)) score += 3;
-      });
-    });
-    return { doc, score };
+    html += '<div class="bar-row">';
+    html += '<div class="bar-label">' + ch.label + ' (' + ch.ko + ')</div>';
+    html += '<div class="bar-track">';
+    html += '<div class="bar-segment a" style="width:' + aPct + '%;" title="A: ' + g.a + '"></div>';
+    html += '<div class="bar-segment b" style="width:' + bPct + '%;" title="B: ' + g.b + '"></div>';
+    html += '<div class="bar-segment c" style="width:' + cPct + '%;" title="C: ' + g.c + '"></div>';
+    html += '</div>';
+    html += '<div class="bar-value">' + g.total + '</div>';
+    html += '</div>';
   });
-
-  return scored
-    .filter(s => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .map(s => s.doc);
-}
-
-function getQuestionType(question) {
-  const q = question.toLowerCase();
-  if (q.includes('어떻게') || q.includes('방법') || q.includes('절차')) return 'how';
-  if (q.includes('언제') || q.includes('시간') || q.includes('주기')) return 'when';
-  if (q.includes('어디') || q.includes('장소') || q.includes('위치')) return 'where';
-  if (q.includes('누가') || q.includes('담당') || q.includes('책임')) return 'who';
-  if (q.includes('왜') || q.includes('이유') || q.includes('목적')) return 'why';
-  if (q.includes('무엇') || q.includes('뭐')) return 'what';
-  return 'all';
-}
-
-function generateAnswer(question) {
-  const matched = findMatchingDocs(question);
-  const qType = getQuestionType(question);
-
-  if (matched.length === 0) {
-    return {
-      noMatch: true,
-      text: '죄송합니다. 학습된 데이터에서 관련 정보를 찾지 못했습니다.\n\n다른 방식으로 질문해 주시거나, 검색 화면에서 직접 자료를 찾아보실 수 있습니다.',
-      sources: [],
-      followups: [
-        '🛡️ 작업장 안전 수칙은 무엇인가요?',
-        '✅ 품질 점검 절차는?',
-        '🚨 응급 상황 대응은?'
-      ]
-    };
-  }
-
-  const primary = matched[0];
-  const sources = matched.slice(0, 3);
-
-  return {
-    primary: primary,
-    sources: sources,
-    qType: qType,
-    followups: generateFollowups(primary, matched)
-  };
-}
-
-function generateFollowups(primary, allMatched) {
-  const followups = [];
-  followups.push(primary.title + '의 상세 절차는?');
-  followups.push(primary.who + '의 연락처를 알려주세요');
-  if (allMatched.length > 1) {
-    followups.push('관련된 다른 자료는?');
-  }
-  return followups.slice(0, 3);
+  el.innerHTML = html;
 }
 
 // ============================================
-// 메시지 추가
+// 카테고리 분포 차트
 // ============================================
+function renderCategoryChart() {
+  const el = document.getElementById('categoryBarChart');
+  const max = Math.max.apply(null, CATEGORIES.map(c => c.count));
+  let html = '';
+  CATEGORIES.forEach(cat => {
+    const pct = (cat.count / max) * 100;
+    html += '<div class="bar-row">';
+    html += '<div class="bar-label">' + cat.name + '</div>';
+    html += '<div class="bar-track">';
+    html += '<div class="bar-segment solid" style="width:' + pct + '%;"></div>';
+    html += '</div>';
+    html += '<div class="bar-value">' + cat.count + '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
 
-function getTimeStr() {
+// ============================================
+// 활동 로그 렌더
+// ============================================
+function renderActivityLog() {
+  const el = document.getElementById('activityLog');
+  let html = '';
+  ACTIVITIES.forEach(a => {
+    html += '<div class="activity-row">';
+    html += '<div class="activity-time">' + a.time + '</div>';
+    html += '<div class="activity-icon">' + a.icon + '</div>';
+    html += '<div class="activity-text">' + a.text + '</div>';
+    html += '<div class="activity-tag">' + a.tag + '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+// 갱신 시각
+function updateTime() {
   const d = new Date();
   const h = String(d.getHours()).padStart(2, '0');
   const m = String(d.getMinutes()).padStart(2, '0');
-  return h + ':' + m;
+  const s = String(d.getSeconds()).padStart(2, '0');
+  document.getElementById('updateTime').textContent = h + ':' + m + ':' + s;
 }
 
-function addUserMessage(text) {
-  const html =
-    '<div class="msg user">' +
-      '<div class="msg-avatar">나</div>' +
-      '<div>' +
-        '<div class="msg-bubble">' + escapeHtml(text) + '</div>' +
-        '<div class="msg-time">' + getTimeStr() + '</div>' +
-      '</div>' +
-    '</div>';
-  chatBox.insertAdjacentHTML('beforeend', html);
-  scrollToBottom();
-}
-
-function addTypingIndicator() {
-  const html =
-    '<div class="msg ai" id="typingMsg">' +
-      '<div class="msg-avatar">AI</div>' +
-      '<div class="msg-bubble">' +
-        '<div class="typing">' +
-          '<div class="typing-dot"></div>' +
-          '<div class="typing-dot"></div>' +
-          '<div class="typing-dot"></div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  chatBox.insertAdjacentHTML('beforeend', html);
-  scrollToBottom();
-}
-
-function removeTypingIndicator() {
-  const el = document.getElementById('typingMsg');
-  if (el) el.remove();
-}
-
-function addAIMessage(answer) {
-  let bubbleHtml = '';
-
-  if (answer.noMatch) {
-    bubbleHtml += '<div style="color:#7B1F2A;font-weight:900;margin-bottom:8px;">⚠️ 관련 정보를 찾지 못했습니다</div>';
-    bubbleHtml += '<div style="white-space:pre-line;">' + escapeHtml(answer.text) + '</div>';
-  } else {
-    const p = answer.primary;
-    bubbleHtml += '<div class="ai-answer-title">📌 ' + escapeHtml(p.title) + '</div>';
-    bubbleHtml += '<div class="ai-answer-channels">';
-    CHANNELS.forEach(ch => {
-      bubbleHtml += '<div class="ai-channel-line">';
-      bubbleHtml += '<span class="ai-channel-icon">' + ch.icon + ' ' + ch.ko + ':</span>';
-      bubbleHtml += escapeHtml(p[ch.key]);
-      bubbleHtml += '</div>';
-    });
-    bubbleHtml += '</div>';
-
-    // 출처 카드
-    if (answer.sources.length > 0) {
-      bubbleHtml += '<div class="ai-sources">';
-      bubbleHtml += '<div class="ai-sources-title">📂 참고 자료 ' + answer.sources.length + '건</div>';
-      answer.sources.forEach(s => {
-        const gCls = s.grade === 'B' ? ' b' : (s.grade === 'C' ? ' c' : '');
-        bubbleHtml += '<div class="ai-source-item" data-id="' + s.id + '">';
-        bubbleHtml += '<span class="ai-source-name">' + escapeHtml(s.source) + '</span>';
-        bubbleHtml += '<span class="ai-source-grade' + gCls + '">' + s.grade + '</span>';
-        bubbleHtml += '</div>';
-      });
-      bubbleHtml += '</div>';
-    }
-  }
-
-  // 후속 질문
-  if (answer.followups && answer.followups.length > 0) {
-    bubbleHtml += '<div class="ai-followups">';
-    bubbleHtml += '<div class="ai-followups-title">💡 추가로 물어볼 만한 질문</div>';
-    answer.followups.forEach(f => {
-      bubbleHtml += '<button class="ai-followup-btn" data-q="' + escapeHtmlAttr(f) + '">↩ ' + escapeHtml(f) + '</button>';
-    });
-    bubbleHtml += '</div>';
-  }
-
-  // 만족도
-  if (!answer.noMatch) {
-    bubbleHtml += '<div class="ai-feedback">';
-    bubbleHtml += '<span class="ai-feedback-label">답변이 도움됐나요?</span>';
-    bubbleHtml += '<button class="ai-feedback-btn" data-fb="up">👍</button>';
-    bubbleHtml += '<button class="ai-feedback-btn" data-fb="down">👎</button>';
-    bubbleHtml += '</div>';
-  }
-
-  const html =
-    '<div class="msg ai">' +
-      '<div class="msg-avatar">AI</div>' +
-      '<div>' +
-        '<div class="msg-bubble">' + bubbleHtml + '</div>' +
-        '<div class="msg-time">' + getTimeStr() + '</div>' +
-      '</div>' +
-    '</div>';
-
-  chatBox.insertAdjacentHTML('beforeend', html);
-  scrollToBottom();
-
-  // 이벤트 바인딩
-  bindLastAIMessageEvents();
-}
-
-function bindLastAIMessageEvents() {
-  // 후속 질문 클릭
-  chatBox.querySelectorAll('.ai-followup-btn').forEach(btn => {
-    if (btn.dataset.bound) return;
-    btn.dataset.bound = '1';
-    btn.addEventListener('click', () => {
-      qaInput.value = btn.dataset.q;
-      sendQuestion();
-    });
-  });
-
-  // 출처 카드 클릭
-  chatBox.querySelectorAll('.ai-source-item').forEach(item => {
-    if (item.dataset.bound) return;
-    item.dataset.bound = '1';
-    item.addEventListener('click', () => {
-      const id = item.dataset.id;
-      const doc = SAMPLE_DATA.find(d => d.id === id);
-      if (doc) {
-        alert('📂 ' + doc.title + '\n\n전체 내용은 검색 화면에서 확인 가능합니다.\n\n출처: ' + doc.source + '\n등록: ' + doc.date + '\n등급: ' + doc.grade);
-      }
-    });
-  });
-
-  // 만족도
-  chatBox.querySelectorAll('.ai-feedback-btn').forEach(btn => {
-    if (btn.dataset.bound) return;
-    btn.dataset.bound = '1';
-    btn.addEventListener('click', () => {
-      const fb = btn.dataset.fb;
-      const parent = btn.parentElement;
-      parent.querySelectorAll('.ai-feedback-btn').forEach(b => b.classList.remove('selected', 'up', 'down'));
-      btn.classList.add('selected', fb);
-      const msg = fb === 'up' ? '✅ 피드백 감사합니다!' : '⚠️ 의견 주셔서 감사합니다. 답변 품질 개선에 반영됩니다.';
-      // 작은 토스트 효과 대신 비활성 처리만
-      btn.disabled = true;
-    });
-  });
-}
-
-function scrollToBottom() {
-  setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50);
-}
-
-function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function escapeHtmlAttr(s) {
-  return escapeHtml(s).replace(/"/g, '&quot;');
-}
-
-// ============================================
-// 질문 전송
-// ============================================
-
-async function sendQuestion() {
-  const text = qaInput.value.trim();
-  if (text.length === 0) return;
-
-  // 환영 메시지 숨김
-  if (welcomeMsg) {
-    welcomeMsg.style.display = 'none';
-  }
-
-  qaInput.value = '';
-  qaInput.disabled = true;
-  sendBtn.disabled = true;
-
-  addUserMessage(text);
-
-  // 타이핑 인디케이터
-  addTypingIndicator();
-
-  // 답변 생성 시뮬레이션 (1.2초)
-  await new Promise(r => setTimeout(r, 1200));
-
-  removeTypingIndicator();
-
-  const answer = generateAnswer(text);
-  addAIMessage(answer);
-
-  qaInput.disabled = false;
-  sendBtn.disabled = false;
-  qaInput.focus();
-}
-
-sendBtn.addEventListener('click', sendQuestion);
-qaInput.addEventListener('keypress', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendQuestion();
-  }
-});
-
-// 빠른 질문
-document.querySelectorAll('.welcome-quick-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    qaInput.value = btn.dataset.q;
-    sendQuestion();
-  });
-});
-
-// 새 대화 (초기화)
-clearBtn.addEventListener('click', () => {
-  if (chatBox.querySelectorAll('.msg').length === 0) return;
-  if (!confirm('대화를 모두 초기화하시겠습니까?')) return;
-  chatBox.innerHTML = '';
-  chatBox.appendChild(welcomeMsg);
-  welcomeMsg.style.display = '';
-});
-
-// 하단 화면 이동
+// 하단 이동
 document.querySelectorAll('.bottom-btn[data-nav]').forEach(btn => {
   btn.addEventListener('click', () => {
     const nav = btn.dataset.nav;
-    const labels = {
-      'search': '🔍 검색',
-      'dashboard': '📊 대시보드',
-      'report': '📑 보고서'
-    };
+    const labels = { 'search': '🔍 검색', 'qa': '💬 AI 질의응답', 'report': '📑 보고서' };
     alert(labels[nav] + ' 화면으로 이동합니다.\n\n(해당 화면 제작 후 연결됩니다)');
   });
 });
+
+// 초기화
+renderChannelChart();
+renderCategoryChart();
+renderActivityLog();
+updateTime();
+setInterval(updateTime, 1000);
 </script>
 
 </body>
