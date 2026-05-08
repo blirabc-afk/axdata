@@ -2,13 +2,13 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 6 v4 - Word 호환 개선 (html-docx-js)</title>
+<title>saas.html 화면 6 v5 - 진짜 OOXML DOCX (한컴·MS·LibreOffice 호환)</title>
 
 <!-- 진짜 파일 생성 라이브러리 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-<script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+<script src="https://unpkg.com/docx@9.5.0/build/index.umd.js"></script>
 
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
@@ -166,7 +166,7 @@
 </head>
 <body>
 
-<div class="top-banner">진짜 PDF · Word · PowerPoint 자동 생성 (v4 - Word 호환성 개선)</div>
+<div class="top-banner">진짜 PDF · Word · PowerPoint 자동 생성 (v5 - 한컴·MS·LibreOffice 모두 호환)</div>
 
 <section class="report-wrapper">
 
@@ -373,7 +373,7 @@ function checkLibraries() {
   if (window.jspdf && window.jspdf.jsPDF) ok.push('PDF'); else missing.push('PDF');
   if (window.html2canvas) ok.push('html2canvas'); else missing.push('html2canvas');
   if (window.PptxGenJS) ok.push('PPTX'); else missing.push('PPTX');
-  if (window.htmlDocx) ok.push('DOCX'); else missing.push('DOCX');
+  if (window.docx) ok.push('DOCX'); else missing.push('DOCX');
 
   if (missing.length === 0) {
     status.textContent = '✅ 모든 라이브러리 로드 완료';
@@ -631,68 +631,138 @@ async function generatePDFBlob() {
 }
 
 // ============================================
-// [v4 NEW] DOCX 생성 - html-docx-js (HTML→DOCX 변환)
+// [v5] 진짜 OOXML DOCX 생성 - docx@9.x
+// skill 가이드 준수: A4 명시, dual width, ShadingType.CLEAR, 안전한 속성만
+// 한컴 한글·MS Word·LibreOffice 모두 호환
 // ============================================
-function generateDOCXBlob() {
+async function generateDOCXBlob() {
+  const d = window.docx;
   const tpl = TEMPLATES[selectedTemplate];
-  let body = '';
+
+  const NAVY = '1A237E';
+  const WINE = '7B1F2A';
+
+  const cellBorder = { style: d.BorderStyle.SINGLE, size: 8, color: NAVY };
+  const allBorders = { top: cellBorder, bottom: cellBorder, left: cellBorder, right: cellBorder };
+  const cellMargins = { top: 100, bottom: 100, left: 150, right: 150 };
+
+  function p(text, opts) {
+    opts = opts || {};
+    return new d.Paragraph({
+      children: [new d.TextRun({
+        text: text,
+        size: opts.size || 22,
+        bold: opts.bold || false,
+        color: opts.color || '000000',
+        font: '맑은 고딕'
+      })],
+      alignment: opts.align || d.AlignmentType.LEFT,
+      spacing: opts.spacing || { after: 100 }
+    });
+  }
+
+  function h(text) {
+    return new d.Paragraph({
+      children: [new d.TextRun({ text: text, size: 28, bold: true, color: NAVY, font: '맑은 고딕' })],
+      spacing: { before: 300, after: 200 }
+    });
+  }
+
+  function cell(text, isHeader, colWidth) {
+    return new d.TableCell({
+      borders: allBorders,
+      margins: cellMargins,
+      width: { size: colWidth, type: d.WidthType.DXA },
+      shading: isHeader ? { type: d.ShadingType.CLEAR, color: 'auto', fill: NAVY } : undefined,
+      children: [new d.Paragraph({
+        children: [new d.TextRun({
+          text: text,
+          size: isHeader ? 22 : 20,
+          bold: isHeader,
+          color: isHeader ? 'FFFFFF' : '000000',
+          font: '맑은 고딕'
+        })],
+        alignment: d.AlignmentType.CENTER
+      })]
+    });
+  }
+
+  const children = [];
 
   // 표지
-  body += '<div style="text-align:center;margin-bottom:30px;border-bottom:3px solid #1A237E;padding-bottom:24px;">';
-  body += '<p style="font-size:11pt;color:#fff;background:#1A237E;display:inline-block;padding:4px 14px;">AX-2026-0508 자동 생성</p>';
-  body += '<h1 style="color:#1A237E;font-size:28pt;font-weight:bold;margin:14px 0 10px 0;">' + tpl.name + '</h1>';
-  body += '<p style="font-size:14pt;font-weight:bold;color:#000;margin:6px 0;">대상 기간: ' + formatPeriod() + '</p>';
-  body += '<p style="font-size:11pt;color:#555;margin:6px 0;">📅 ' + formatDate(new Date()) + ' 발행 · 👤 AX-00000 작성 · 📦 Word 형식</p>';
-  body += '</div>';
+  children.push(new d.Paragraph({
+    children: [new d.TextRun({ text: tpl.name, size: 56, bold: true, color: NAVY, font: '맑은 고딕' })],
+    alignment: d.AlignmentType.CENTER,
+    spacing: { before: 400, after: 200 }
+  }));
+  children.push(p('대상 기간: ' + formatPeriod(), { size: 28, bold: true, align: d.AlignmentType.CENTER, spacing: { after: 100 } }));
+  children.push(p('AX-2026-0508 · 작성자: AX-00000 · 발행: ' + formatDate(new Date()),
+    { size: 20, color: '555555', align: d.AlignmentType.CENTER, spacing: { after: 600 } }));
 
   if (selectedSections.has('summary')) {
-    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">1. 요약</h2>';
-    body += '<p style="font-size:11pt;line-height:1.7;color:#000;">본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. 총 <b>1,248개</b> 데이터를 학습했으며, A 등급 비율이 <b>78%</b>로 안정적인 운영 상태를 보입니다. 6채널 중 <b>Who(누가)</b> 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.</p>';
+    children.push(h('1. 요약'));
+    children.push(p(
+      '본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. ' +
+      '총 1,248개 데이터를 학습했으며, A 등급 비율이 78%로 안정적인 운영 상태를 보입니다. ' +
+      '6채널 중 Who(누가) 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.',
+      { size: 22, spacing: { after: 200 } }
+    ));
   }
 
   if (selectedSections.has('kpi')) {
-    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">2. 핵심 지표 (KPI)</h2>';
-    body += '<table style="width:100%;border-collapse:collapse;margin:10px 0;">';
-    body += '<tr style="background:#1A237E;color:#fff;">';
-    ['총 데이터', 'A 등급', '평균 응답', '사용자'].forEach(function(h) {
-      body += '<td style="padding:10px;border:1px solid #1A237E;text-align:center;font-weight:bold;font-size:11pt;color:#fff;">' + h + '</td>';
-    });
-    body += '</tr><tr>';
-    ['1,248개', '78%', '0.82초', '28명'].forEach(function(v) {
-      body += '<td style="padding:14px;border:1px solid #1A237E;text-align:center;font-size:18pt;font-weight:bold;color:#1A237E;">' + v + '</td>';
-    });
-    body += '</tr></table>';
+    children.push(h('2. 핵심 지표 (KPI)'));
+    var kpiColW = 2250;
+    children.push(new d.Table({
+      width: { size: kpiColW * 4, type: d.WidthType.DXA },
+      columnWidths: [kpiColW, kpiColW, kpiColW, kpiColW],
+      rows: [
+        new d.TableRow({ children: [
+          cell('총 데이터', true, kpiColW),
+          cell('A 등급', true, kpiColW),
+          cell('평균 응답', true, kpiColW),
+          cell('사용자', true, kpiColW)
+        ]}),
+        new d.TableRow({ children: [
+          cell('1,248개', false, kpiColW),
+          cell('78%', false, kpiColW),
+          cell('0.82초', false, kpiColW),
+          cell('28명', false, kpiColW)
+        ]})
+      ]
+    }));
+    children.push(p('', { spacing: { after: 200 } }));
   }
 
   if (selectedSections.has('channel')) {
-    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">3. 5W1H 6채널 품질 분석</h2>';
-    body += '<table style="width:100%;border-collapse:collapse;margin:10px 0;">';
-    body += '<tr style="background:#1A237E;color:#fff;">';
-    ['채널', '의미', 'A 등급', 'B 등급', 'C 등급', '합계', '정상률'].forEach(function(h) {
-      body += '<td style="padding:8px;border:1px solid #1A237E;text-align:center;font-weight:bold;color:#fff;">' + h + '</td>';
+    children.push(h('3. 5W1H 6채널 품질 분석'));
+    var colW = 1280;
+    var headerRow = new d.TableRow({
+      children: ['채널', '의미', 'A', 'B', 'C', '합계', '정상률'].map(function(t) { return cell(t, true, colW); })
     });
-    body += '</tr>';
-    CHANNELS.forEach(function(ch) {
+    var dataRows = CHANNELS.map(function(ch) {
       var g = CHANNEL_GRADES[ch.key];
       var pct = ((g.a/g.total)*100).toFixed(1) + '%';
-      body += '<tr>';
-      [ch.label, ch.ko, String(g.a), String(g.b), String(g.c), String(g.total), pct].forEach(function(v, idx) {
-        var align = idx <= 1 ? 'left' : 'center';
-        body += '<td style="padding:8px;border:1px solid #1A237E;text-align:' + align + ';font-size:11pt;">' + v + '</td>';
-      });
-      body += '</tr>';
+      return new d.TableRow({ children: [
+        cell(ch.label, false, colW),
+        cell(ch.ko, false, colW),
+        cell(String(g.a), false, colW),
+        cell(String(g.b), false, colW),
+        cell(String(g.c), false, colW),
+        cell(String(g.total), false, colW),
+        cell(pct, false, colW)
+      ]});
     });
-    body += '</table>';
+    children.push(new d.Table({
+      width: { size: colW * 7, type: d.WidthType.DXA },
+      columnWidths: [colW, colW, colW, colW, colW, colW, colW],
+      rows: [headerRow].concat(dataRows)
+    }));
+    children.push(p('', { spacing: { after: 200 } }));
   }
 
   if (selectedSections.has('trend')) {
-    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">4. 처리 추이 분석</h2>';
-    body += '<table style="width:80%;border-collapse:collapse;margin:10px auto;">';
-    body += '<tr style="background:#1A237E;color:#fff;">';
-    ['날짜', '처리량', '전일 대비'].forEach(function(h) {
-      body += '<td style="padding:8px;border:1px solid #1A237E;text-align:center;font-weight:bold;color:#fff;font-size:11pt;">' + h + '</td>';
-    });
-    body += '</tr>';
+    children.push(h('4. 처리 추이 분석'));
+    var trendColW = 3000;
     var trendData = [
       ['5/02', '120건', '-'],
       ['5/03', '145건', '↑ +25 (+21%)'],
@@ -702,56 +772,98 @@ function generateDOCXBlob() {
       ['5/07', '168건', '↑ +26 (+18%)'],
       ['5/08', '175건', '↑ +7 (피크)']
     ];
-    trendData.forEach(function(row) {
-      body += '<tr>';
-      row.forEach(function(v) {
-        body += '<td style="padding:8px;border:1px solid #1A237E;text-align:center;font-size:11pt;">' + v + '</td>';
-      });
-      body += '</tr>';
-    });
-    body += '</table>';
-    body += '<p style="text-align:center;font-size:10pt;color:#7B1F2A;font-weight:bold;margin-top:8px;">총 1,040건 처리 · 일평균 148.6건 · 증가 추세</p>';
+    children.push(new d.Table({
+      width: { size: trendColW * 3, type: d.WidthType.DXA },
+      columnWidths: [trendColW, trendColW, trendColW],
+      rows: [
+        new d.TableRow({ children: [
+          cell('날짜', true, trendColW),
+          cell('처리량', true, trendColW),
+          cell('전일 대비', true, trendColW)
+        ]})
+      ].concat(trendData.map(function(row) {
+        return new d.TableRow({ children: row.map(function(v) { return cell(v, false, trendColW); }) });
+      }))
+    }));
+    children.push(p('총 1,040건 처리 · 일평균 148.6건 · 증가 추세',
+      { size: 20, bold: true, color: WINE, align: d.AlignmentType.CENTER, spacing: { before: 100, after: 200 } }));
   }
 
   if (selectedSections.has('activity')) {
-    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">5. 주요 활동 내역</h2>';
-    body += '<ul style="font-size:11pt;line-height:1.9;color:#000;">';
-    body += '<li><b>품질 평가 정기 실행</b> - 78% A 등급 달성</li>';
-    body += '<li><b>자동 보완 2회 실행</b> - C 등급 → B 등급 개선</li>';
-    body += '<li><b>신규 매뉴얼 3건 학습</b> 완료 (안전관리 분야)</li>';
-    body += '<li><b>주간 안전 보고서 1건</b> 자동 생성</li>';
-    body += '<li><b>일일 검색·질의응답 175건</b> 처리 (최고치 기록)</li>';
-    body += '</ul>';
+    children.push(h('5. 주요 활동 내역'));
+    var acts = [
+      '품질 평가 정기 실행 - 78% A 등급 달성',
+      '자동 보완 2회 실행 - C 등급 → B 등급 개선',
+      '신규 매뉴얼 3건 학습 완료 (안전관리 분야)',
+      '주간 안전 보고서 1건 자동 생성',
+      '일일 검색·질의응답 175건 처리 (최고치)'
+    ];
+    acts.forEach(function(t) {
+      children.push(p('• ' + t, { size: 22, spacing: { after: 80 } }));
+    });
+    children.push(p('', { spacing: { after: 100 } }));
   }
 
   if (selectedSections.has('rec')) {
-    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">6. 권고사항</h2>';
+    children.push(h('6. 권고사항'));
     var recs = [
       '⚠️ Who 채널 보완 권장: 미흡 데이터 74개 잔존, 자동 보완 모드 실행 권장',
       '📚 교육·훈련 분야 강화: 데이터 128개로 다른 분야 대비 부족',
       '📈 사용량 증가 대응: 일일 검색량 12% 증가, 시스템 자원 모니터링 필요'
     ];
+    var recColW = 9000;
     recs.forEach(function(r) {
-      body += '<p style="background:#fff5f5;border-left:4px solid #7B1F2A;padding:10px 14px;margin:10px 0;font-size:11pt;font-weight:bold;color:#000;">' + r + '</p>';
+      children.push(new d.Table({
+        width: { size: recColW, type: d.WidthType.DXA },
+        columnWidths: [recColW],
+        rows: [
+          new d.TableRow({ children: [
+            new d.TableCell({
+              borders: {
+                top: { style: d.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                bottom: { style: d.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                right: { style: d.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                left: { style: d.BorderStyle.SINGLE, size: 24, color: WINE }
+              },
+              margins: { top: 150, bottom: 150, left: 200, right: 200 },
+              width: { size: recColW, type: d.WidthType.DXA },
+              shading: { type: d.ShadingType.CLEAR, color: 'auto', fill: 'FFF5F5' },
+              children: [new d.Paragraph({
+                children: [new d.TextRun({ text: r, size: 22, bold: true, color: '000000', font: '맑은 고딕' })]
+              })]
+            })
+          ]})
+        ]
+      }));
+      children.push(p('', { spacing: { after: 80 } }));
     });
   }
 
-  body += '<hr style="margin-top:30px;border:none;border-top:1px solid #ccc;">';
-  body += '<p style="text-align:center;font-size:9pt;color:#888;font-style:italic;">본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · 시스템 ID: AX-2026-0508</p>';
+  children.push(p('', { spacing: { before: 400 } }));
+  children.push(p('본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · 시스템 ID: AX-2026-0508',
+    { size: 18, color: '888888', align: d.AlignmentType.CENTER }));
 
-  var fullHtml =
-    '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
-    'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
-    'xmlns="http://www.w3.org/TR/REC-html40">' +
-    '<head><meta charset="UTF-8"><title>' + tpl.name + '</title>' +
-    '<style>@page { size: A4; margin: 2cm; } body { font-family: "맑은 고딕", "Malgun Gothic", sans-serif; font-size: 11pt; }</style>' +
-    '</head><body>' + body + '</body></html>';
-
-  return window.htmlDocx.asBlob(fullHtml, {
-    orientation: 'portrait',
-    margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+  var doc = new d.Document({
+    creator: 'AX 시스템',
+    title: tpl.name,
+    description: 'AX-2026-0508 자동 생성 보고서',
+    styles: {
+      default: { document: { run: { font: '맑은 고딕', size: 22 } } }
+    },
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 11906, height: 16838 },
+          margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+        }
+      },
+      children: children
+    }]
   });
+
+  return await d.Packer.toBlob(doc);
 }
+
 
 
 // ============================================
