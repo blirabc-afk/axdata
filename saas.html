@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 3 - 검색 (5W1H 6채널 통합)</title>
+<title>saas.html 화면 4 - AI 질의응답 (5W1H 6채널 기반)</title>
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
 
@@ -11,13 +11,12 @@
     padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0;
   }
 
-  .search-wrapper {
+  .qa-wrapper {
     max-width: 1200px; margin: 0 auto 28px auto;
     border: 3px solid #1A237E; border-radius: 16px;
     padding: 40px; background: #ffffff; box-sizing: border-box;
   }
 
-  /* 시스템 정보 헤더 */
   .sys-header {
     display: flex; justify-content: space-between; align-items: center;
     background: #f5f7ff; border: 2px solid #1A237E;
@@ -25,21 +24,9 @@
     font-size: 14px; font-weight: 700; color: #000000;
   }
 
-  .sys-header-info {
-    display: flex; gap: 20px; flex-wrap: wrap;
-  }
-
-  .sys-info-item {
-    color: #000000;
-  }
-
-  .sys-info-label {
-    color: #555; margin-right: 6px;
-  }
-
-  .sys-info-value {
-    color: #1A237E; font-family: 'Courier New', monospace; font-weight: 900;
-  }
+  .sys-header-info { display: flex; gap: 20px; flex-wrap: wrap; }
+  .sys-info-label { color: #555; margin-right: 6px; }
+  .sys-info-value { color: #1A237E; font-family: 'Courier New', monospace; font-weight: 900; }
 
   .screen-title {
     color: #1A237E; font-size: 36px; font-weight: 900;
@@ -48,351 +35,295 @@
 
   .screen-subtitle {
     color: #000000; font-size: 20px; font-weight: 700;
-    text-align: center; margin: 0 0 30px 0;
+    text-align: center; margin: 0 0 28px 0;
   }
 
-  /* 검색 입력 */
-  .search-input-wrap {
-    display: flex; gap: 12px; margin: 0 0 22px 0;
+  /* 채팅 영역 */
+  .chat-box {
+    border: 2px solid #1A237E; border-radius: 12px;
+    background: #fafafa;
+    height: 520px; overflow-y: auto;
+    padding: 24px; margin: 0 0 16px 0;
+    display: flex; flex-direction: column; gap: 16px;
   }
 
-  .search-input {
-    flex-grow: 1; padding: 18px 24px;
+  /* 안내 메시지 (초기) */
+  .welcome-msg {
+    text-align: center; padding: 20px;
+    color: #555; font-size: 15px; font-weight: 700;
+  }
+
+  .welcome-icon { font-size: 56px; margin: 0 0 12px 0; line-height: 1; }
+  .welcome-title { color: #1A237E; font-size: 22px; font-weight: 900; margin: 0 0 8px 0; }
+
+  .welcome-quick-title {
+    color: #7B1F2A; font-size: 15px; font-weight: 900;
+    margin: 24px 0 12px 0; text-align: center;
+  }
+
+  .welcome-quick-list {
+    display: flex; flex-direction: column; gap: 8px;
+    max-width: 500px; margin: 0 auto;
+  }
+
+  .welcome-quick-btn {
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 15px; font-weight: 700;
+    padding: 12px 18px; border-radius: 10px;
+    cursor: pointer; text-align: left;
+    transition: all 0.2s; font-family: inherit;
+  }
+
+  .welcome-quick-btn:hover {
+    background: #1A237E; color: #ffffff; transform: translateX(4px);
+  }
+
+  /* 메시지 풍선 */
+  .msg {
+    display: flex; gap: 10px; max-width: 85%;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user {
+    align-self: flex-end; flex-direction: row-reverse;
+  }
+
+  .msg.ai {
+    align-self: flex-start;
+  }
+
+  .msg-avatar {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900;
+    color: #ffffff;
+  }
+
+  .msg.user .msg-avatar { background: #1A237E; }
+  .msg.ai .msg-avatar { background: #7B1F2A; }
+
+  .msg-bubble {
+    padding: 14px 18px; border-radius: 12px;
+    font-size: 16px; line-height: 1.6;
+    word-wrap: break-word; word-break: break-word;
+  }
+
+  .msg.user .msg-bubble {
+    background: #1A237E; color: #ffffff;
+    font-weight: 700;
+    border-top-right-radius: 4px;
+  }
+
+  .msg.ai .msg-bubble {
+    background: #ffffff; color: #000000;
+    border: 2px solid #7B1F2A;
+    font-weight: 500;
+    border-top-left-radius: 4px;
+  }
+
+  .msg-time {
+    font-size: 11px; color: #888;
+    margin: 4px 0 0 0; font-weight: 700;
+  }
+
+  .msg.user .msg-time { text-align: right; }
+
+  /* AI 답변 본문 */
+  .ai-answer-title {
+    color: #1A237E; font-size: 17px; font-weight: 900;
+    margin: 0 0 10px 0;
+  }
+
+  .ai-answer-channels {
+    display: flex; flex-direction: column; gap: 6px;
+    margin: 0 0 12px 0;
+  }
+
+  .ai-channel-line {
+    color: #000000; font-size: 15px; font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .ai-channel-icon {
+    color: #7B1F2A; font-weight: 900; margin-right: 6px;
+  }
+
+  /* 출처 카드 */
+  .ai-sources {
+    margin: 12px 0 0 0;
+    padding: 12px 14px;
+    background: #f5f7ff;
+    border-radius: 8px;
+    border-left: 3px solid #1A237E;
+  }
+
+  .ai-sources-title {
+    color: #1A237E; font-size: 13px; font-weight: 900;
+    margin: 0 0 8px 0;
+  }
+
+  .ai-source-item {
+    display: flex; gap: 8px; align-items: center;
+    padding: 6px 10px; margin: 4px 0;
+    background: #ffffff;
+    border: 1px solid #1A237E;
+    border-radius: 6px;
+    font-size: 13px; color: #000000; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+
+  .ai-source-item:hover {
+    background: #1A237E; color: #ffffff;
+  }
+
+  .ai-source-item:hover .ai-source-grade { background: #ffffff; color: #1A237E; }
+
+  .ai-source-name { flex-grow: 1; }
+
+  .ai-source-grade {
+    background: #1A237E; color: #ffffff;
+    font-size: 11px; font-weight: 900;
+    padding: 2px 8px; border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .ai-source-grade.b { background: #b8860b; }
+  .ai-source-grade.c { background: #7B1F2A; }
+
+  /* 후속 질문 */
+  .ai-followups {
+    margin: 12px 0 0 0;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  .ai-followups-title {
+    color: #7B1F2A; font-size: 13px; font-weight: 900;
+    margin: 0 0 4px 0;
+  }
+
+  .ai-followup-btn {
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 13px; font-weight: 700;
+    padding: 8px 14px; border-radius: 999px;
+    cursor: pointer; text-align: left;
+    transition: all 0.2s; font-family: inherit;
+  }
+
+  .ai-followup-btn:hover {
+    background: #1A237E; color: #ffffff;
+  }
+
+  /* 만족도 */
+  .ai-feedback {
+    display: flex; gap: 6px; margin: 10px 0 0 0;
+    padding: 8px 0 0 0;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .ai-feedback-label {
+    font-size: 12px; color: #555; font-weight: 700;
+    margin-right: 4px; align-self: center;
+  }
+
+  .ai-feedback-btn {
+    background: none; border: 1px solid #cccccc;
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .ai-feedback-btn:hover {
+    border-color: #1A237E; transform: scale(1.1);
+  }
+
+  .ai-feedback-btn.selected.up {
+    background: #1A237E; border-color: #1A237E; color: #ffffff;
+  }
+
+  .ai-feedback-btn.selected.down {
+    background: #7B1F2A; border-color: #7B1F2A; color: #ffffff;
+  }
+
+  /* 타이핑 인디케이터 */
+  .typing {
+    display: flex; gap: 4px; padding: 6px 0;
+  }
+
+  .typing-dot {
+    width: 8px; height: 8px;
+    background: #7B1F2A;
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-4px); }
+  }
+
+  /* 입력 영역 */
+  .input-wrap {
+    display: flex; gap: 10px;
+  }
+
+  .qa-input {
+    flex-grow: 1; padding: 16px 20px;
     border: 3px solid #1A237E; border-radius: 12px;
-    font-size: 20px; font-weight: 700; color: #000000;
+    font-size: 17px; font-weight: 700; color: #000000;
     box-sizing: border-box; font-family: inherit;
+    resize: none;
   }
 
-  .search-input:focus {
+  .qa-input:focus {
     outline: none; border-color: #7B1F2A;
     box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.15);
   }
 
-  .search-btn {
+  .qa-input:disabled {
+    background: #f0f0f0; color: #888;
+  }
+
+  .send-btn {
     background: #7B1F2A; color: #ffffff;
-    font-size: 20px; font-weight: 900;
-    padding: 18px 36px; border: none; border-radius: 12px;
-    cursor: pointer; white-space: nowrap;
-    transition: all 0.2s;
-  }
-
-  .search-btn:hover { background: #1A237E; transform: translateY(-2px); }
-
-  /* 빠른 검색 예시 */
-  .quick-search {
-    margin: 0 0 24px 0;
-  }
-
-  .quick-search-label {
-    color: #555; font-size: 14px; font-weight: 700; margin-right: 10px;
-  }
-
-  .quick-search-tag {
-    display: inline-block;
-    background: #ffffff; color: #1A237E;
-    border: 2px solid #1A237E;
-    font-size: 14px; font-weight: 700;
-    padding: 6px 14px; border-radius: 999px;
-    margin: 0 6px 6px 0; cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .quick-search-tag:hover {
-    background: #1A237E; color: #ffffff;
-  }
-
-  /* 채널 필터 */
-  .filter-section {
-    background: #f5f5f5; border-radius: 12px;
-    padding: 18px 20px; margin: 0 0 24px 0;
-  }
-
-  .filter-title {
-    color: #1A237E; font-size: 16px; font-weight: 900;
-    margin: 0 0 12px 0;
-    padding: 0 0 0 8px;
-    border-left: 4px solid #7B1F2A;
-  }
-
-  .filter-row {
-    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-  }
-
-  .filter-group {
-    display: flex; gap: 8px; flex-wrap: wrap;
-  }
-
-  .filter-chip {
-    display: inline-flex; align-items: center;
-    gap: 6px; padding: 8px 14px;
-    background: #ffffff; border: 2px solid #1A237E;
-    border-radius: 999px;
-    font-size: 14px; font-weight: 700; color: #1A237E;
-    cursor: pointer; user-select: none;
-    transition: all 0.2s;
-  }
-
-  .filter-chip.active {
-    background: #1A237E; color: #ffffff;
-  }
-
-  .filter-chip:hover { transform: translateY(-2px); }
-
-  .filter-divider {
-    width: 1px; height: 28px;
-    background: #cccccc; margin: 0 6px;
-  }
-
-  .filter-label {
-    color: #000000; font-size: 14px; font-weight: 900;
-    margin-right: 4px;
-  }
-
-  .sort-select {
-    padding: 8px 14px; border: 2px solid #1A237E;
-    border-radius: 999px; background: #ffffff;
-    font-size: 14px; font-weight: 700; color: #1A237E;
-    cursor: pointer; font-family: inherit;
-  }
-
-  /* 결과 헤더 */
-  .results-header {
-    display: flex; justify-content: space-between;
-    align-items: center; margin: 0 0 16px 0;
-    padding: 0 0 12px 0;
-    border-bottom: 2px solid #1A237E;
-  }
-
-  .results-count {
-    color: #1A237E; font-size: 18px; font-weight: 900;
-  }
-
-  .results-count strong {
-    color: #7B1F2A; font-size: 22px;
-  }
-
-  .results-time {
-    color: #555; font-size: 13px; font-weight: 700;
-  }
-
-  /* 로딩 */
-  .loading {
-    text-align: center; padding: 40px 20px;
-    color: #1A237E; font-size: 18px; font-weight: 900;
-    display: none;
-  }
-
-  .loading.show { display: block; }
-
-  .loading-spinner {
-    display: inline-block; width: 40px; height: 40px;
-    border: 4px solid #f0f0f0;
-    border-top: 4px solid #7B1F2A;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-    margin: 0 0 12px 0;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  /* 결과 카드 */
-  .results-list {
-    display: flex; flex-direction: column; gap: 14px;
-  }
-
-  .result-card {
-    border: 2px solid #cccccc; border-radius: 12px;
-    padding: 20px 24px; background: #ffffff;
-    cursor: pointer; transition: all 0.2s;
-  }
-
-  .result-card:hover {
-    border-color: #1A237E; background: #f5f7ff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 0 0 rgba(26, 35, 126, 0.15);
-  }
-
-  .result-top {
-    display: flex; justify-content: space-between;
-    align-items: flex-start; margin: 0 0 12px 0;
-    gap: 16px;
-  }
-
-  .result-title {
-    color: #1A237E; font-size: 20px; font-weight: 900;
-    margin: 0; flex-grow: 1;
-  }
-
-  .result-grade {
-    background: #1A237E; color: #ffffff;
-    font-size: 14px; font-weight: 900;
-    padding: 4px 12px; border-radius: 999px;
-    flex-shrink: 0;
-  }
-
-  .result-grade.b { background: #b8860b; }
-  .result-grade.c { background: #7B1F2A; }
-
-  .result-channels {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 8px 16px; margin: 0 0 12px 0;
-  }
-
-  .result-channel {
-    font-size: 14px; color: #000000;
-    padding: 6px 0; line-height: 1.4;
-  }
-
-  .result-channel-label {
-    display: inline-block; width: 56px;
-    color: #7B1F2A; font-weight: 900;
-    margin-right: 6px;
-  }
-
-  .result-meta {
-    display: flex; justify-content: space-between;
-    align-items: center; padding: 10px 0 0 0;
-    border-top: 1px solid #e0e0e0;
-    font-size: 13px; font-weight: 700; color: #555;
-  }
-
-  .result-source {
-    color: #1A237E; font-family: 'Courier New', monospace;
-  }
-
-  .result-relevance {
-    color: #7B1F2A;
-  }
-
-  /* 결과 없음 */
-  .no-results {
-    text-align: center; padding: 60px 20px;
-    color: #555; font-size: 18px; font-weight: 700;
-    display: none;
-  }
-  .no-results.show { display: block; }
-
-  .no-results-icon {
-    font-size: 64px; line-height: 1; margin: 0 0 12px 0;
-  }
-
-  /* 상세 모달 */
-  .modal-backdrop {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
-    align-items: center; justify-content: center;
-    padding: 20px;
-  }
-
-  .modal-backdrop.show {
-    display: flex;
-  }
-
-  .modal-box {
-    background: #ffffff;
-    border: 3px solid #1A237E;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 800px; width: 100%;
-    max-height: 85vh; overflow-y: auto;
-    box-sizing: border-box;
-  }
-
-  .modal-header {
-    display: flex; justify-content: space-between;
-    align-items: flex-start; gap: 16px;
-    margin: 0 0 20px 0;
-  }
-
-  .modal-title {
-    color: #1A237E; font-size: 26px; font-weight: 900;
-    margin: 0; flex-grow: 1;
-  }
-
-  .modal-close {
-    background: #ffffff; color: #7B1F2A;
-    border: 2px solid #7B1F2A;
-    width: 36px; height: 36px;
-    border-radius: 50%;
     font-size: 18px; font-weight: 900;
-    cursor: pointer; flex-shrink: 0;
-    transition: all 0.2s;
+    padding: 14px 28px; border: none; border-radius: 12px;
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.2s; flex-shrink: 0;
   }
 
-  .modal-close:hover {
-    background: #7B1F2A; color: #ffffff;
+  .send-btn:hover:not(:disabled) {
+    background: #1A237E; transform: translateY(-2px);
   }
 
-  .modal-info-bar {
-    display: flex; gap: 12px;
-    margin: 0 0 20px 0;
-    padding: 12px 16px;
-    background: #f5f7ff;
-    border-radius: 10px;
-    flex-wrap: wrap;
+  .send-btn:disabled {
+    background: #cccccc; cursor: not-allowed;
   }
 
-  .modal-info-item {
-    font-size: 14px; font-weight: 700; color: #000000;
-  }
-
-  .modal-info-item strong {
-    color: #1A237E;
-  }
-
-  .modal-channels {
-    display: grid; gap: 14px;
-    margin: 0 0 20px 0;
-  }
-
-  .modal-channel {
-    border: 2px solid #1A237E;
-    border-radius: 10px;
-    padding: 14px 18px;
-    background: #ffffff;
-  }
-
-  .modal-channel-header {
-    color: #7B1F2A; font-size: 16px; font-weight: 900;
-    margin: 0 0 8px 0;
-  }
-
-  .modal-channel-content {
-    color: #000000; font-size: 16px; font-weight: 700;
-    line-height: 1.6;
-  }
-
-  .modal-actions {
-    display: flex; gap: 10px; justify-content: flex-end;
-    padding: 16px 0 0 0;
-    border-top: 2px solid #1A237E;
-  }
-
-  .modal-btn {
+  .clear-btn {
     background: #ffffff; color: #1A237E;
-    border: 2px solid #1A237E;
-    font-size: 15px; font-weight: 900;
-    padding: 10px 22px; border-radius: 10px;
-    cursor: pointer; transition: all 0.2s;
+    font-size: 14px; font-weight: 700;
+    padding: 14px 18px; border: 2px solid #1A237E;
+    border-radius: 12px; cursor: pointer;
+    transition: all 0.2s; flex-shrink: 0;
   }
 
-  .modal-btn:hover {
+  .clear-btn:hover {
     background: #1A237E; color: #ffffff;
   }
 
-  .modal-btn.primary {
-    background: #7B1F2A; color: #ffffff;
-    border-color: #7B1F2A;
-  }
-
-  .modal-btn.primary:hover {
-    background: #1A237E; border-color: #1A237E;
-  }
-
-  /* 하단 액션 - 다른 화면으로 */
+  /* 하단 화면 이동 */
   .bottom-actions {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 10px; margin: 28px 0 0 0;
@@ -403,24 +334,19 @@
     border: 2px solid #1A237E;
     font-size: 14px; font-weight: 900;
     padding: 14px 8px; border-radius: 10px;
-    cursor: pointer; transition: all 0.2s;
-    text-align: center;
+    cursor: pointer; transition: all 0.2s; text-align: center;
   }
 
   .bottom-btn:hover {
-    background: #1A237E; color: #ffffff;
-    transform: translateY(-2px);
+    background: #1A237E; color: #ffffff; transform: translateY(-2px);
   }
 
-  .bottom-btn-icon {
-    font-size: 22px; display: block; margin: 0 0 4px 0;
-  }
+  .bottom-btn-icon { font-size: 22px; display: block; margin: 0 0 4px 0; }
 
   .bottom-btn.current {
     background: #7B1F2A; color: #ffffff;
     border-color: #7B1F2A; cursor: default;
   }
-
   .bottom-btn.current:hover { transform: none; }
 
   .file-types-bar {
@@ -430,18 +356,15 @@
     text-align: center; box-sizing: border-box;
   }
 
-  .file-types-bar .label {
-    color: #000000; font-size: 18px; font-weight: 700;
-  }
+  .file-types-bar .label { color: #000000; font-size: 18px; font-weight: 700; }
 </style>
 </head>
 <body>
 
-<div class="top-banner">5W1H 6채널 통합 검색 시스템</div>
+<div class="top-banner">5W1H 6채널 기반 AI 질의응답 시스템</div>
 
-<section class="search-wrapper">
+<section class="qa-wrapper">
 
-  <!-- 시스템 정보 헤더 -->
   <div class="sys-header">
     <div class="sys-header-info">
       <span class="sys-info-item">
@@ -463,529 +386,408 @@
     </div>
   </div>
 
-  <h1 class="screen-title">🔍 검색</h1>
-  <p class="screen-subtitle">5W1H 6채널을 통합 검색합니다 - 자연어로 입력하세요</p>
+  <h1 class="screen-title">💬 AI 질의응답</h1>
+  <p class="screen-subtitle">5W1H 6채널 데이터 기반으로 자연어 답변을 제공합니다</p>
 
-  <!-- 검색 입력 -->
-  <div class="search-input-wrap">
-    <input type="text" class="search-input" id="searchInput"
-      placeholder="검색어를 입력하세요 (예: 화재 대피, 품질 점검, 안전 수칙)" autofocus>
-    <button class="search-btn" id="searchBtn">🔍 검색</button>
-  </div>
+  <!-- 채팅 영역 -->
+  <div class="chat-box" id="chatBox">
+    <div class="welcome-msg" id="welcomeMsg">
+      <div class="welcome-icon">💬</div>
+      <div class="welcome-title">무엇이든 물어보세요</div>
+      <div>회사의 모든 자료를 학습한 AI가 답변해 드립니다.</div>
 
-  <!-- 빠른 검색 예시 -->
-  <div class="quick-search">
-    <span class="quick-search-label">빠른 검색:</span>
-    <span class="quick-search-tag" data-q="화재 대피">화재 대피</span>
-    <span class="quick-search-tag" data-q="품질 점검">품질 점검</span>
-    <span class="quick-search-tag" data-q="안전 수칙">안전 수칙</span>
-    <span class="quick-search-tag" data-q="설비 점검">설비 점검</span>
-    <span class="quick-search-tag" data-q="응급 대응">응급 대응</span>
-    <span class="quick-search-tag" data-q="작업 절차">작업 절차</span>
-  </div>
-
-  <!-- 필터 -->
-  <div class="filter-section">
-    <div class="filter-title">🎯 검색 필터</div>
-    <div class="filter-row">
-      <span class="filter-label">채널:</span>
-      <div class="filter-group" id="channelFilters">
-        <!-- 6채널 필터 동적 생성 -->
+      <div class="welcome-quick-title">📋 빠른 질문 예시</div>
+      <div class="welcome-quick-list">
+        <button class="welcome-quick-btn" data-q="화재 발생시 어떻게 대피해야 하나요?">
+          🔥 화재 발생시 어떻게 대피해야 하나요?
+        </button>
+        <button class="welcome-quick-btn" data-q="품질 점검은 누가 어떻게 하나요?">
+          ✅ 품질 점검은 누가 어떻게 하나요?
+        </button>
+        <button class="welcome-quick-btn" data-q="응급 상황이 생기면 어디로 연락해야 하나요?">
+          🚨 응급 상황이 생기면 어디로 연락해야 하나요?
+        </button>
+        <button class="welcome-quick-btn" data-q="작업장 안전 수칙은 무엇인가요?">
+          🛡️ 작업장 안전 수칙은 무엇인가요?
+        </button>
+        <button class="welcome-quick-btn" data-q="설비 점검은 언제 하나요?">
+          🔧 설비 점검은 언제 하나요?
+        </button>
       </div>
-      <div class="filter-divider"></div>
-      <span class="filter-label">등급:</span>
-      <div class="filter-group" id="gradeFilters">
-        <span class="filter-chip active" data-grade="all">전체</span>
-        <span class="filter-chip" data-grade="A">A 등급</span>
-        <span class="filter-chip" data-grade="B">B 등급</span>
-        <span class="filter-chip" data-grade="C">C 등급</span>
-      </div>
-      <div class="filter-divider"></div>
-      <span class="filter-label">정렬:</span>
-      <select class="sort-select" id="sortSelect">
-        <option value="relevance">관련도순</option>
-        <option value="date">최신순</option>
-        <option value="grade">등급순</option>
-      </select>
     </div>
   </div>
 
-  <!-- 결과 헤더 -->
-  <div class="results-header">
-    <div class="results-count" id="resultsCount">
-      검색어를 입력하거나 빠른 검색을 선택하세요
-    </div>
-    <div class="results-time" id="resultsTime"></div>
+  <!-- 입력 영역 -->
+  <div class="input-wrap">
+    <button class="clear-btn" id="clearBtn" title="대화 초기화">🔄 새 대화</button>
+    <input type="text" class="qa-input" id="qaInput"
+      placeholder="질문을 입력하세요 (예: 화재 발생시 어떻게 대피해야 하나요?)" autofocus>
+    <button class="send-btn" id="sendBtn">전송 →</button>
   </div>
 
-  <!-- 로딩 -->
-  <div class="loading" id="loading">
-    <div class="loading-spinner"></div>
-    <div>검색 중입니다...</div>
-  </div>
-
-  <!-- 결과 없음 -->
-  <div class="no-results" id="noResults">
-    <div class="no-results-icon">🔎</div>
-    <div>일치하는 결과가 없습니다</div>
-    <div style="font-size:14px; margin-top:8px; color:#888;">다른 검색어나 필터를 시도해 보세요</div>
-  </div>
-
-  <!-- 결과 리스트 -->
-  <div class="results-list" id="resultsList"></div>
-
-  <!-- 하단 화면 이동 버튼 -->
+  <!-- 하단 화면 이동 -->
   <div class="bottom-actions">
-    <button class="bottom-btn current">
-      <span class="bottom-btn-icon">🔍</span>
-      검색 (현재)
+    <button class="bottom-btn" data-nav="search">
+      <span class="bottom-btn-icon">🔍</span>검색
     </button>
-    <button class="bottom-btn" data-nav="qa">
-      <span class="bottom-btn-icon">💬</span>
-      AI 질의응답
+    <button class="bottom-btn current">
+      <span class="bottom-btn-icon">💬</span>AI 질의응답 (현재)
     </button>
     <button class="bottom-btn" data-nav="dashboard">
-      <span class="bottom-btn-icon">📊</span>
-      대시보드
+      <span class="bottom-btn-icon">📊</span>대시보드
     </button>
     <button class="bottom-btn" data-nav="report">
-      <span class="bottom-btn-icon">📑</span>
-      보고서
+      <span class="bottom-btn-icon">📑</span>보고서
     </button>
   </div>
 
 </section>
 
 <div class="file-types-bar">
-  <span class="label">5W1H 6채널 통합 검색 · 자연어 입력 · 채널별 필터 · 등급별 정렬</span>
-</div>
-
-<!-- 상세 모달 -->
-<div class="modal-backdrop" id="modal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h2 class="modal-title" id="modalTitle"></h2>
-      <button class="modal-close" id="modalClose">✕</button>
-    </div>
-
-    <div class="modal-info-bar">
-      <span class="modal-info-item">📂 출처: <strong id="modalSource"></strong></span>
-      <span class="modal-info-item">📅 등록: <strong id="modalDate"></strong></span>
-      <span class="modal-info-item">🏷 등급: <strong id="modalGrade"></strong></span>
-      <span class="modal-info-item">⭐ 관련도: <strong id="modalRelevance"></strong></span>
-    </div>
-
-    <div class="modal-channels" id="modalChannels"></div>
-
-    <div class="modal-actions">
-      <button class="modal-btn" id="modalAskAI">💬 AI에게 질문하기</button>
-      <button class="modal-btn primary" id="modalCloseBtn">확인</button>
-    </div>
-  </div>
+  <span class="label">자연어 대화 · 6채널 데이터 기반 · 출처 자동 표시 · 후속 질문 추천</span>
 </div>
 
 <script>
 const CHANNELS = [
-  { key: 'why',   label: 'Why',   ko: '왜 (목적/이유)' },
-  { key: 'what',  label: 'What',  ko: '무엇 (대상/내용)' },
-  { key: 'when',  label: 'When',  ko: '언제 (시점/기간)' },
-  { key: 'where', label: 'Where', ko: '어디 (장소/위치)' },
-  { key: 'who',   label: 'Who',   ko: '누가 (담당/대상자)' },
-  { key: 'how',   label: 'How',   ko: '어떻게 (방법/절차)' }
+  { key: 'why',   label: 'Why',   ko: '왜', icon: '🎯' },
+  { key: 'what',  label: 'What',  ko: '무엇', icon: '📋' },
+  { key: 'when',  label: 'When',  ko: '언제', icon: '⏰' },
+  { key: 'where', label: 'Where', ko: '어디', icon: '📍' },
+  { key: 'who',   label: 'Who',   ko: '누가', icon: '👤' },
+  { key: 'how',   label: 'How',   ko: '어떻게', icon: '🔧' }
 ];
 
-// 샘플 데이터 (재난안전·제조공정·품질관리 혼합)
+// 검색 화면과 동일한 샘플 데이터
 const SAMPLE_DATA = [
-  {
-    id: 'doc-001',
-    title: '화재 발생시 대피 경로 안내',
-    why: '비상 상황 발생시 인명 보호',
-    what: '제조동 대피 경로 매뉴얼',
-    when: '화재 감지 즉시',
-    where: '제조동 1층/2층 전 구역',
-    who: '안전관리책임자, 작업자 전원',
-    how: '비상등 경로 따라 옥외 집결지 이동',
-    grade: 'A',
-    source: '안전관리매뉴얼_v3.pdf',
-    date: '2026-04-15',
-    relevance: 96,
-    keywords: ['화재', '대피', '비상', '안전', '경로']
-  },
-  {
-    id: 'doc-002',
-    title: '제조 공정 품질 점검 절차',
-    why: '제품 품질 표준 유지',
-    what: '공정 단계별 품질 점검 항목',
-    when: '매 작업 시작 및 종료 시',
-    where: '제조 라인 1~3호기',
-    who: '품질관리팀 조장',
-    how: '점검표 기반 항목별 측정 후 기록',
-    grade: 'A',
-    source: '품질관리지침_v2.docx',
-    date: '2026-04-08',
-    relevance: 94,
-    keywords: ['품질', '점검', '공정', '관리', '측정']
-  },
-  {
-    id: 'doc-003',
-    title: '작업장 안전 수칙',
-    why: '작업 중 사고 예방',
-    what: '필수 안전 수칙 12항목',
-    when: '모든 작업 시간',
-    where: '전 작업장',
-    who: '전 작업자',
-    how: '교육 이수 후 현장 게시판 부착·준수',
-    grade: 'A',
-    source: '안전수칙고시_v1.pdf',
-    date: '2026-03-22',
-    relevance: 91,
-    keywords: ['안전', '수칙', '작업', '예방']
-  },
-  {
-    id: 'doc-004',
-    title: '화학물질 취급 절차',
-    why: '화학물질 누출·오염 방지',
-    what: '인화성·독성 화학물질 취급 매뉴얼',
-    when: '화학물질 입출고 및 사용 시',
-    where: '화학물질 저장고 및 작업장',
-    who: '안전교육 이수자만 가능',
-    how: '보호구 착용 후 지정된 절차 따라 취급',
-    grade: 'B',
-    source: '화학물질매뉴얼.pdf',
-    date: '2026-03-15',
-    relevance: 88,
-    keywords: ['화학', '취급', '안전', '보호']
-  },
-  {
-    id: 'doc-005',
-    title: '응급 상황 대응 매뉴얼',
-    why: '응급 상황 시 신속 대응',
-    what: '의료 응급·재난 응급 대응 절차',
-    when: '응급 상황 발생 즉시',
-    where: '전 사업장 및 인근 지역',
-    who: '응급처치 자격자, 안전관리자',
-    how: '119 신고 → 응급처치 → 후송 협조',
-    grade: 'A',
-    source: '응급대응매뉴얼.pdf',
-    date: '2026-03-01',
-    relevance: 89,
-    keywords: ['응급', '대응', '재난', '의료']
-  },
-  {
-    id: 'doc-006',
-    title: '설비 정기 점검 일지',
-    why: '설비 고장 사전 예방',
-    what: '주요 설비 점검 항목 및 결과',
-    when: '매주 월요일 / 매월 1일',
-    where: '제조 1~3호기, 보일러실',
-    who: '설비관리팀 김민수 과장',
-    how: '체크리스트 점검 후 일지 작성·보고',
-    grade: 'A',
-    source: '설비점검일지_2026Q1.xlsx',
-    date: '2026-02-28',
-    relevance: 85,
-    keywords: ['설비', '점검', '예방', '관리']
-  },
-  {
-    id: 'doc-007',
-    title: '비상 대응 훈련 결과',
-    why: '비상 대응 역량 평가 및 향상',
-    what: '연 2회 정기 대응 훈련 결과 보고',
-    when: '2026년 상반기 (4월 진행)',
-    where: '본사 사업장 전체',
-    who: '전 임직원 참여',
-    how: '시나리오 기반 실전 훈련 진행',
-    grade: 'B',
-    source: '훈련결과보고서.docx',
-    date: '2026-04-22',
-    relevance: 82,
-    keywords: ['훈련', '비상', '대응', '평가']
-  },
-  {
-    id: 'doc-008',
-    title: '안전 교육 이수 현황',
-    why: '법정 의무 안전교육 이행',
-    what: '신규 입사자·기존 직원 안전교육 현황',
-    when: '분기별 갱신',
-    where: '본사·지사 전체',
-    who: '인사팀 + 안전관리팀 공동 관리',
-    how: '온라인 LMS 시스템 + 오프라인 실습',
-    grade: 'B',
-    source: '교육이수현황_2026Q1.xlsx',
-    date: '2026-03-31',
-    relevance: 79,
-    keywords: ['교육', '이수', '안전', '인사']
-  },
-  {
-    id: 'doc-009',
-    title: '품질 부적합 사례 분석',
-    why: '재발 방지 및 품질 향상',
-    what: '2026년 1분기 부적합 사례 12건',
-    when: '2026년 1월~3월',
-    where: '제조 라인 2호기 집중 발생',
-    who: '품질팀 + 생산팀 협업',
-    how: '근본원인 분석(RCA) 후 시정조치',
-    grade: 'C',
-    source: '부적합분석_2026Q1.docx',
-    date: '2026-04-05',
-    relevance: 76,
-    keywords: ['품질', '부적합', '분석', '시정']
-  },
-  {
-    id: 'doc-010',
-    title: '협력사 안전 점검 결과',
-    why: '협력사 안전 관리 수준 점검',
-    what: '주요 협력사 12개사 안전 점검',
-    when: '2026년 4월',
-    where: '협력사 사업장',
-    who: '본사 안전팀',
-    how: '체크리스트 기반 현장 실사',
-    grade: 'A',
-    source: '협력사점검_2026Apr.pdf',
-    date: '2026-04-18',
-    relevance: 84,
-    keywords: ['협력사', '점검', '안전', '실사']
-  }
+  { id: 'doc-001', title: '화재 발생시 대피 경로 안내', why: '비상 상황 발생시 인명 보호', what: '제조동 대피 경로 매뉴얼', when: '화재 감지 즉시', where: '제조동 1층/2층 전 구역', who: '안전관리책임자, 작업자 전원', how: '비상등 경로 따라 옥외 집결지 이동', grade: 'A', source: '안전관리매뉴얼_v3.pdf', date: '2026-04-15', keywords: ['화재', '대피', '비상', '안전', '경로'] },
+  { id: 'doc-002', title: '제조 공정 품질 점검 절차', why: '제품 품질 표준 유지', what: '공정 단계별 품질 점검 항목', when: '매 작업 시작 및 종료 시', where: '제조 라인 1~3호기', who: '품질관리팀 조장', how: '점검표 기반 항목별 측정 후 기록', grade: 'A', source: '품질관리지침_v2.docx', date: '2026-04-08', keywords: ['품질', '점검', '공정', '관리', '측정'] },
+  { id: 'doc-003', title: '작업장 안전 수칙', why: '작업 중 사고 예방', what: '필수 안전 수칙 12항목', when: '모든 작업 시간', where: '전 작업장', who: '전 작업자', how: '교육 이수 후 현장 게시판 부착·준수', grade: 'A', source: '안전수칙고시_v1.pdf', date: '2026-03-22', keywords: ['안전', '수칙', '작업', '예방'] },
+  { id: 'doc-004', title: '화학물질 취급 절차', why: '화학물질 누출·오염 방지', what: '인화성·독성 화학물질 취급 매뉴얼', when: '화학물질 입출고 및 사용 시', where: '화학물질 저장고 및 작업장', who: '안전교육 이수자만 가능', how: '보호구 착용 후 지정된 절차 따라 취급', grade: 'B', source: '화학물질매뉴얼.pdf', date: '2026-03-15', keywords: ['화학', '취급', '안전', '보호'] },
+  { id: 'doc-005', title: '응급 상황 대응 매뉴얼', why: '응급 상황 시 신속 대응', what: '의료 응급·재난 응급 대응 절차', when: '응급 상황 발생 즉시', where: '전 사업장 및 인근 지역', who: '응급처치 자격자, 안전관리자', how: '119 신고 → 응급처치 → 후송 협조', grade: 'A', source: '응급대응매뉴얼.pdf', date: '2026-03-01', keywords: ['응급', '대응', '재난', '의료'] },
+  { id: 'doc-006', title: '설비 정기 점검 일지', why: '설비 고장 사전 예방', what: '주요 설비 점검 항목 및 결과', when: '매주 월요일 / 매월 1일', where: '제조 1~3호기, 보일러실', who: '설비관리팀 김민수 과장', how: '체크리스트 점검 후 일지 작성·보고', grade: 'A', source: '설비점검일지_2026Q1.xlsx', date: '2026-02-28', keywords: ['설비', '점검', '예방', '관리'] },
+  { id: 'doc-007', title: '비상 대응 훈련 결과', why: '비상 대응 역량 평가 및 향상', what: '연 2회 정기 대응 훈련 결과 보고', when: '2026년 상반기 (4월 진행)', where: '본사 사업장 전체', who: '전 임직원 참여', how: '시나리오 기반 실전 훈련 진행', grade: 'B', source: '훈련결과보고서.docx', date: '2026-04-22', keywords: ['훈련', '비상', '대응', '평가'] },
+  { id: 'doc-008', title: '안전 교육 이수 현황', why: '법정 의무 안전교육 이행', what: '신규 입사자·기존 직원 안전교육 현황', when: '분기별 갱신', where: '본사·지사 전체', who: '인사팀 + 안전관리팀 공동 관리', how: '온라인 LMS 시스템 + 오프라인 실습', grade: 'B', source: '교육이수현황_2026Q1.xlsx', date: '2026-03-31', keywords: ['교육', '이수', '안전', '인사'] },
+  { id: 'doc-009', title: '품질 부적합 사례 분석', why: '재발 방지 및 품질 향상', what: '2026년 1분기 부적합 사례 12건', when: '2026년 1월~3월', where: '제조 라인 2호기 집중 발생', who: '품질팀 + 생산팀 협업', how: '근본원인 분석(RCA) 후 시정조치', grade: 'C', source: '부적합분석_2026Q1.docx', date: '2026-04-05', keywords: ['품질', '부적합', '분석', '시정'] },
+  { id: 'doc-010', title: '협력사 안전 점검 결과', why: '협력사 안전 관리 수준 점검', what: '주요 협력사 12개사 안전 점검', when: '2026년 4월', where: '협력사 사업장', who: '본사 안전팀', how: '체크리스트 기반 현장 실사', grade: 'A', source: '협력사점검_2026Apr.pdf', date: '2026-04-18', keywords: ['협력사', '점검', '안전', '실사'] }
 ];
 
-// 상태
-let activeChannelFilters = new Set(); // 빈 set = 전체 채널
-let activeGradeFilter = 'all';
-let activeSort = 'relevance';
-let lastResults = [];
+const chatBox = document.getElementById('chatBox');
+const welcomeMsg = document.getElementById('welcomeMsg');
+const qaInput = document.getElementById('qaInput');
+const sendBtn = document.getElementById('sendBtn');
+const clearBtn = document.getElementById('clearBtn');
 
-// DOM
-const searchInput = document.getElementById('searchInput');
-const searchBtn = document.getElementById('searchBtn');
-const channelFiltersEl = document.getElementById('channelFilters');
-const gradeFiltersEl = document.getElementById('gradeFilters');
-const sortSelect = document.getElementById('sortSelect');
-const resultsCount = document.getElementById('resultsCount');
-const resultsTime = document.getElementById('resultsTime');
-const loading = document.getElementById('loading');
-const noResults = document.getElementById('noResults');
-const resultsList = document.getElementById('resultsList');
+// ============================================
+// 질문 분석 및 매칭
+// ============================================
 
-const modal = document.getElementById('modal');
-const modalTitle = document.getElementById('modalTitle');
-const modalSource = document.getElementById('modalSource');
-const modalDate = document.getElementById('modalDate');
-const modalGrade = document.getElementById('modalGrade');
-const modalRelevance = document.getElementById('modalRelevance');
-const modalChannels = document.getElementById('modalChannels');
-const modalClose = document.getElementById('modalClose');
-const modalCloseBtn = document.getElementById('modalCloseBtn');
-const modalAskAI = document.getElementById('modalAskAI');
-
-// 채널 필터 초기화
-function initChannelFilters() {
-  let html = '<span class="filter-chip active" data-channel="all">전체</span>';
-  CHANNELS.forEach(ch => {
-    html += '<span class="filter-chip" data-channel="' + ch.key + '">' + ch.label + '</span>';
-  });
-  channelFiltersEl.innerHTML = html;
-
-  channelFiltersEl.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const ch = chip.dataset.channel;
-      if (ch === 'all') {
-        activeChannelFilters.clear();
-        channelFiltersEl.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-      } else {
-        channelFiltersEl.querySelector('[data-channel="all"]').classList.remove('active');
-        if (activeChannelFilters.has(ch)) {
-          activeChannelFilters.delete(ch);
-          chip.classList.remove('active');
-        } else {
-          activeChannelFilters.add(ch);
-          chip.classList.add('active');
-        }
-        if (activeChannelFilters.size === 0) {
-          channelFiltersEl.querySelector('[data-channel="all"]').classList.add('active');
-        }
-      }
-      if (lastResults.length > 0) doSearch();
+function findMatchingDocs(question) {
+  const q = question.toLowerCase();
+  const scored = SAMPLE_DATA.map(doc => {
+    let score = 0;
+    // 제목 매칭 (가장 강력)
+    if (doc.title.toLowerCase().includes(q)) score += 50;
+    // 키워드 매칭
+    doc.keywords.forEach(kw => {
+      if (q.includes(kw.toLowerCase())) score += 20;
     });
-  });
-}
-
-// 등급 필터
-gradeFiltersEl.querySelectorAll('.filter-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    gradeFiltersEl.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeGradeFilter = chip.dataset.grade;
-    if (lastResults.length > 0) doSearch();
-  });
-});
-
-// 정렬
-sortSelect.addEventListener('change', () => {
-  activeSort = sortSelect.value;
-  if (lastResults.length > 0) doSearch();
-});
-
-// 빠른 검색
-document.querySelectorAll('.quick-search-tag').forEach(tag => {
-  tag.addEventListener('click', () => {
-    searchInput.value = tag.dataset.q;
-    doSearch();
-  });
-});
-
-// 검색 실행
-searchBtn.addEventListener('click', doSearch);
-searchInput.addEventListener('keypress', e => {
-  if (e.key === 'Enter') doSearch();
-});
-
-async function doSearch() {
-  const query = searchInput.value.trim();
-
-  // 결과 초기화
-  resultsList.innerHTML = '';
-  noResults.classList.remove('show');
-  loading.classList.add('show');
-  resultsCount.textContent = '검색 중...';
-  resultsTime.textContent = '';
-
-  // 검색 시뮬레이션 (0.6초)
-  const startTime = Date.now();
-  await new Promise(r => setTimeout(r, 600));
-
-  // 필터링
-  let results = SAMPLE_DATA.slice();
-
-  if (query.length > 0) {
-    const q = query.toLowerCase();
-    results = results.filter(r => {
-      // 제목, 키워드, 모든 채널 텍스트에서 검색
-      const allText = (r.title + ' ' + r.keywords.join(' ') + ' ' +
-        CHANNELS.map(c => r[c.key]).join(' ')).toLowerCase();
-      return allText.includes(q);
+    // 6채널 텍스트 매칭
+    CHANNELS.forEach(ch => {
+      if (doc[ch.key].toLowerCase().includes(q)) score += 10;
     });
-  }
-
-  // 채널 필터 (적용된 채널 중 하나라도 매치되어야 통과)
-  if (activeChannelFilters.size > 0 && query.length > 0) {
-    const q = query.toLowerCase();
-    results = results.filter(r => {
-      return Array.from(activeChannelFilters).some(ch => {
-        return r[ch].toLowerCase().includes(q);
+    // 부분 단어 매칭
+    const qWords = q.split(/\s+/).filter(w => w.length >= 2);
+    qWords.forEach(word => {
+      if (doc.title.toLowerCase().includes(word)) score += 8;
+      doc.keywords.forEach(kw => {
+        if (kw.toLowerCase().includes(word)) score += 5;
+      });
+      CHANNELS.forEach(ch => {
+        if (doc[ch.key].toLowerCase().includes(word)) score += 3;
       });
     });
-  }
+    return { doc, score };
+  });
 
-  // 등급 필터
-  if (activeGradeFilter !== 'all') {
-    results = results.filter(r => r.grade === activeGradeFilter);
-  }
-
-  // 정렬
-  if (activeSort === 'relevance') {
-    results.sort((a, b) => b.relevance - a.relevance);
-  } else if (activeSort === 'date') {
-    results.sort((a, b) => b.date.localeCompare(a.date));
-  } else if (activeSort === 'grade') {
-    const order = { 'A': 0, 'B': 1, 'C': 2 };
-    results.sort((a, b) => order[a.grade] - order[b.grade]);
-  }
-
-  const elapsed = Date.now() - startTime;
-
-  loading.classList.remove('show');
-  lastResults = results;
-
-  if (results.length === 0) {
-    resultsCount.textContent = '검색 결과 없음';
-    resultsTime.textContent = '';
-    noResults.classList.add('show');
-    return;
-  }
-
-  resultsCount.innerHTML = '<strong>' + results.length + '건</strong> 검색됨';
-  resultsTime.textContent = '검색 소요 ' + (elapsed / 1000).toFixed(2) + '초';
-
-  renderResults(results, query);
+  return scored
+    .filter(s => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(s => s.doc);
 }
 
-function renderResults(results, query) {
-  let html = '';
-  results.forEach(r => {
-    const gradeClass = r.grade === 'B' ? ' b' : (r.grade === 'C' ? ' c' : '');
-    html += '<div class="result-card" data-id="' + r.id + '">';
-    html += '<div class="result-top">';
-    html += '<h3 class="result-title">' + highlightText(r.title, query) + '</h3>';
-    html += '<span class="result-grade' + gradeClass + '">' + r.grade + ' 등급</span>';
-    html += '</div>';
-    html += '<div class="result-channels">';
+function getQuestionType(question) {
+  const q = question.toLowerCase();
+  if (q.includes('어떻게') || q.includes('방법') || q.includes('절차')) return 'how';
+  if (q.includes('언제') || q.includes('시간') || q.includes('주기')) return 'when';
+  if (q.includes('어디') || q.includes('장소') || q.includes('위치')) return 'where';
+  if (q.includes('누가') || q.includes('담당') || q.includes('책임')) return 'who';
+  if (q.includes('왜') || q.includes('이유') || q.includes('목적')) return 'why';
+  if (q.includes('무엇') || q.includes('뭐')) return 'what';
+  return 'all';
+}
+
+function generateAnswer(question) {
+  const matched = findMatchingDocs(question);
+  const qType = getQuestionType(question);
+
+  if (matched.length === 0) {
+    return {
+      noMatch: true,
+      text: '죄송합니다. 학습된 데이터에서 관련 정보를 찾지 못했습니다.\n\n다른 방식으로 질문해 주시거나, 검색 화면에서 직접 자료를 찾아보실 수 있습니다.',
+      sources: [],
+      followups: [
+        '🛡️ 작업장 안전 수칙은 무엇인가요?',
+        '✅ 품질 점검 절차는?',
+        '🚨 응급 상황 대응은?'
+      ]
+    };
+  }
+
+  const primary = matched[0];
+  const sources = matched.slice(0, 3);
+
+  return {
+    primary: primary,
+    sources: sources,
+    qType: qType,
+    followups: generateFollowups(primary, matched)
+  };
+}
+
+function generateFollowups(primary, allMatched) {
+  const followups = [];
+  followups.push(primary.title + '의 상세 절차는?');
+  followups.push(primary.who + '의 연락처를 알려주세요');
+  if (allMatched.length > 1) {
+    followups.push('관련된 다른 자료는?');
+  }
+  return followups.slice(0, 3);
+}
+
+// ============================================
+// 메시지 추가
+// ============================================
+
+function getTimeStr() {
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return h + ':' + m;
+}
+
+function addUserMessage(text) {
+  const html =
+    '<div class="msg user">' +
+      '<div class="msg-avatar">나</div>' +
+      '<div>' +
+        '<div class="msg-bubble">' + escapeHtml(text) + '</div>' +
+        '<div class="msg-time">' + getTimeStr() + '</div>' +
+      '</div>' +
+    '</div>';
+  chatBox.insertAdjacentHTML('beforeend', html);
+  scrollToBottom();
+}
+
+function addTypingIndicator() {
+  const html =
+    '<div class="msg ai" id="typingMsg">' +
+      '<div class="msg-avatar">AI</div>' +
+      '<div class="msg-bubble">' +
+        '<div class="typing">' +
+          '<div class="typing-dot"></div>' +
+          '<div class="typing-dot"></div>' +
+          '<div class="typing-dot"></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  chatBox.insertAdjacentHTML('beforeend', html);
+  scrollToBottom();
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById('typingMsg');
+  if (el) el.remove();
+}
+
+function addAIMessage(answer) {
+  let bubbleHtml = '';
+
+  if (answer.noMatch) {
+    bubbleHtml += '<div style="color:#7B1F2A;font-weight:900;margin-bottom:8px;">⚠️ 관련 정보를 찾지 못했습니다</div>';
+    bubbleHtml += '<div style="white-space:pre-line;">' + escapeHtml(answer.text) + '</div>';
+  } else {
+    const p = answer.primary;
+    bubbleHtml += '<div class="ai-answer-title">📌 ' + escapeHtml(p.title) + '</div>';
+    bubbleHtml += '<div class="ai-answer-channels">';
     CHANNELS.forEach(ch => {
-      html += '<div class="result-channel">';
-      html += '<span class="result-channel-label">' + ch.label + '</span>';
-      html += highlightText(r[ch.key], query);
-      html += '</div>';
+      bubbleHtml += '<div class="ai-channel-line">';
+      bubbleHtml += '<span class="ai-channel-icon">' + ch.icon + ' ' + ch.ko + ':</span>';
+      bubbleHtml += escapeHtml(p[ch.key]);
+      bubbleHtml += '</div>';
     });
-    html += '</div>';
-    html += '<div class="result-meta">';
-    html += '<span class="result-source">📂 ' + r.source + '</span>';
-    html += '<span>📅 ' + r.date + '</span>';
-    html += '<span class="result-relevance">⭐ 관련도 ' + r.relevance + '%</span>';
-    html += '</div>';
-    html += '</div>';
-  });
-  resultsList.innerHTML = html;
+    bubbleHtml += '</div>';
 
-  // 카드 클릭 이벤트
-  resultsList.querySelectorAll('.result-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const id = card.dataset.id;
-      const item = SAMPLE_DATA.find(d => d.id === id);
-      if (item) showDetailModal(item);
+    // 출처 카드
+    if (answer.sources.length > 0) {
+      bubbleHtml += '<div class="ai-sources">';
+      bubbleHtml += '<div class="ai-sources-title">📂 참고 자료 ' + answer.sources.length + '건</div>';
+      answer.sources.forEach(s => {
+        const gCls = s.grade === 'B' ? ' b' : (s.grade === 'C' ? ' c' : '');
+        bubbleHtml += '<div class="ai-source-item" data-id="' + s.id + '">';
+        bubbleHtml += '<span class="ai-source-name">' + escapeHtml(s.source) + '</span>';
+        bubbleHtml += '<span class="ai-source-grade' + gCls + '">' + s.grade + '</span>';
+        bubbleHtml += '</div>';
+      });
+      bubbleHtml += '</div>';
+    }
+  }
+
+  // 후속 질문
+  if (answer.followups && answer.followups.length > 0) {
+    bubbleHtml += '<div class="ai-followups">';
+    bubbleHtml += '<div class="ai-followups-title">💡 추가로 물어볼 만한 질문</div>';
+    answer.followups.forEach(f => {
+      bubbleHtml += '<button class="ai-followup-btn" data-q="' + escapeHtmlAttr(f) + '">↩ ' + escapeHtml(f) + '</button>';
+    });
+    bubbleHtml += '</div>';
+  }
+
+  // 만족도
+  if (!answer.noMatch) {
+    bubbleHtml += '<div class="ai-feedback">';
+    bubbleHtml += '<span class="ai-feedback-label">답변이 도움됐나요?</span>';
+    bubbleHtml += '<button class="ai-feedback-btn" data-fb="up">👍</button>';
+    bubbleHtml += '<button class="ai-feedback-btn" data-fb="down">👎</button>';
+    bubbleHtml += '</div>';
+  }
+
+  const html =
+    '<div class="msg ai">' +
+      '<div class="msg-avatar">AI</div>' +
+      '<div>' +
+        '<div class="msg-bubble">' + bubbleHtml + '</div>' +
+        '<div class="msg-time">' + getTimeStr() + '</div>' +
+      '</div>' +
+    '</div>';
+
+  chatBox.insertAdjacentHTML('beforeend', html);
+  scrollToBottom();
+
+  // 이벤트 바인딩
+  bindLastAIMessageEvents();
+}
+
+function bindLastAIMessageEvents() {
+  // 후속 질문 클릭
+  chatBox.querySelectorAll('.ai-followup-btn').forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      qaInput.value = btn.dataset.q;
+      sendQuestion();
+    });
+  });
+
+  // 출처 카드 클릭
+  chatBox.querySelectorAll('.ai-source-item').forEach(item => {
+    if (item.dataset.bound) return;
+    item.dataset.bound = '1';
+    item.addEventListener('click', () => {
+      const id = item.dataset.id;
+      const doc = SAMPLE_DATA.find(d => d.id === id);
+      if (doc) {
+        alert('📂 ' + doc.title + '\n\n전체 내용은 검색 화면에서 확인 가능합니다.\n\n출처: ' + doc.source + '\n등록: ' + doc.date + '\n등급: ' + doc.grade);
+      }
+    });
+  });
+
+  // 만족도
+  chatBox.querySelectorAll('.ai-feedback-btn').forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      const fb = btn.dataset.fb;
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.ai-feedback-btn').forEach(b => b.classList.remove('selected', 'up', 'down'));
+      btn.classList.add('selected', fb);
+      const msg = fb === 'up' ? '✅ 피드백 감사합니다!' : '⚠️ 의견 주셔서 감사합니다. 답변 품질 개선에 반영됩니다.';
+      // 작은 토스트 효과 대신 비활성 처리만
+      btn.disabled = true;
     });
   });
 }
 
-function highlightText(text, query) {
-  if (!query || query.length === 0) return escapeHtml(text);
-  const escaped = escapeHtml(text);
-  const escapedQuery = escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const re = new RegExp('(' + escapedQuery + ')', 'gi');
-  return escaped.replace(re, '<mark style="background:#fff3a0;color:#7B1F2A;font-weight:900;padding:1px 3px;border-radius:3px;">$1</mark>');
+function scrollToBottom() {
+  setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50);
 }
 
 function escapeHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (s == null) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// 상세 모달
-function showDetailModal(item) {
-  modalTitle.textContent = item.title;
-  modalSource.textContent = item.source;
-  modalDate.textContent = item.date;
-  modalGrade.textContent = item.grade + ' 등급';
-  modalRelevance.textContent = item.relevance + '%';
-
-  let chHtml = '';
-  CHANNELS.forEach(ch => {
-    chHtml += '<div class="modal-channel">';
-    chHtml += '<div class="modal-channel-header">' + ch.label + ' (' + ch.ko + ')</div>';
-    chHtml += '<div class="modal-channel-content">' + escapeHtml(item[ch.key]) + '</div>';
-    chHtml += '</div>';
-  });
-  modalChannels.innerHTML = chHtml;
-
-  modal.classList.add('show');
+function escapeHtmlAttr(s) {
+  return escapeHtml(s).replace(/"/g, '&quot;');
 }
 
-modalClose.addEventListener('click', () => modal.classList.remove('show'));
-modalCloseBtn.addEventListener('click', () => modal.classList.remove('show'));
-modal.addEventListener('click', e => {
-  if (e.target === modal) modal.classList.remove('show');
+// ============================================
+// 질문 전송
+// ============================================
+
+async function sendQuestion() {
+  const text = qaInput.value.trim();
+  if (text.length === 0) return;
+
+  // 환영 메시지 숨김
+  if (welcomeMsg) {
+    welcomeMsg.style.display = 'none';
+  }
+
+  qaInput.value = '';
+  qaInput.disabled = true;
+  sendBtn.disabled = true;
+
+  addUserMessage(text);
+
+  // 타이핑 인디케이터
+  addTypingIndicator();
+
+  // 답변 생성 시뮬레이션 (1.2초)
+  await new Promise(r => setTimeout(r, 1200));
+
+  removeTypingIndicator();
+
+  const answer = generateAnswer(text);
+  addAIMessage(answer);
+
+  qaInput.disabled = false;
+  sendBtn.disabled = false;
+  qaInput.focus();
+}
+
+sendBtn.addEventListener('click', sendQuestion);
+qaInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendQuestion();
+  }
 });
 
-modalAskAI.addEventListener('click', () => {
-  alert('💬 AI 질의응답 화면으로 이동합니다.\n\n선택한 항목 기준으로 추가 질문 가능합니다.\n\n(질의응답 화면 제작 후 연결됩니다)');
+// 빠른 질문
+document.querySelectorAll('.welcome-quick-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    qaInput.value = btn.dataset.q;
+    sendQuestion();
+  });
+});
+
+// 새 대화 (초기화)
+clearBtn.addEventListener('click', () => {
+  if (chatBox.querySelectorAll('.msg').length === 0) return;
+  if (!confirm('대화를 모두 초기화하시겠습니까?')) return;
+  chatBox.innerHTML = '';
+  chatBox.appendChild(welcomeMsg);
+  welcomeMsg.style.display = '';
 });
 
 // 하단 화면 이동
@@ -993,16 +795,13 @@ document.querySelectorAll('.bottom-btn[data-nav]').forEach(btn => {
   btn.addEventListener('click', () => {
     const nav = btn.dataset.nav;
     const labels = {
-      'qa': '💬 AI 질의응답',
+      'search': '🔍 검색',
       'dashboard': '📊 대시보드',
       'report': '📑 보고서'
     };
     alert(labels[nav] + ' 화면으로 이동합니다.\n\n(해당 화면 제작 후 연결됩니다)');
   });
 });
-
-// 초기화
-initChannelFilters();
 </script>
 
 </body>
