@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 5 - 품질 관리 대시보드</title>
+<title>saas.html 화면 5 v2 - 대시보드 (인터랙티브)</title>
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
 
@@ -14,32 +14,107 @@
   .dash-wrapper {
     max-width: 1200px; margin: 0 auto 28px auto;
     border: 3px solid #1A237E; border-radius: 16px;
-    padding: 40px; background: #ffffff; box-sizing: border-box;
+    padding: 36px 40px; background: #ffffff; box-sizing: border-box;
   }
 
-  /* 시스템 헤더 */
-  .sys-header {
-    display: flex; justify-content: space-between; align-items: center;
-    background: #f5f7ff; border: 2px solid #1A237E;
-    border-radius: 10px; padding: 12px 20px; margin: 0 0 24px 0;
-    font-size: 14px; font-weight: 700; color: #000000;
+  /* 상단 영역: 시스템 정보 + 액션 버튼 */
+  .dash-top {
+    display: flex; gap: 14px; margin: 0 0 20px 0;
   }
-  .sys-header-info { display: flex; gap: 20px; flex-wrap: wrap; }
+
+  .sys-header {
+    flex-grow: 1;
+    background: #f5f7ff; border: 2px solid #1A237E;
+    border-radius: 10px; padding: 12px 20px;
+    font-size: 14px; font-weight: 700; color: #000000;
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+  }
   .sys-info-label { color: #555; margin-right: 6px; }
   .sys-info-value { color: #1A237E; font-family: 'Courier New', monospace; font-weight: 900; }
+
+  .dash-actions {
+    display: flex; gap: 8px;
+  }
+
+  .action-icon-btn {
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 14px; font-weight: 900;
+    padding: 10px 16px; border-radius: 10px;
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .action-icon-btn:hover {
+    background: #1A237E; color: #ffffff;
+    transform: translateY(-2px);
+  }
 
   .screen-title {
     color: #1A237E; font-size: 36px; font-weight: 900;
     text-align: center; margin: 0 0 14px 0;
   }
   .screen-subtitle {
-    color: #000000; font-size: 20px; font-weight: 700;
-    text-align: center; margin: 0 0 30px 0;
+    color: #000000; font-size: 18px; font-weight: 700;
+    text-align: center; margin: 0 0 24px 0;
   }
 
+  /* 탭 + 기간 필터 */
+  .dash-controls {
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 14px;
+    margin: 0 0 24px 0; flex-wrap: wrap;
+  }
+
+  .dash-tabs {
+    display: flex; gap: 4px;
+    background: #f5f5f5; border-radius: 12px;
+    padding: 4px;
+  }
+
+  .tab {
+    background: transparent; color: #555;
+    border: none;
+    font-size: 14px; font-weight: 900;
+    padding: 10px 18px; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .tab:hover { color: #1A237E; }
+
+  .tab.active {
+    background: #1A237E; color: #ffffff;
+  }
+
+  .period-filter {
+    display: flex; gap: 4px;
+    background: #f5f5f5; border-radius: 999px;
+    padding: 3px;
+  }
+
+  .period {
+    background: transparent; color: #555;
+    border: none;
+    font-size: 13px; font-weight: 900;
+    padding: 8px 16px; border-radius: 999px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .period:hover { color: #1A237E; }
+
+  .period.active {
+    background: #7B1F2A; color: #ffffff;
+  }
+
+  /* 탭 콘텐츠 */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
   .section-title {
-    color: #1A237E; font-size: 18px; font-weight: 900;
-    margin: 28px 0 14px 0;
+    color: #1A237E; font-size: 17px; font-weight: 900;
+    margin: 24px 0 12px 0;
     padding: 0 0 0 10px;
     border-left: 5px solid #7B1F2A;
   }
@@ -47,7 +122,7 @@
   /* KPI 카드 */
   .kpi-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 14px; margin: 0 0 8px 0;
+    gap: 14px;
   }
 
   .kpi-card {
@@ -56,6 +131,7 @@
     padding: 22px 20px;
     background: #ffffff;
     text-align: center;
+    cursor: pointer;
     transition: all 0.2s;
   }
 
@@ -64,163 +140,118 @@
     box-shadow: 0 4px 0 0 rgba(26, 35, 126, 0.15);
   }
 
-  .kpi-icon {
-    font-size: 36px; line-height: 1; margin: 0 0 8px 0;
-  }
-
-  .kpi-label {
-    color: #000000; font-size: 14px; font-weight: 700;
-    margin: 0 0 6px 0;
-  }
-
-  .kpi-value {
-    color: #1A237E; font-size: 36px; font-weight: 900;
-    line-height: 1;
-  }
-
-  .kpi-unit {
-    color: #1A237E; font-size: 16px; font-weight: 700;
-    margin-left: 2px;
-  }
-
-  .kpi-trend {
-    color: #7B1F2A; font-size: 13px; font-weight: 700;
+  .kpi-card::after {
+    content: '클릭 → 상세';
+    display: block;
+    color: #888; font-size: 11px; font-weight: 700;
     margin: 8px 0 0 0;
+    opacity: 0; transition: opacity 0.2s;
   }
+  .kpi-card:hover::after { opacity: 1; }
 
-  .kpi-trend.up { color: #1A237E; }
-  .kpi-trend.warn { color: #b8860b; }
+  .kpi-icon { font-size: 36px; line-height: 1; margin: 0 0 8px 0; }
+  .kpi-label { color: #000000; font-size: 14px; font-weight: 700; margin: 0 0 6px 0; }
+  .kpi-value { color: #1A237E; font-size: 36px; font-weight: 900; line-height: 1; }
+  .kpi-unit { color: #1A237E; font-size: 16px; font-weight: 700; margin-left: 2px; }
+  .kpi-trend { color: #1A237E; font-size: 13px; font-weight: 700; margin: 8px 0 0 0; }
 
-  /* 차트 행 */
+  /* 차트 */
   .chart-row {
     display: grid; grid-template-columns: 1.4fr 1fr;
     gap: 16px; margin: 0 0 8px 0;
   }
-
-  .chart-row.half {
-    grid-template-columns: 1fr 1fr;
-  }
+  .chart-row.half { grid-template-columns: 1fr 1fr; }
 
   .chart-card {
     border: 2px solid #1A237E;
     border-radius: 12px;
-    padding: 24px;
+    padding: 22px;
     background: #ffffff;
   }
 
   .chart-card-title {
-    color: #1A237E; font-size: 17px; font-weight: 900;
-    margin: 0 0 16px 0;
+    color: #1A237E; font-size: 16px; font-weight: 900;
+    margin: 0 0 14px 0;
     padding: 0 0 10px 0;
     border-bottom: 2px solid #f0f0f0;
+    display: flex; justify-content: space-between; align-items: center;
   }
 
-  /* 가로 막대 차트 (채널 등급, 카테고리) */
-  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+  .chart-hint {
+    color: #888; font-size: 11px; font-weight: 700;
+  }
+
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
 
   .bar-row {
     display: grid;
     grid-template-columns: 90px 1fr 60px;
     gap: 10px;
     align-items: center;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: all 0.2s;
+    border-radius: 6px;
   }
 
-  .bar-label {
-    color: #000000; font-size: 14px; font-weight: 900;
-    text-align: right;
+  .bar-row:hover {
+    background: #f5f7ff;
+    padding: 4px 8px;
   }
+
+  .bar-label { color: #000000; font-size: 13px; font-weight: 900; text-align: right; }
 
   .bar-track {
-    height: 24px;
+    height: 22px;
     background: #f0f0f0;
     border-radius: 6px;
     overflow: hidden;
     display: flex;
   }
 
-  .bar-segment {
-    height: 100%; transition: all 0.6s ease;
-  }
-
+  .bar-segment { height: 100%; transition: all 0.6s ease; }
   .bar-segment.a { background: #1A237E; }
   .bar-segment.b { background: #b8860b; }
   .bar-segment.c { background: #7B1F2A; }
   .bar-segment.solid { background: #1A237E; }
 
-  .bar-value {
-    color: #1A237E; font-size: 14px; font-weight: 900;
-    text-align: left;
-  }
+  .bar-value { color: #1A237E; font-size: 13px; font-weight: 900; text-align: left; }
 
   .bar-legend {
     display: flex; gap: 14px; justify-content: center;
-    margin: 16px 0 0 0;
-    padding: 12px 0 0 0;
+    margin: 14px 0 0 0;
+    padding: 10px 0 0 0;
     border-top: 1px solid #f0f0f0;
-    font-size: 13px; font-weight: 700;
+    font-size: 12px; font-weight: 700;
   }
-
   .legend-item { display: flex; align-items: center; gap: 6px; }
-
-  .legend-dot {
-    width: 14px; height: 14px; border-radius: 3px;
-  }
-
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
   .legend-dot.a { background: #1A237E; }
   .legend-dot.b { background: #b8860b; }
   .legend-dot.c { background: #7B1F2A; }
 
-  /* 도넛 차트 */
+  /* 도넛 */
   .donut-wrap {
-    display: flex; align-items: center; gap: 24px;
-    justify-content: center;
+    display: flex; align-items: center; gap: 20px; justify-content: center;
   }
-
-  .donut-svg {
-    flex-shrink: 0;
-  }
-
-  .donut-center {
-    position: absolute;
-    text-align: center;
-  }
-
-  .donut-stats {
-    display: flex; flex-direction: column; gap: 12px;
-  }
-
+  .donut-stats { display: flex; flex-direction: column; gap: 10px; }
   .donut-stat-row {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; padding: 4px 8px;
+    border-radius: 6px; transition: all 0.2s;
   }
-
-  .donut-stat-dot {
-    width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
-  }
-
-  .donut-stat-label {
-    color: #000000; min-width: 60px;
-  }
-
-  .donut-stat-value {
-    color: #1A237E; font-weight: 900;
-    margin-left: auto;
-  }
+  .donut-stat-row:hover { background: #f5f7ff; }
+  .donut-stat-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .donut-stat-label { color: #000000; min-width: 56px; }
+  .donut-stat-value { color: #1A237E; font-weight: 900; margin-left: auto; }
 
   /* 라인 차트 */
-  .line-chart-wrap {
-    position: relative;
-  }
-
-  .line-svg {
-    width: 100%;
-    height: 200px;
-  }
-
+  .line-svg { width: 100%; height: 200px; }
   .line-x-labels {
     display: flex; justify-content: space-between;
     margin: 4px 0 0 0;
-    font-size: 12px; font-weight: 700; color: #555;
+    font-size: 11px; font-weight: 700; color: #555;
     padding: 0 12px;
   }
 
@@ -228,7 +259,7 @@
   .activity-log {
     border: 2px solid #1A237E;
     border-radius: 12px;
-    padding: 20px 24px;
+    padding: 16px 22px;
     background: #ffffff;
     max-height: 280px;
     overflow-y: auto;
@@ -236,36 +267,37 @@
 
   .activity-row {
     display: grid;
-    grid-template-columns: 80px 30px 1fr 80px;
+    grid-template-columns: 70px 28px 1fr 80px;
     gap: 12px;
     align-items: center;
-    padding: 10px 0;
+    padding: 9px 0;
     border-bottom: 1px solid #f0f0f0;
-    font-size: 14px; font-weight: 700;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .activity-row:hover {
+    background: #f5f7ff;
+    padding-left: 6px;
   }
 
   .activity-row:last-child { border-bottom: none; }
 
-  .activity-time {
-    color: #555; font-family: 'Courier New', monospace;
-  }
-
-  .activity-icon {
-    font-size: 20px; text-align: center;
-  }
-
-  .activity-text { color: #000000; }
+  .activity-time { color: #555; font-family: 'Courier New', monospace; font-size: 12px; }
+  .activity-icon { font-size: 18px; text-align: center; }
+  .activity-text { color: #000000; font-size: 13px; }
   .activity-text strong { color: #1A237E; }
 
   .activity-tag {
     background: #f5f7ff; color: #1A237E;
     border: 1px solid #1A237E;
-    font-size: 12px; font-weight: 900;
-    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 900;
+    padding: 3px 8px; border-radius: 999px;
     text-align: center;
   }
 
-  /* 알림/이슈 */
+  /* 알림 - 액션 버튼 추가 */
   .alerts-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 14px;
@@ -273,32 +305,352 @@
 
   .alert-card {
     border-radius: 12px;
-    padding: 20px;
+    padding: 18px;
     border: 2px solid;
     background: #ffffff;
+    display: flex; flex-direction: column;
   }
 
   .alert-card.warning { border-color: #b8860b; background: #fffbe6; }
   .alert-card.success { border-color: #1A237E; background: #f5f7ff; }
   .alert-card.info { border-color: #7B1F2A; background: #fff5f5; }
 
-  .alert-icon {
-    font-size: 32px; line-height: 1; margin: 0 0 10px 0;
-  }
-
-  .alert-title {
-    font-size: 16px; font-weight: 900;
-    margin: 0 0 6px 0;
-  }
-
+  .alert-icon { font-size: 28px; line-height: 1; margin: 0 0 8px 0; }
+  .alert-title { font-size: 15px; font-weight: 900; margin: 0 0 6px 0; }
   .alert-card.warning .alert-title { color: #b8860b; }
   .alert-card.success .alert-title { color: #1A237E; }
   .alert-card.info .alert-title { color: #7B1F2A; }
-
   .alert-msg {
-    color: #000000; font-size: 14px; font-weight: 700;
-    line-height: 1.5;
+    color: #000000; font-size: 13px; font-weight: 700;
+    line-height: 1.5; margin: 0 0 12px 0;
+    flex-grow: 1;
   }
+
+  .alert-action {
+    background: #ffffff;
+    color: inherit;
+    border: 2px solid currentColor;
+    font-size: 13px; font-weight: 900;
+    padding: 8px 14px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+    align-self: flex-start;
+  }
+
+  .alert-card.warning .alert-action { color: #b8860b; }
+  .alert-card.success .alert-action { color: #1A237E; }
+  .alert-card.info .alert-action { color: #7B1F2A; }
+
+  .alert-action:hover {
+    background: currentColor;
+    color: #ffffff !important;
+    filter: brightness(1.05);
+  }
+
+  /* 6채널 상세 탭 */
+  .channel-detail-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .channel-card {
+    border: 2px solid #1A237E;
+    border-radius: 12px;
+    padding: 20px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .channel-card:hover {
+    background: #f5f7ff; transform: translateY(-3px);
+  }
+
+  .channel-card-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin: 0 0 14px 0;
+  }
+
+  .channel-card-title {
+    color: #1A237E; font-size: 18px; font-weight: 900;
+  }
+
+  .channel-card-grade {
+    color: #ffffff; background: #1A237E;
+    font-size: 13px; font-weight: 900;
+    padding: 4px 12px; border-radius: 999px;
+  }
+
+  .channel-card-stats {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin: 0 0 14px 0;
+  }
+
+  .channel-stat {
+    text-align: center;
+    padding: 10px;
+    background: #f5f7ff;
+    border-radius: 8px;
+  }
+
+  .channel-stat-value {
+    color: #1A237E; font-size: 22px; font-weight: 900;
+    line-height: 1;
+  }
+
+  .channel-stat-label {
+    color: #555; font-size: 11px; font-weight: 700;
+    margin: 4px 0 0 0;
+  }
+
+  .channel-mini-bar {
+    height: 8px; background: #f0f0f0;
+    border-radius: 4px; overflow: hidden;
+    display: flex; margin: 0 0 6px 0;
+  }
+
+  .channel-card-foot {
+    color: #555; font-size: 12px; font-weight: 700;
+    text-align: center;
+  }
+
+  /* 사용자 탭 */
+  .user-list {
+    border: 2px solid #1A237E;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .user-row {
+    display: grid;
+    grid-template-columns: 50px 100px 1fr 80px 80px 100px;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px; font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .user-row:last-child { border-bottom: none; }
+  .user-row:hover { background: #f5f7ff; }
+  .user-row.header {
+    background: #1A237E; color: #ffffff;
+    font-size: 13px; font-weight: 900;
+  }
+
+  .user-avatar {
+    width: 36px; height: 36px;
+    background: #7B1F2A; color: #ffffff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900;
+  }
+
+  .user-id { font-family: 'Courier New', monospace; color: #1A237E; font-weight: 900; }
+  .user-name { color: #000000; }
+
+  .user-status {
+    display: inline-block; padding: 4px 10px;
+    border-radius: 999px; font-size: 12px; font-weight: 900;
+  }
+  .user-status.active { background: #f5f7ff; color: #1A237E; border: 1px solid #1A237E; }
+  .user-status.idle { background: #fffbe6; color: #b8860b; border: 1px solid #b8860b; }
+
+  /* 시스템 탭 */
+  .system-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .system-card {
+    border: 2px solid #1A237E;
+    border-radius: 12px;
+    padding: 20px;
+    background: #ffffff;
+  }
+
+  .resource-row {
+    display: flex; flex-direction: column;
+    gap: 4px; margin: 0 0 14px 0;
+  }
+
+  .resource-row:last-child { margin-bottom: 0; }
+
+  .resource-header {
+    display: flex; justify-content: space-between;
+    font-size: 14px; font-weight: 900; color: #000000;
+  }
+
+  .resource-pct { color: #1A237E; }
+
+  .resource-bar {
+    height: 12px; background: #f0f0f0;
+    border-radius: 6px; overflow: hidden;
+  }
+
+  .resource-fill {
+    height: 100%; background: #1A237E;
+    border-radius: 6px; transition: width 0.6s ease;
+  }
+
+  .resource-fill.warning { background: #b8860b; }
+  .resource-fill.critical { background: #7B1F2A; }
+
+  .module-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .module-row {
+    display: grid; grid-template-columns: 30px 1fr 80px;
+    gap: 12px; align-items: center;
+    padding: 10px 14px;
+    background: #f5f7ff; border-radius: 8px;
+    font-size: 13px; font-weight: 700;
+  }
+
+  .module-icon { font-size: 18px; text-align: center; }
+  .module-name { color: #000000; }
+  .module-status {
+    display: inline-block; padding: 4px 10px;
+    background: #1A237E; color: #ffffff;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 900; text-align: center;
+  }
+
+  /* 데이터 탭 */
+  .data-toolbar {
+    display: flex; gap: 10px; align-items: center;
+    margin: 0 0 14px 0;
+  }
+
+  .data-search {
+    flex-grow: 1; padding: 12px 16px;
+    border: 2px solid #1A237E; border-radius: 10px;
+    font-size: 14px; font-weight: 700;
+    font-family: inherit;
+  }
+
+  .data-search:focus { outline: none; border-color: #7B1F2A; }
+
+  .data-filter-btn {
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 13px; font-weight: 900;
+    padding: 12px 16px; border-radius: 10px;
+    cursor: pointer; white-space: nowrap;
+  }
+
+  .data-filter-btn:hover { background: #1A237E; color: #ffffff; }
+
+  .data-table {
+    border: 2px solid #1A237E; border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .data-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 100px 70px 100px;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px; font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .data-row:last-child { border-bottom: none; }
+  .data-row:hover { background: #f5f7ff; }
+  .data-row.header {
+    background: #1A237E; color: #ffffff;
+    font-size: 13px; font-weight: 900;
+  }
+
+  .data-checkbox {
+    width: 18px; height: 18px;
+    cursor: pointer;
+  }
+
+  .data-title { color: #000000; }
+  .data-source { color: #555; font-family: 'Courier New', monospace; font-size: 12px; }
+
+  .data-grade-tag {
+    display: inline-block;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 900;
+    color: #ffffff; text-align: center;
+  }
+  .data-grade-tag.a { background: #1A237E; }
+  .data-grade-tag.b { background: #b8860b; }
+  .data-grade-tag.c { background: #7B1F2A; }
+
+  /* 모달 */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.show { display: flex; }
+
+  .modal-box {
+    background: #ffffff;
+    border: 3px solid #1A237E;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 700px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  .modal-header {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 16px;
+    margin: 0 0 20px 0;
+    padding: 0 0 14px 0;
+    border-bottom: 2px solid #1A237E;
+  }
+
+  .modal-title {
+    color: #1A237E; font-size: 24px; font-weight: 900; margin: 0;
+  }
+
+  .modal-close {
+    background: #ffffff; color: #7B1F2A;
+    border: 2px solid #7B1F2A;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    font-size: 18px; font-weight: 900;
+    cursor: pointer; flex-shrink: 0;
+  }
+
+  .modal-close:hover { background: #7B1F2A; color: #ffffff; }
+
+  .modal-body { font-size: 15px; line-height: 1.7; color: #000000; }
+  .modal-body p { margin: 0 0 12px 0; }
+
+  .modal-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding: 16px 0 0 0;
+    margin: 16px 0 0 0;
+    border-top: 2px solid #1A237E;
+  }
+
+  .modal-btn {
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 14px; font-weight: 900;
+    padding: 10px 22px; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .modal-btn:hover { background: #1A237E; color: #ffffff; }
+  .modal-btn.primary { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; }
+  .modal-btn.primary:hover { background: #1A237E; border-color: #1A237E; }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: #555; font-size: 16px; font-weight: 700;
+  }
+
+  .empty-icon { font-size: 64px; line-height: 1; margin: 0 0 12px 0; }
 
   /* 하단 */
   .bottom-actions {
@@ -313,17 +665,9 @@
     padding: 14px 8px; border-radius: 10px;
     cursor: pointer; transition: all 0.2s; text-align: center;
   }
-
-  .bottom-btn:hover {
-    background: #1A237E; color: #ffffff; transform: translateY(-2px);
-  }
-
+  .bottom-btn:hover { background: #1A237E; color: #ffffff; transform: translateY(-2px); }
   .bottom-btn-icon { font-size: 22px; display: block; margin: 0 0 4px 0; }
-
-  .bottom-btn.current {
-    background: #7B1F2A; color: #ffffff;
-    border-color: #7B1F2A; cursor: default;
-  }
+  .bottom-btn.current { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; cursor: default; }
   .bottom-btn.current:hover { transform: none; }
 
   .file-types-bar {
@@ -332,285 +676,481 @@
     border-radius: 12px; padding: 18px 40px;
     text-align: center; box-sizing: border-box;
   }
-
   .file-types-bar .label { color: #000000; font-size: 18px; font-weight: 700; }
 </style>
 </head>
 <body>
 
-<div class="top-banner">AX 시스템 품질 관리 대시보드 - 실시간 모니터링</div>
+<div class="top-banner">AX 시스템 품질 관리 대시보드 - 인터랙티브 모니터링</div>
 
 <section class="dash-wrapper">
 
-  <div class="sys-header">
-    <div class="sys-header-info">
-      <span class="sys-info-item"><span class="sys-info-label">시스템 ID</span><span class="sys-info-value">AX-2026-0508</span></span>
-      <span class="sys-info-item"><span class="sys-info-label">사용자</span><span class="sys-info-value">AX-00000</span></span>
-      <span class="sys-info-item"><span class="sys-info-label">상태</span><span class="sys-info-value">정상 운영</span></span>
+  <!-- 상단: 시스템 정보 + 액션 버튼 -->
+  <div class="dash-top">
+    <div class="sys-header">
+      <span><span class="sys-info-label">시스템</span><span class="sys-info-value">AX-2026-0508</span></span>
+      <span><span class="sys-info-label">사용자</span><span class="sys-info-value">AX-00000</span></span>
+      <span><span class="sys-info-label">상태</span><span class="sys-info-value">정상 운영</span></span>
+      <span><span class="sys-info-label">갱신</span><span class="sys-info-value" id="updateTime">-</span></span>
     </div>
-    <div class="sys-info-item">
-      <span class="sys-info-label">갱신</span>
-      <span class="sys-info-value" id="updateTime">-</span>
+    <div class="dash-actions">
+      <button class="action-icon-btn" id="btnRefresh">🔄 새로고침</button>
+      <button class="action-icon-btn" id="btnExport">📥 내보내기</button>
+      <button class="action-icon-btn" id="btnSettings">⚙️ 설정</button>
     </div>
   </div>
 
   <h1 class="screen-title">📊 품질 관리 대시보드</h1>
-  <p class="screen-subtitle">AX 시스템 운영 현황 한눈에 보기</p>
+  <p class="screen-subtitle">AX 시스템 운영 현황 - 클릭하여 상세 정보 확인</p>
 
-  <!-- KPI 카드 -->
-  <div class="section-title">📈 핵심 지표</div>
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-icon">📚</div>
-      <div class="kpi-label">총 학습 데이터</div>
-      <div class="kpi-value">1,248<span class="kpi-unit">개</span></div>
-      <div class="kpi-trend up">▲ 전주 대비 +84개</div>
+  <!-- 탭 + 기간 필터 -->
+  <div class="dash-controls">
+    <div class="dash-tabs">
+      <button class="tab active" data-tab="summary">📈 요약</button>
+      <button class="tab" data-tab="channel">🔗 6채널 상세</button>
+      <button class="tab" data-tab="user">👥 사용자</button>
+      <button class="tab" data-tab="system">⚙️ 시스템</button>
+      <button class="tab" data-tab="data">📋 데이터</button>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">✅</div>
-      <div class="kpi-label">A 등급 비율</div>
-      <div class="kpi-value">78<span class="kpi-unit">%</span></div>
-      <div class="kpi-trend up">▲ 전주 대비 +5%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">⚡</div>
-      <div class="kpi-label">평균 응답 시간</div>
-      <div class="kpi-value">0.82<span class="kpi-unit">초</span></div>
-      <div class="kpi-trend up">▼ 전주 대비 -0.18초</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">👥</div>
-      <div class="kpi-label">일일 사용자</div>
-      <div class="kpi-value">28<span class="kpi-unit">명</span></div>
-      <div class="kpi-trend up">▲ 전주 대비 +12%</div>
+    <div class="period-filter">
+      <button class="period" data-period="today">오늘</button>
+      <button class="period active" data-period="7d">7일</button>
+      <button class="period" data-period="30d">30일</button>
+      <button class="period" data-period="90d">90일</button>
     </div>
   </div>
 
-  <!-- 차트 행 1: 6채널 분포 + 등급 비율 -->
-  <div class="section-title">🔗 5W1H 6채널 품질 분포</div>
-  <div class="chart-row">
-    <!-- 6채널 등급 분포 -->
-    <div class="chart-card">
-      <div class="chart-card-title">채널별 A/B/C 등급 분포</div>
-      <div class="bar-chart" id="channelBarChart"></div>
-      <div class="bar-legend">
-        <div class="legend-item"><span class="legend-dot a"></span>A 등급</div>
-        <div class="legend-item"><span class="legend-dot b"></span>B 등급</div>
-        <div class="legend-item"><span class="legend-dot c"></span>C 등급</div>
+  <!-- 탭 1: 요약 -->
+  <div class="tab-panel active" id="panelSummary">
+
+    <div class="section-title">📈 핵심 지표 (클릭 → 상세 분석)</div>
+    <div class="kpi-grid">
+      <div class="kpi-card" data-kpi="data">
+        <div class="kpi-icon">📚</div>
+        <div class="kpi-label">총 학습 데이터</div>
+        <div class="kpi-value">1,248<span class="kpi-unit">개</span></div>
+        <div class="kpi-trend">▲ 전주 대비 +84개</div>
+      </div>
+      <div class="kpi-card" data-kpi="grade">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-label">A 등급 비율</div>
+        <div class="kpi-value">78<span class="kpi-unit">%</span></div>
+        <div class="kpi-trend">▲ 전주 대비 +5%</div>
+      </div>
+      <div class="kpi-card" data-kpi="response">
+        <div class="kpi-icon">⚡</div>
+        <div class="kpi-label">평균 응답 시간</div>
+        <div class="kpi-value">0.82<span class="kpi-unit">초</span></div>
+        <div class="kpi-trend">▼ 전주 대비 -0.18초</div>
+      </div>
+      <div class="kpi-card" data-kpi="users">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-label">일일 사용자</div>
+        <div class="kpi-value">28<span class="kpi-unit">명</span></div>
+        <div class="kpi-trend">▲ 전주 대비 +12%</div>
       </div>
     </div>
 
-    <!-- 등급 비율 도넛 -->
-    <div class="chart-card">
-      <div class="chart-card-title">전체 등급 비율</div>
-      <div class="donut-wrap" style="position:relative;">
-        <svg class="donut-svg" width="160" height="160" viewBox="0 0 160 160">
-          <!-- 배경 원 -->
-          <circle cx="80" cy="80" r="60" fill="none" stroke="#f0f0f0" stroke-width="28"/>
-          <!-- A 등급 70% -->
-          <circle cx="80" cy="80" r="60" fill="none" stroke="#1A237E" stroke-width="28"
-                  stroke-dasharray="263.76 376.8" transform="rotate(-90 80 80)"/>
-          <!-- B 등급 22% (시작점 70% = 263.76) -->
-          <circle cx="80" cy="80" r="60" fill="none" stroke="#b8860b" stroke-width="28"
-                  stroke-dasharray="82.9 376.8" stroke-dashoffset="-263.76"
-                  transform="rotate(-90 80 80)"/>
-          <!-- C 등급 8% -->
-          <circle cx="80" cy="80" r="60" fill="none" stroke="#7B1F2A" stroke-width="28"
-                  stroke-dasharray="30.14 376.8" stroke-dashoffset="-346.66"
-                  transform="rotate(-90 80 80)"/>
-          <!-- 중앙 텍스트 -->
-          <text x="80" y="78" text-anchor="middle" fill="#1A237E"
-                font-size="32" font-weight="900" font-family="Noto Sans KR">78%</text>
-          <text x="80" y="98" text-anchor="middle" fill="#000000"
-                font-size="11" font-weight="700" font-family="Noto Sans KR">A 등급</text>
-        </svg>
-        <div class="donut-stats">
-          <div class="donut-stat-row">
-            <span class="donut-stat-dot" style="background:#1A237E;"></span>
-            <span class="donut-stat-label">A 등급</span>
-            <span class="donut-stat-value">974개 (78%)</span>
-          </div>
-          <div class="donut-stat-row">
-            <span class="donut-stat-dot" style="background:#b8860b;"></span>
-            <span class="donut-stat-label">B 등급</span>
-            <span class="donut-stat-value">175개 (14%)</span>
-          </div>
-          <div class="donut-stat-row">
-            <span class="donut-stat-dot" style="background:#7B1F2A;"></span>
-            <span class="donut-stat-label">C 등급</span>
-            <span class="donut-stat-value">99개 (8%)</span>
+    <div class="section-title">🔗 5W1H 6채널 품질 분포 (막대 클릭 → 채널 상세)</div>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-card-title">
+          채널별 A/B/C 등급 분포
+          <span class="chart-hint">막대 클릭 시 상세 보기</span>
+        </div>
+        <div class="bar-chart" id="channelBarChart"></div>
+        <div class="bar-legend">
+          <div class="legend-item"><span class="legend-dot a"></span>A 등급</div>
+          <div class="legend-item"><span class="legend-dot b"></span>B 등급</div>
+          <div class="legend-item"><span class="legend-dot c"></span>C 등급</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-title">전체 등급 비율</div>
+        <div class="donut-wrap">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#f0f0f0" stroke-width="28"/>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#1A237E" stroke-width="28"
+                    stroke-dasharray="263.76 376.8" transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#b8860b" stroke-width="28"
+                    stroke-dasharray="82.9 376.8" stroke-dashoffset="-263.76" transform="rotate(-90 80 80)"/>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#7B1F2A" stroke-width="28"
+                    stroke-dasharray="30.14 376.8" stroke-dashoffset="-346.66" transform="rotate(-90 80 80)"/>
+            <text x="80" y="78" text-anchor="middle" fill="#1A237E" font-size="32" font-weight="900" font-family="Noto Sans KR">78%</text>
+            <text x="80" y="98" text-anchor="middle" fill="#000000" font-size="11" font-weight="700" font-family="Noto Sans KR">A 등급</text>
+          </svg>
+          <div class="donut-stats">
+            <div class="donut-stat-row" data-grade="A">
+              <span class="donut-stat-dot" style="background:#1A237E;"></span>
+              <span class="donut-stat-label">A 등급</span>
+              <span class="donut-stat-value">974개</span>
+            </div>
+            <div class="donut-stat-row" data-grade="B">
+              <span class="donut-stat-dot" style="background:#b8860b;"></span>
+              <span class="donut-stat-label">B 등급</span>
+              <span class="donut-stat-value">175개</span>
+            </div>
+            <div class="donut-stat-row" data-grade="C">
+              <span class="donut-stat-dot" style="background:#7B1F2A;"></span>
+              <span class="donut-stat-label">C 등급</span>
+              <span class="donut-stat-value">99개</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- 차트 행 2: 일별 추이 + 카테고리 -->
-  <div class="section-title">📅 처리 추이 및 분야별 분포</div>
-  <div class="chart-row half">
-    <!-- 일별 추이 라인 -->
-    <div class="chart-card">
-      <div class="chart-card-title">최근 7일 처리량 추이</div>
-      <div class="line-chart-wrap">
+    <div class="section-title">📅 처리 추이 및 분야별 분포</div>
+    <div class="chart-row half">
+      <div class="chart-card">
+        <div class="chart-card-title">최근 7일 처리량 추이</div>
         <svg class="line-svg" viewBox="0 0 600 200" preserveAspectRatio="none">
-          <!-- 격자선 -->
-          <line x1="0" y1="40"  x2="600" y2="40"  stroke="#f0f0f0" stroke-width="1"/>
-          <line x1="0" y1="80"  x2="600" y2="80"  stroke="#f0f0f0" stroke-width="1"/>
+          <line x1="0" y1="40" x2="600" y2="40" stroke="#f0f0f0" stroke-width="1"/>
+          <line x1="0" y1="80" x2="600" y2="80" stroke="#f0f0f0" stroke-width="1"/>
           <line x1="0" y1="120" x2="600" y2="120" stroke="#f0f0f0" stroke-width="1"/>
           <line x1="0" y1="160" x2="600" y2="160" stroke="#f0f0f0" stroke-width="1"/>
-
-          <!-- Y축 레이블 -->
-          <text x="6" y="44"  fill="#888" font-size="10" font-family="Noto Sans KR">200</text>
-          <text x="6" y="84"  fill="#888" font-size="10" font-family="Noto Sans KR">150</text>
-          <text x="6" y="124" fill="#888" font-size="10" font-family="Noto Sans KR">100</text>
-          <text x="6" y="164" fill="#888" font-size="10" font-family="Noto Sans KR">50</text>
-
-          <!-- 라인 (값: 120, 145, 132, 158, 142, 168, 175 / 200 max) -->
-          <!-- y = 200 - (val/200 * 160) -->
-          <!-- 120→104, 145→84, 132→94, 158→73.6, 142→86.4, 168→65.6, 175→60 -->
+          <text x="6" y="44" fill="#888" font-size="10">200</text>
+          <text x="6" y="84" fill="#888" font-size="10">150</text>
+          <text x="6" y="124" fill="#888" font-size="10">100</text>
+          <text x="6" y="164" fill="#888" font-size="10">50</text>
           <polyline points="50,104 140,84 230,94 320,73.6 410,86.4 500,65.6 580,60"
                     fill="none" stroke="#7B1F2A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-
-          <!-- 영역 채우기 -->
           <polygon points="50,104 140,84 230,94 320,73.6 410,86.4 500,65.6 580,60 580,180 50,180"
                    fill="rgba(123, 31, 42, 0.1)"/>
-
-          <!-- 점 + 값 라벨 -->
-          <circle cx="50"  cy="104"  r="5" fill="#7B1F2A"/>
-          <circle cx="140" cy="84"   r="5" fill="#7B1F2A"/>
-          <circle cx="230" cy="94"   r="5" fill="#7B1F2A"/>
+          <circle cx="50" cy="104" r="5" fill="#7B1F2A"/>
+          <circle cx="140" cy="84" r="5" fill="#7B1F2A"/>
+          <circle cx="230" cy="94" r="5" fill="#7B1F2A"/>
           <circle cx="320" cy="73.6" r="5" fill="#7B1F2A"/>
           <circle cx="410" cy="86.4" r="5" fill="#7B1F2A"/>
           <circle cx="500" cy="65.6" r="5" fill="#7B1F2A"/>
-          <circle cx="580" cy="60"   r="6" fill="#1A237E" stroke="#ffffff" stroke-width="2"/>
-
-          <text x="50"  y="94"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">120</text>
-          <text x="140" y="74"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">145</text>
-          <text x="230" y="84"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">132</text>
-          <text x="320" y="63"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">158</text>
-          <text x="410" y="76"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">142</text>
-          <text x="500" y="55"  text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900" font-family="Noto Sans KR">168</text>
-          <text x="580" y="48"  text-anchor="middle" fill="#7B1F2A" font-size="13" font-weight="900" font-family="Noto Sans KR">175</text>
+          <circle cx="580" cy="60" r="6" fill="#1A237E" stroke="#ffffff" stroke-width="2"/>
+          <text x="50" y="94" text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900">120</text>
+          <text x="140" y="74" text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900">145</text>
+          <text x="230" y="84" text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900">132</text>
+          <text x="320" y="63" text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900">158</text>
+          <text x="410" y="76" text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900">142</text>
+          <text x="500" y="55" text-anchor="middle" fill="#1A237E" font-size="11" font-weight="900">168</text>
+          <text x="580" y="48" text-anchor="middle" fill="#7B1F2A" font-size="13" font-weight="900">175</text>
         </svg>
         <div class="line-x-labels">
-          <span>5/02</span>
-          <span>5/03</span>
-          <span>5/04</span>
-          <span>5/05</span>
-          <span>5/06</span>
-          <span>5/07</span>
-          <span>5/08</span>
+          <span>5/02</span><span>5/03</span><span>5/04</span><span>5/05</span><span>5/06</span><span>5/07</span><span>5/08</span>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-title">분야별 데이터 분포</div>
+        <div class="bar-chart" id="categoryBarChart"></div>
+      </div>
+    </div>
+
+    <div class="section-title">📋 최근 활동 (행 클릭 → 상세)</div>
+    <div class="activity-log" id="activityLog"></div>
+
+    <div class="section-title">🔔 알림 및 이슈 (액션 가능)</div>
+    <div class="alerts-grid">
+      <div class="alert-card warning">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-title">C 등급 1건 보완 필요</div>
+        <div class="alert-msg">
+          품질 부적합 사례 (2026Q1) 보완 권장.
+          자동 보완 모드로 즉시 처리 가능합니다.
+        </div>
+        <button class="alert-action" data-alert="fix">▶ 지금 보완 실행</button>
+      </div>
+      <div class="alert-card success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-title">시스템 정상 운영</div>
+        <div class="alert-msg">
+          모든 6모듈 정상 작동 중. 평균 응답 0.82초로 안정적.
+        </div>
+        <button class="alert-action" data-alert="view">📊 상태 확인</button>
+      </div>
+      <div class="alert-card info">
+        <div class="alert-icon">📈</div>
+        <div class="alert-title">사용량 12% 증가</div>
+        <div class="alert-msg">
+          일일 검색·질의응답 횟수가 전주 대비 증가했습니다.
+        </div>
+        <button class="alert-action" data-alert="trend">📉 추이 분석</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 2: 6채널 상세 -->
+  <div class="tab-panel" id="panelChannel">
+    <div class="section-title">🔗 5W1H 6채널 상세 분석 (카드 클릭 → 보완 작업)</div>
+    <div class="channel-detail-grid" id="channelDetailGrid"></div>
+  </div>
+
+  <!-- 탭 3: 사용자 -->
+  <div class="tab-panel" id="panelUser">
+    <div class="section-title">👥 사용자 활동 현황</div>
+    <div class="user-list">
+      <div class="user-row header">
+        <div></div>
+        <div>사용자 ID</div>
+        <div>이름</div>
+        <div>활동량</div>
+        <div>상태</div>
+        <div>마지막 접속</div>
+      </div>
+      <div class="user-row" data-user="AX-00000">
+        <div class="user-avatar">배</div>
+        <div class="user-id">AX-00000</div>
+        <div class="user-name">배종옥 (관리자)</div>
+        <div>248회</div>
+        <div><span class="user-status active">활성</span></div>
+        <div>방금 전</div>
+      </div>
+      <div class="user-row" data-user="AX-00001">
+        <div class="user-avatar">김</div>
+        <div class="user-id">AX-00001</div>
+        <div class="user-name">김민수 (안전팀)</div>
+        <div>156회</div>
+        <div><span class="user-status active">활성</span></div>
+        <div>2분 전</div>
+      </div>
+      <div class="user-row" data-user="AX-00002">
+        <div class="user-avatar">이</div>
+        <div class="user-id">AX-00002</div>
+        <div class="user-name">이영희 (품질팀)</div>
+        <div>132회</div>
+        <div><span class="user-status active">활성</span></div>
+        <div>15분 전</div>
+      </div>
+      <div class="user-row" data-user="AX-00003">
+        <div class="user-avatar">박</div>
+        <div class="user-id">AX-00003</div>
+        <div class="user-name">박철수 (생산팀)</div>
+        <div>87회</div>
+        <div><span class="user-status idle">대기</span></div>
+        <div>1시간 전</div>
+      </div>
+      <div class="user-row" data-user="AX-00004">
+        <div class="user-avatar">정</div>
+        <div class="user-id">AX-00004</div>
+        <div class="user-name">정수진 (설비팀)</div>
+        <div>64회</div>
+        <div><span class="user-status idle">대기</span></div>
+        <div>3시간 전</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 4: 시스템 -->
+  <div class="tab-panel" id="panelSystem">
+    <div class="section-title">⚙️ 시스템 자원 및 모듈 상태</div>
+    <div class="system-grid">
+      <div class="system-card">
+        <div class="chart-card-title">시스템 자원 사용량</div>
+        <div class="resource-row">
+          <div class="resource-header"><span>💻 CPU</span><span class="resource-pct">32%</span></div>
+          <div class="resource-bar"><div class="resource-fill" style="width:32%"></div></div>
+        </div>
+        <div class="resource-row">
+          <div class="resource-header"><span>🧠 메모리</span><span class="resource-pct">58%</span></div>
+          <div class="resource-bar"><div class="resource-fill" style="width:58%"></div></div>
+        </div>
+        <div class="resource-row">
+          <div class="resource-header"><span>💾 저장소</span><span class="resource-pct">24%</span></div>
+          <div class="resource-bar"><div class="resource-fill" style="width:24%"></div></div>
+        </div>
+        <div class="resource-row">
+          <div class="resource-header"><span>🌐 네트워크</span><span class="resource-pct">12%</span></div>
+          <div class="resource-bar"><div class="resource-fill" style="width:12%"></div></div>
+        </div>
+      </div>
+
+      <div class="system-card">
+        <div class="chart-card-title">6모듈 상태</div>
+        <div class="module-list">
+          <div class="module-row"><span class="module-icon">🗄️</span><span class="module-name">저장소 시스템</span><span class="module-status">✓ 정상</span></div>
+          <div class="module-row"><span class="module-icon">🔍</span><span class="module-name">검색 엔진</span><span class="module-status">✓ 정상</span></div>
+          <div class="module-row"><span class="module-icon">💬</span><span class="module-name">AI 질의응답</span><span class="module-status">✓ 정상</span></div>
+          <div class="module-row"><span class="module-icon">📊</span><span class="module-name">대시보드</span><span class="module-status">✓ 정상</span></div>
+          <div class="module-row"><span class="module-icon">📑</span><span class="module-name">보고서 생성</span><span class="module-status">✓ 정상</span></div>
+          <div class="module-row"><span class="module-icon">📈</span><span class="module-name">통계 분석</span><span class="module-status">✓ 정상</span></div>
         </div>
       </div>
     </div>
-
-    <!-- 카테고리별 -->
-    <div class="chart-card">
-      <div class="chart-card-title">분야별 데이터 분포</div>
-      <div class="bar-chart" id="categoryBarChart"></div>
-    </div>
   </div>
 
-  <!-- 활동 로그 -->
-  <div class="section-title">📋 최근 활동 로그</div>
-  <div class="activity-log" id="activityLog"></div>
-
-  <!-- 알림 -->
-  <div class="section-title">🔔 알림 및 이슈</div>
-  <div class="alerts-grid">
-    <div class="alert-card warning">
-      <div class="alert-icon">⚠️</div>
-      <div class="alert-title">C 등급 1건 보완 필요</div>
-      <div class="alert-msg">
-        품질 부적합 사례 분석 (2026Q1) 채널 보완 권장.
-        보완 모드 실행 시 자동 개선 가능합니다.
-      </div>
+  <!-- 탭 5: 데이터 -->
+  <div class="tab-panel" id="panelData">
+    <div class="section-title">📋 데이터 관리</div>
+    <div class="data-toolbar">
+      <input type="text" class="data-search" id="dataSearch" placeholder="데이터 검색 (제목, 출처)">
+      <button class="data-filter-btn" data-grade-filter="all">전체</button>
+      <button class="data-filter-btn" data-grade-filter="A">A 등급</button>
+      <button class="data-filter-btn" data-grade-filter="B">B 등급</button>
+      <button class="data-filter-btn" data-grade-filter="C">C 등급</button>
     </div>
-    <div class="alert-card success">
-      <div class="alert-icon">✅</div>
-      <div class="alert-title">시스템 정상 운영</div>
-      <div class="alert-msg">
-        모든 6모듈 정상 작동 중입니다.
-        평균 응답 0.82초로 안정적 성능 유지 중.
-      </div>
-    </div>
-    <div class="alert-card info">
-      <div class="alert-icon">📈</div>
-      <div class="alert-title">사용량 증가</div>
-      <div class="alert-msg">
-        일일 검색·질의응답 횟수가 전주 대비 12% 증가했습니다.
-        시스템 활용도 상승 중.
-      </div>
-    </div>
+    <div class="data-table" id="dataTable"></div>
   </div>
 
-  <!-- 하단 화면 이동 -->
+  <!-- 하단 -->
   <div class="bottom-actions">
-    <button class="bottom-btn" data-nav="search">
-      <span class="bottom-btn-icon">🔍</span>검색
-    </button>
-    <button class="bottom-btn" data-nav="qa">
-      <span class="bottom-btn-icon">💬</span>AI 질의응답
-    </button>
-    <button class="bottom-btn current">
-      <span class="bottom-btn-icon">📊</span>대시보드 (현재)
-    </button>
-    <button class="bottom-btn" data-nav="report">
-      <span class="bottom-btn-icon">📑</span>보고서
-    </button>
+    <button class="bottom-btn" data-nav="search"><span class="bottom-btn-icon">🔍</span>검색</button>
+    <button class="bottom-btn" data-nav="qa"><span class="bottom-btn-icon">💬</span>AI 질의응답</button>
+    <button class="bottom-btn current"><span class="bottom-btn-icon">📊</span>대시보드 (현재)</button>
+    <button class="bottom-btn" data-nav="report"><span class="bottom-btn-icon">📑</span>보고서</button>
   </div>
 
 </section>
 
 <div class="file-types-bar">
-  <span class="label">실시간 모니터링 · 6채널 품질 추적 · 시계열 분석 · 자동 알림</span>
+  <span class="label">실시간 모니터링 · 5개 탭 메뉴 · 클릭 드릴다운 · 액션 버튼 · 기간 필터</span>
+</div>
+
+<!-- 모달 -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">제목</h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
 </div>
 
 <script>
 const CHANNELS = [
-  { key: 'why',   label: 'Why',   ko: '왜' },
-  { key: 'what',  label: 'What',  ko: '무엇' },
-  { key: 'when',  label: 'When',  ko: '언제' },
-  { key: 'where', label: 'Where', ko: '어디' },
-  { key: 'who',   label: 'Who',   ko: '누가' },
-  { key: 'how',   label: 'How',   ko: '어떻게' }
+  { key: 'why', label: 'Why', ko: '왜', icon: '🎯' },
+  { key: 'what', label: 'What', ko: '무엇', icon: '📋' },
+  { key: 'when', label: 'When', ko: '언제', icon: '⏰' },
+  { key: 'where', label: 'Where', ko: '어디', icon: '📍' },
+  { key: 'who', label: 'Who', ko: '누가', icon: '👤' },
+  { key: 'how', label: 'How', ko: '어떻게', icon: '🔧' }
 ];
 
-// 6채널 등급 분포 데이터 (총 1248개 기준 × 6채널)
 const CHANNEL_GRADES = {
-  why:   { a: 230, b: 12, c: 0,   total: 242 },
-  what:  { a: 240, b: 8,  c: 0,   total: 248 },
-  when:  { a: 195, b: 38, c: 9,   total: 242 },
-  where: { a: 220, b: 18, c: 4,   total: 242 },
-  who:   { a: 168, b: 52, c: 22,  total: 242 },
-  how:   { a: 215, b: 22, c: 5,   total: 242 }
+  why: { a: 230, b: 12, c: 0, total: 242 },
+  what: { a: 240, b: 8, c: 0, total: 248 },
+  when: { a: 195, b: 38, c: 9, total: 242 },
+  where: { a: 220, b: 18, c: 4, total: 242 },
+  who: { a: 168, b: 52, c: 22, total: 242 },
+  how: { a: 215, b: 22, c: 5, total: 242 }
 };
 
-// 카테고리별 데이터
 const CATEGORIES = [
-  { name: '안전 관리',   count: 380, color: '#1A237E' },
-  { name: '품질 관리',   count: 312, color: '#1A237E' },
-  { name: '설비 관리',   count: 198, color: '#1A237E' },
-  { name: '응급 대응',   count: 142, color: '#1A237E' },
-  { name: '교육·훈련',   count: 128, color: '#1A237E' },
-  { name: '기타',        count: 88,  color: '#1A237E' }
+  { name: '안전 관리', count: 380 },
+  { name: '품질 관리', count: 312 },
+  { name: '설비 관리', count: 198 },
+  { name: '응급 대응', count: 142 },
+  { name: '교육·훈련', count: 128 },
+  { name: '기타', count: 88 }
 ];
 
-// 활동 로그
 const ACTIVITIES = [
-  { time: '09:18', icon: '🔍', text: '<strong>품질관리</strong> 검색 - 1건 매칭',           tag: '검색' },
-  { time: '09:15', icon: '💬', text: '<strong>화재 대피 방법</strong> 질의응답',              tag: '질의응답' },
-  { time: '09:10', icon: '📑', text: '<strong>주간 안전 보고서</strong> 자동 생성 완료',      tag: '보고서' },
-  { time: '09:05', icon: '📚', text: '신규 매뉴얼 <strong>3건 학습</strong> 완료',           tag: '학습' },
-  { time: '09:00', icon: '🚀', text: '<strong>시스템 시작</strong> - 모든 모듈 정상',         tag: '시스템' },
-  { time: '08:45', icon: '🔧', text: '<strong>설비 점검</strong> 데이터 자동 분류',          tag: '구조화' },
-  { time: '08:30', icon: '✅', text: '<strong>품질 평가</strong> 정기 실행 - 78% A 등급',     tag: '평가' },
-  { time: '08:00', icon: '🤖', text: '자동 보완 <strong>2회 실행</strong> 완료',             tag: '보완' }
+  { time: '09:18', icon: '🔍', text: '<strong>품질관리</strong> 검색 - 1건 매칭', tag: '검색' },
+  { time: '09:15', icon: '💬', text: '<strong>화재 대피 방법</strong> 질의응답', tag: '질의응답' },
+  { time: '09:10', icon: '📑', text: '<strong>주간 안전 보고서</strong> 자동 생성', tag: '보고서' },
+  { time: '09:05', icon: '📚', text: '신규 매뉴얼 <strong>3건</strong> 학습 완료', tag: '학습' },
+  { time: '09:00', icon: '🚀', text: '<strong>시스템 시작</strong> - 모든 모듈 정상', tag: '시스템' },
+  { time: '08:45', icon: '🔧', text: '<strong>설비 점검</strong> 데이터 자동 분류', tag: '구조화' },
+  { time: '08:30', icon: '✅', text: '<strong>품질 평가</strong> 정기 실행 - 78% A', tag: '평가' },
+  { time: '08:00', icon: '🤖', text: '자동 보완 <strong>2회</strong> 실행 완료', tag: '보완' }
 ];
 
-// ============================================
-// 6채널 등급 분포 차트
-// ============================================
+const SAMPLE_DATA = [
+  { id: 'doc-001', title: '화재 발생시 대피 경로 안내', grade: 'A', source: '안전관리매뉴얼_v3.pdf', date: '2026-04-15' },
+  { id: 'doc-002', title: '제조 공정 품질 점검 절차', grade: 'A', source: '품질관리지침_v2.docx', date: '2026-04-08' },
+  { id: 'doc-003', title: '작업장 안전 수칙', grade: 'A', source: '안전수칙고시_v1.pdf', date: '2026-03-22' },
+  { id: 'doc-004', title: '화학물질 취급 절차', grade: 'B', source: '화학물질매뉴얼.pdf', date: '2026-03-15' },
+  { id: 'doc-005', title: '응급 상황 대응 매뉴얼', grade: 'A', source: '응급대응매뉴얼.pdf', date: '2026-03-01' },
+  { id: 'doc-006', title: '설비 정기 점검 일지', grade: 'A', source: '설비점검일지_2026Q1.xlsx', date: '2026-02-28' },
+  { id: 'doc-007', title: '비상 대응 훈련 결과', grade: 'B', source: '훈련결과보고서.docx', date: '2026-04-22' },
+  { id: 'doc-008', title: '안전 교육 이수 현황', grade: 'B', source: '교육이수현황_2026Q1.xlsx', date: '2026-03-31' },
+  { id: 'doc-009', title: '품질 부적합 사례 분석', grade: 'C', source: '부적합분석_2026Q1.docx', date: '2026-04-05' },
+  { id: 'doc-010', title: '협력사 안전 점검 결과', grade: 'A', source: '협력사점검_2026Apr.pdf', date: '2026-04-18' }
+];
+
+// 탭 전환
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('panel' + capitalize(tab.dataset.tab));
+    if (panel) panel.classList.add('active');
+  });
+});
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// 기간 필터
+document.querySelectorAll('.period').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.period').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    const labels = { 'today': '오늘', '7d': '최근 7일', '30d': '최근 30일', '90d': '최근 90일' };
+    showSimpleAlert('📅 기간 변경', '<p>기간 필터: <strong>' + labels[p.dataset.period] + '</strong></p><p>해당 기간의 데이터로 차트와 통계가 갱신됩니다.</p>');
+  });
+});
+
+// 액션 버튼
+document.getElementById('btnRefresh').addEventListener('click', () => {
+  showSimpleAlert('🔄 새로고침', '<p>대시보드 데이터를 갱신합니다...</p><p>최신 통계와 활동 로그가 다시 불러와집니다.</p>');
+  setTimeout(updateTime, 500);
+});
+
+document.getElementById('btnExport').addEventListener('click', () => {
+  showModal('📥 내보내기', '<p>현재 대시보드를 어떤 형식으로 내보내시겠습니까?</p>',
+    [
+      { label: 'PDF 보고서', primary: true, action: () => alert('📄 PDF 보고서가 생성됩니다.\n시스템: AX-2026-0508\n기간: 최근 7일') },
+      { label: 'Excel 데이터', action: () => alert('📊 Excel 데이터가 생성됩니다.') },
+      { label: 'CSV 원본', action: () => alert('📑 CSV 원본 데이터가 생성됩니다.') }
+    ]);
+});
+
+document.getElementById('btnSettings').addEventListener('click', () => {
+  showSimpleAlert('⚙️ 설정', '<p>대시보드 환경설정 화면입니다.</p><ul style="margin-left:20px;"><li>알림 환경설정</li><li>차트 표시 옵션</li><li>자동 갱신 주기</li><li>접근 권한 관리</li></ul>');
+});
+
+// KPI 카드 클릭
+document.querySelectorAll('.kpi-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const kpi = card.dataset.kpi;
+    const details = {
+      'data': {
+        title: '📚 총 학습 데이터 상세',
+        body: '<p>현재 학습된 총 데이터: <strong>1,248개</strong></p>' +
+              '<p>전주 대비 증가: <strong>+84개 (+7.2%)</strong></p>' +
+              '<h4 style="margin-top:16px;color:#1A237E;">분야별 분포</h4>' +
+              '<ul style="margin-left:20px;"><li>안전 관리: 380개</li><li>품질 관리: 312개</li><li>설비 관리: 198개</li><li>응급 대응: 142개</li><li>교육·훈련: 128개</li><li>기타: 88개</li></ul>'
+      },
+      'grade': {
+        title: '✅ A 등급 비율 상세',
+        body: '<p>전체 A 등급 비율: <strong>78%</strong></p>' +
+              '<p>전주 대비 증가: <strong>+5%</strong></p>' +
+              '<h4 style="margin-top:16px;color:#1A237E;">등급별 데이터</h4>' +
+              '<ul style="margin-left:20px;"><li>A 등급: 974개 (78%)</li><li>B 등급: 175개 (14%)</li><li>C 등급: 99개 (8%)</li></ul>' +
+              '<p style="margin-top:12px;">증가 원인: <strong>2차·3차 자동 보완</strong>으로 B/C 등급이 A로 개선됨</p>'
+      },
+      'response': {
+        title: '⚡ 평균 응답 시간 상세',
+        body: '<p>평균 응답 시간: <strong>0.82초</strong></p>' +
+              '<p>전주 대비 개선: <strong>-0.18초</strong></p>' +
+              '<h4 style="margin-top:16px;color:#1A237E;">유형별 응답</h4>' +
+              '<ul style="margin-left:20px;"><li>검색: 0.65초</li><li>질의응답: 1.12초</li><li>보고서 생성: 2.34초</li></ul>' +
+              '<p style="margin-top:12px;">개선 요인: <strong>인덱스 최적화 + 캐시 적용</strong></p>'
+      },
+      'users': {
+        title: '👥 일일 사용자 상세',
+        body: '<p>오늘 일일 사용자: <strong>28명</strong></p>' +
+              '<p>전주 대비 증가: <strong>+12% (+3명)</strong></p>' +
+              '<h4 style="margin-top:16px;color:#1A237E;">활동 분포</h4>' +
+              '<ul style="margin-left:20px;"><li>활성 사용자: 18명 (방금~5분 이내)</li><li>최근 사용자: 7명 (1시간 이내)</li><li>대기 중: 3명 (3시간 이상)</li></ul>'
+      }
+    };
+    const d = details[kpi];
+    if (d) showSimpleAlert(d.title, d.body);
+  });
+});
+
+// 6채널 막대 클릭
 function renderChannelChart() {
   const el = document.getElementById('channelBarChart');
   let html = '';
@@ -619,48 +1159,50 @@ function renderChannelChart() {
     const aPct = (g.a / g.total) * 100;
     const bPct = (g.b / g.total) * 100;
     const cPct = (g.c / g.total) * 100;
-
-    html += '<div class="bar-row">';
+    html += '<div class="bar-row" data-ch="' + ch.key + '">';
     html += '<div class="bar-label">' + ch.label + ' (' + ch.ko + ')</div>';
     html += '<div class="bar-track">';
-    html += '<div class="bar-segment a" style="width:' + aPct + '%;" title="A: ' + g.a + '"></div>';
-    html += '<div class="bar-segment b" style="width:' + bPct + '%;" title="B: ' + g.b + '"></div>';
-    html += '<div class="bar-segment c" style="width:' + cPct + '%;" title="C: ' + g.c + '"></div>';
+    html += '<div class="bar-segment a" style="width:' + aPct + '%;"></div>';
+    html += '<div class="bar-segment b" style="width:' + bPct + '%;"></div>';
+    html += '<div class="bar-segment c" style="width:' + cPct + '%;"></div>';
     html += '</div>';
     html += '<div class="bar-value">' + g.total + '</div>';
     html += '</div>';
   });
   el.innerHTML = html;
+  el.querySelectorAll('.bar-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const chKey = row.dataset.ch;
+      const ch = CHANNELS.find(c => c.key === chKey);
+      const g = CHANNEL_GRADES[chKey];
+      showSimpleAlert(ch.icon + ' ' + ch.label + ' (' + ch.ko + ') 채널 상세',
+        '<p>총 데이터: <strong>' + g.total + '개</strong></p>' +
+        '<ul style="margin-left:20px;"><li>A 등급: ' + g.a + '개 (' + ((g.a/g.total)*100).toFixed(1) + '%)</li><li>B 등급: ' + g.b + '개 (' + ((g.b/g.total)*100).toFixed(1) + '%)</li><li>C 등급: ' + g.c + '개 (' + ((g.c/g.total)*100).toFixed(1) + '%)</li></ul>' +
+        (g.b + g.c > 0 ? '<p style="margin-top:12px;color:#7B1F2A;font-weight:900;">⚠️ 미흡 항목 ' + (g.b + g.c) + '개 - 보완 권장</p>' : ''));
+    });
+  });
 }
 
-// ============================================
-// 카테고리 분포 차트
-// ============================================
 function renderCategoryChart() {
   const el = document.getElementById('categoryBarChart');
   const max = Math.max.apply(null, CATEGORIES.map(c => c.count));
   let html = '';
   CATEGORIES.forEach(cat => {
     const pct = (cat.count / max) * 100;
-    html += '<div class="bar-row">';
+    html += '<div class="bar-row" data-cat="' + cat.name + '">';
     html += '<div class="bar-label">' + cat.name + '</div>';
-    html += '<div class="bar-track">';
-    html += '<div class="bar-segment solid" style="width:' + pct + '%;"></div>';
-    html += '</div>';
+    html += '<div class="bar-track"><div class="bar-segment solid" style="width:' + pct + '%;"></div></div>';
     html += '<div class="bar-value">' + cat.count + '</div>';
     html += '</div>';
   });
   el.innerHTML = html;
 }
 
-// ============================================
-// 활동 로그 렌더
-// ============================================
 function renderActivityLog() {
   const el = document.getElementById('activityLog');
   let html = '';
-  ACTIVITIES.forEach(a => {
-    html += '<div class="activity-row">';
+  ACTIVITIES.forEach((a, idx) => {
+    html += '<div class="activity-row" data-act="' + idx + '">';
     html += '<div class="activity-time">' + a.time + '</div>';
     html += '<div class="activity-icon">' + a.icon + '</div>';
     html += '<div class="activity-text">' + a.text + '</div>';
@@ -668,15 +1210,199 @@ function renderActivityLog() {
     html += '</div>';
   });
   el.innerHTML = html;
+  el.querySelectorAll('.activity-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const a = ACTIVITIES[row.dataset.act];
+      showSimpleAlert('📋 활동 상세 - ' + a.tag,
+        '<p>시각: <strong>' + a.time + '</strong></p>' +
+        '<p>활동: <strong>' + a.text.replace(/<[^>]+>/g, '') + '</strong></p>' +
+        '<p>분류: <strong>' + a.tag + '</strong></p>' +
+        '<p style="margin-top:12px;color:#555;">상세 로그를 확인하려면 시스템 탭으로 이동하세요.</p>');
+    });
+  });
 }
+
+// 도넛 통계 클릭
+document.querySelectorAll('.donut-stat-row').forEach(row => {
+  row.addEventListener('click', () => {
+    const grade = row.dataset.grade;
+    const counts = { 'A': 974, 'B': 175, 'C': 99 };
+    showSimpleAlert(grade + ' 등급 데이터 상세',
+      '<p>' + grade + ' 등급 데이터: <strong>' + counts[grade] + '개</strong></p>' +
+      (grade === 'C' ? '<p style="color:#7B1F2A;font-weight:900;">⚠️ 보완 권장 항목</p><p>자동 보완으로 처리 가능합니다.</p>' :
+       grade === 'B' ? '<p style="color:#b8860b;font-weight:900;">⚠️ 일부 미흡 항목</p>' :
+       '<p style="color:#1A237E;font-weight:900;">✅ 정상 수준</p>'));
+  });
+});
+
+// 알림 액션
+document.querySelectorAll('.alert-action').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.alert;
+    const actions = {
+      'fix': { title: '🤖 자동 보완 실행', body: '<p>C 등급 1건에 대해 자동 보완을 실행합니다.</p><p>예상 소요: <strong>약 1.5초</strong></p><p>완료 후 자동으로 재평가됩니다.</p>' },
+      'view': { title: '📊 시스템 상태 확인', body: '<p>시스템 탭으로 이동하여 6모듈 상태를 확인할 수 있습니다.</p><p>현재 모든 모듈 <strong>정상 작동</strong> 중입니다.</p>' },
+      'trend': { title: '📉 사용량 추이 분석', body: '<p>최근 30일 사용량 추이:</p><ul style="margin-left:20px;"><li>전월 평균: 132건/일</li><li>이번 주: 148건/일</li><li>오늘: 175건</li></ul><p style="margin-top:12px;">증가 추세 지속 중</p>' }
+    };
+    showSimpleAlert(actions[action].title, actions[action].body);
+  });
+});
+
+// 6채널 상세 탭
+function renderChannelDetailGrid() {
+  const el = document.getElementById('channelDetailGrid');
+  let html = '';
+  CHANNELS.forEach(ch => {
+    const g = CHANNEL_GRADES[ch.key];
+    const aPct = (g.a / g.total) * 100;
+    const bPct = (g.b / g.total) * 100;
+    const cPct = (g.c / g.total) * 100;
+    const dominantGrade = g.b + g.c === 0 ? 'A' : (g.c > 0 ? 'C 잔존' : 'B 잔존');
+    html += '<div class="channel-card" data-ch="' + ch.key + '">';
+    html += '<div class="channel-card-header">';
+    html += '<div class="channel-card-title">' + ch.icon + ' ' + ch.label + ' (' + ch.ko + ')</div>';
+    html += '<div class="channel-card-grade">' + dominantGrade + '</div>';
+    html += '</div>';
+    html += '<div class="channel-mini-bar">';
+    html += '<div class="bar-segment a" style="width:' + aPct + '%;"></div>';
+    html += '<div class="bar-segment b" style="width:' + bPct + '%;"></div>';
+    html += '<div class="bar-segment c" style="width:' + cPct + '%;"></div>';
+    html += '</div>';
+    html += '<div class="channel-card-stats">';
+    html += '<div class="channel-stat"><div class="channel-stat-value">' + g.a + '</div><div class="channel-stat-label">A 등급</div></div>';
+    html += '<div class="channel-stat"><div class="channel-stat-value">' + (g.b + g.c) + '</div><div class="channel-stat-label">미흡 (B+C)</div></div>';
+    html += '</div>';
+    html += '<div class="channel-card-foot">' + ((g.a/g.total)*100).toFixed(1) + '% 정상 · 클릭하여 보완 작업</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.channel-card').forEach(c => {
+    c.addEventListener('click', () => {
+      const ch = CHANNELS.find(x => x.key === c.dataset.ch);
+      const g = CHANNEL_GRADES[c.dataset.ch];
+      const total = g.b + g.c;
+      if (total === 0) {
+        showSimpleAlert('✅ ' + ch.label + ' (' + ch.ko + ') 채널',
+          '<p>모든 데이터 <strong>A 등급</strong>입니다.</p><p>추가 보완이 필요하지 않습니다.</p>');
+      } else {
+        showModal(ch.icon + ' ' + ch.label + ' (' + ch.ko + ') 보완',
+          '<p>미흡 데이터 <strong>' + total + '개</strong> (B: ' + g.b + ', C: ' + g.c + ')</p><p>자동 보완을 실행하시겠습니까?</p>',
+          [
+            { label: '🤖 자동 보완 실행', primary: true, action: () => alert('자동 보완을 시작합니다.\n예상 소요: ' + (total * 0.3).toFixed(1) + '초') },
+            { label: '✍️ 직접 수정', action: () => alert('직접 수정 화면으로 이동합니다.') },
+            { label: '취소', action: () => {} }
+          ]);
+      }
+    });
+  });
+}
+renderChannelDetailGrid();
+
+// 사용자 행 클릭
+document.querySelectorAll('.user-row').forEach(row => {
+  if (row.classList.contains('header')) return;
+  row.addEventListener('click', () => {
+    const id = row.dataset.user;
+    const name = row.querySelector('.user-name').textContent;
+    showSimpleAlert('👤 사용자 상세 - ' + name,
+      '<p>사용자 ID: <strong>' + id + '</strong></p>' +
+      '<p>이름: <strong>' + name + '</strong></p>' +
+      '<p>최근 활동을 확인하거나 권한을 관리할 수 있습니다.</p>');
+  });
+});
+
+// 데이터 탭
+let dataGradeFilter = 'all';
+let dataSearchQuery = '';
+
+function renderDataTable() {
+  const el = document.getElementById('dataTable');
+  let filtered = SAMPLE_DATA.slice();
+  if (dataGradeFilter !== 'all') filtered = filtered.filter(d => d.grade === dataGradeFilter);
+  if (dataSearchQuery.length > 0) {
+    const q = dataSearchQuery.toLowerCase();
+    filtered = filtered.filter(d => d.title.toLowerCase().includes(q) || d.source.toLowerCase().includes(q));
+  }
+
+  let html = '<div class="data-row header">' +
+    '<div></div>' +
+    '<div>제목 / 출처</div>' +
+    '<div>등록일</div>' +
+    '<div>등급</div>' +
+    '<div>작업</div>' +
+    '</div>';
+
+  if (filtered.length === 0) {
+    html += '<div class="empty-state"><div class="empty-icon">🔍</div>일치하는 데이터가 없습니다</div>';
+  } else {
+    filtered.forEach(d => {
+      const gCls = d.grade === 'B' ? 'b' : (d.grade === 'C' ? 'c' : 'a');
+      html += '<div class="data-row" data-id="' + d.id + '">';
+      html += '<input type="checkbox" class="data-checkbox">';
+      html += '<div><div class="data-title">' + d.title + '</div><div class="data-source">' + d.source + '</div></div>';
+      html += '<div>' + d.date + '</div>';
+      html += '<div><span class="data-grade-tag ' + gCls + '">' + d.grade + '</span></div>';
+      html += '<div><button class="action-icon-btn" style="padding:6px 10px;font-size:12px;">상세</button></div>';
+      html += '</div>';
+    });
+  }
+  el.innerHTML = html;
+  el.querySelectorAll('.data-checkbox, .action-icon-btn').forEach(c => {
+    c.addEventListener('click', e => e.stopPropagation());
+  });
+}
+
+document.getElementById('dataSearch').addEventListener('input', e => {
+  dataSearchQuery = e.target.value;
+  renderDataTable();
+});
+
+document.querySelectorAll('.data-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    dataGradeFilter = btn.dataset.gradeFilter;
+    document.querySelectorAll('.data-filter-btn').forEach(b => b.style.background = '');
+    document.querySelectorAll('.data-filter-btn').forEach(b => b.style.color = '');
+    btn.style.background = '#1A237E';
+    btn.style.color = '#ffffff';
+    renderDataTable();
+  });
+});
+
+// 모달
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+const modalActions = document.getElementById('modalActions');
+
+function showSimpleAlert(title, bodyHtml) {
+  showModal(title, bodyHtml, [{ label: '확인', primary: true, action: () => {} }]);
+}
+
+function showModal(title, bodyHtml, actions) {
+  modalTitle.textContent = title;
+  modalBody.innerHTML = bodyHtml;
+  modalActions.innerHTML = '';
+  (actions || []).forEach((a, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-btn' + (a.primary ? ' primary' : '');
+    btn.textContent = a.label;
+    btn.addEventListener('click', () => {
+      modal.classList.remove('show');
+      if (a.action) a.action();
+    });
+    modalActions.appendChild(btn);
+  });
+  modal.classList.add('show');
+}
+
+document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('show'));
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
 
 // 갱신 시각
 function updateTime() {
   const d = new Date();
-  const h = String(d.getHours()).padStart(2, '0');
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const s = String(d.getSeconds()).padStart(2, '0');
-  document.getElementById('updateTime').textContent = h + ':' + m + ':' + s;
+  document.getElementById('updateTime').textContent =
+    String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0');
 }
 
 // 하단 이동
@@ -692,8 +1418,13 @@ document.querySelectorAll('.bottom-btn[data-nav]').forEach(btn => {
 renderChannelChart();
 renderCategoryChart();
 renderActivityLog();
+renderDataTable();
 updateTime();
 setInterval(updateTime, 1000);
+
+// 데이터 필터 버튼 초기 활성화
+document.querySelector('[data-grade-filter="all"]').style.background = '#1A237E';
+document.querySelector('[data-grade-filter="all"]').style.color = '#ffffff';
 </script>
 
 </body>
