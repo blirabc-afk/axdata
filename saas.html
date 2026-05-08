@@ -2,13 +2,13 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 6 v3 - 진짜 PDF/DOCX/PPTX 생성</title>
+<title>saas.html 화면 6 v4 - Word 호환 개선 (html-docx-js)</title>
 
 <!-- 진짜 파일 생성 라이브러리 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
 
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
@@ -166,7 +166,7 @@
 </head>
 <body>
 
-<div class="top-banner">5W1H 6채널 데이터 기반 자동 보고서 - 진짜 PDF/DOCX/PPTX 생성</div>
+<div class="top-banner">진짜 PDF · Word · PowerPoint 자동 생성 (v4 - Word 호환성 개선)</div>
 
 <section class="report-wrapper">
 
@@ -373,7 +373,7 @@ function checkLibraries() {
   if (window.jspdf && window.jspdf.jsPDF) ok.push('PDF'); else missing.push('PDF');
   if (window.html2canvas) ok.push('html2canvas'); else missing.push('html2canvas');
   if (window.PptxGenJS) ok.push('PPTX'); else missing.push('PPTX');
-  if (window.docx) ok.push('DOCX'); else missing.push('DOCX');
+  if (window.htmlDocx) ok.push('DOCX'); else missing.push('DOCX');
 
   if (missing.length === 0) {
     status.textContent = '✅ 모든 라이브러리 로드 완료';
@@ -631,193 +631,128 @@ async function generatePDFBlob() {
 }
 
 // ============================================
-// [핵심] 진짜 DOCX 생성 - docx 라이브러리
+// [v4 NEW] DOCX 생성 - html-docx-js (HTML→DOCX 변환)
 // ============================================
-async function generateDOCXBlob() {
-  const d = window.docx;
+function generateDOCXBlob() {
   const tpl = TEMPLATES[selectedTemplate];
+  let body = '';
 
-  const children = [];
+  // 표지
+  body += '<div style="text-align:center;margin-bottom:30px;border-bottom:3px solid #1A237E;padding-bottom:24px;">';
+  body += '<p style="font-size:11pt;color:#fff;background:#1A237E;display:inline-block;padding:4px 14px;">AX-2026-0508 자동 생성</p>';
+  body += '<h1 style="color:#1A237E;font-size:28pt;font-weight:bold;margin:14px 0 10px 0;">' + tpl.name + '</h1>';
+  body += '<p style="font-size:14pt;font-weight:bold;color:#000;margin:6px 0;">대상 기간: ' + formatPeriod() + '</p>';
+  body += '<p style="font-size:11pt;color:#555;margin:6px 0;">📅 ' + formatDate(new Date()) + ' 발행 · 👤 AX-00000 작성 · 📦 Word 형식</p>';
+  body += '</div>';
 
-  // 제목
-  children.push(new d.Paragraph({
-    children: [new d.TextRun({ text: tpl.name, bold: true, size: 56, color: '1A237E' })],
-    alignment: d.AlignmentType.CENTER,
-    spacing: { after: 200 }
-  }));
-
-  children.push(new d.Paragraph({
-    children: [new d.TextRun({ text: '대상 기간: ' + formatPeriod(), size: 24, color: '000000' })],
-    alignment: d.AlignmentType.CENTER,
-    spacing: { after: 100 }
-  }));
-
-  children.push(new d.Paragraph({
-    children: [
-      new d.TextRun({ text: 'AX-2026-0508 ', color: '555555', size: 20 }),
-      new d.TextRun({ text: '· ', color: '888888', size: 20 }),
-      new d.TextRun({ text: '작성자: AX-00000 ', color: '555555', size: 20 }),
-      new d.TextRun({ text: '· ', color: '888888', size: 20 }),
-      new d.TextRun({ text: '발행: ' + formatDate(new Date()), color: '555555', size: 20 })
-    ],
-    alignment: d.AlignmentType.CENTER,
-    spacing: { after: 400 },
-    border: { bottom: { color: '1A237E', space: 1, style: 'single', size: 12 } }
-  }));
-
-  // 1. 요약
   if (selectedSections.has('summary')) {
-    children.push(makeSectionTitle(d, '1. 요약'));
-    children.push(new d.Paragraph({
-      children: [new d.TextRun({
-        text: '본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. 총 1,248개 데이터를 학습했으며, A 등급 비율이 78%로 안정적인 운영 상태를 보입니다. 6채널 중 Who(누가) 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.',
-        size: 22, color: '000000'
-      })],
-      spacing: { after: 300 }
-    }));
+    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">1. 요약</h2>';
+    body += '<p style="font-size:11pt;line-height:1.7;color:#000;">본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. 총 <b>1,248개</b> 데이터를 학습했으며, A 등급 비율이 <b>78%</b>로 안정적인 운영 상태를 보입니다. 6채널 중 <b>Who(누가)</b> 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.</p>';
   }
 
-  // 2. KPI
   if (selectedSections.has('kpi')) {
-    children.push(makeSectionTitle(d, '2. 핵심 지표 (KPI)'));
-    const kpiTable = new d.Table({
-      width: { size: 100, type: d.WidthType.PERCENTAGE },
-      rows: [
-        new d.TableRow({
-          children: ['총 데이터', 'A 등급', '평균 응답', '사용자'].map(t =>
-            makeTableCell(d, t, true)
-          )
-        }),
-        new d.TableRow({
-          children: ['1,248개', '78%', '0.82초', '28명'].map(t =>
-            makeTableCell(d, t, false)
-          )
-        })
-      ]
+    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">2. 핵심 지표 (KPI)</h2>';
+    body += '<table style="width:100%;border-collapse:collapse;margin:10px 0;">';
+    body += '<tr style="background:#1A237E;color:#fff;">';
+    ['총 데이터', 'A 등급', '평균 응답', '사용자'].forEach(function(h) {
+      body += '<td style="padding:10px;border:1px solid #1A237E;text-align:center;font-weight:bold;font-size:11pt;color:#fff;">' + h + '</td>';
     });
-    children.push(kpiTable);
-    children.push(new d.Paragraph({ text: '', spacing: { after: 300 } }));
+    body += '</tr><tr>';
+    ['1,248개', '78%', '0.82초', '28명'].forEach(function(v) {
+      body += '<td style="padding:14px;border:1px solid #1A237E;text-align:center;font-size:18pt;font-weight:bold;color:#1A237E;">' + v + '</td>';
+    });
+    body += '</tr></table>';
   }
 
-  // 3. 6채널
   if (selectedSections.has('channel')) {
-    children.push(makeSectionTitle(d, '3. 5W1H 6채널 품질 분석'));
-    const headerRow = new d.TableRow({
-      children: ['채널', '의미', 'A 등급', 'B 등급', 'C 등급', '합계', '정상률'].map(t =>
-        makeTableCell(d, t, true)
-      )
+    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">3. 5W1H 6채널 품질 분석</h2>';
+    body += '<table style="width:100%;border-collapse:collapse;margin:10px 0;">';
+    body += '<tr style="background:#1A237E;color:#fff;">';
+    ['채널', '의미', 'A 등급', 'B 등급', 'C 등급', '합계', '정상률'].forEach(function(h) {
+      body += '<td style="padding:8px;border:1px solid #1A237E;text-align:center;font-weight:bold;color:#fff;">' + h + '</td>';
     });
-    const dataRows = CHANNELS.map(ch => {
-      const g = CHANNEL_GRADES[ch.key];
-      const pct = ((g.a / g.total) * 100).toFixed(1) + '%';
-      return new d.TableRow({
-        children: [
-          makeTableCell(d, ch.label, false),
-          makeTableCell(d, ch.ko, false),
-          makeTableCell(d, String(g.a), false),
-          makeTableCell(d, String(g.b), false),
-          makeTableCell(d, String(g.c), false),
-          makeTableCell(d, String(g.total), false),
-          makeTableCell(d, pct, false)
-        ]
+    body += '</tr>';
+    CHANNELS.forEach(function(ch) {
+      var g = CHANNEL_GRADES[ch.key];
+      var pct = ((g.a/g.total)*100).toFixed(1) + '%';
+      body += '<tr>';
+      [ch.label, ch.ko, String(g.a), String(g.b), String(g.c), String(g.total), pct].forEach(function(v, idx) {
+        var align = idx <= 1 ? 'left' : 'center';
+        body += '<td style="padding:8px;border:1px solid #1A237E;text-align:' + align + ';font-size:11pt;">' + v + '</td>';
       });
+      body += '</tr>';
     });
-    children.push(new d.Table({
-      width: { size: 100, type: d.WidthType.PERCENTAGE },
-      rows: [headerRow, ...dataRows]
-    }));
-    children.push(new d.Paragraph({ text: '', spacing: { after: 300 } }));
+    body += '</table>';
   }
 
-  // 4. 추이
   if (selectedSections.has('trend')) {
-    children.push(makeSectionTitle(d, '4. 처리 추이 분석'));
-    const trendData = ['5/02: 120건', '5/03: 145건', '5/04: 132건', '5/05: 158건', '5/06: 142건', '5/07: 168건', '5/08: 175건'];
-    trendData.forEach(t => {
-      children.push(new d.Paragraph({
-        children: [new d.TextRun({ text: '• ' + t, size: 22 })],
-        spacing: { after: 60 }
-      }));
+    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">4. 처리 추이 분석</h2>';
+    body += '<table style="width:80%;border-collapse:collapse;margin:10px auto;">';
+    body += '<tr style="background:#1A237E;color:#fff;">';
+    ['날짜', '처리량', '전일 대비'].forEach(function(h) {
+      body += '<td style="padding:8px;border:1px solid #1A237E;text-align:center;font-weight:bold;color:#fff;font-size:11pt;">' + h + '</td>';
     });
-    children.push(new d.Paragraph({
-      children: [new d.TextRun({ text: '총 1,040건 처리, 일평균 148.6건', size: 22, bold: true, color: '7B1F2A' })],
-      spacing: { after: 300 }
-    }));
-  }
-
-  // 5. 활동
-  if (selectedSections.has('activity')) {
-    children.push(makeSectionTitle(d, '5. 주요 활동 내역'));
-    const activities = [
-      '품질 평가 정기 실행 - 78% A 등급 달성',
-      '자동 보완 2회 실행 - C 등급 → B 등급 개선',
-      '신규 매뉴얼 3건 학습 완료 (안전관리 분야)',
-      '주간 안전 보고서 1건 자동 생성',
-      '일일 검색·질의응답 175건 처리 (최고치)'
+    body += '</tr>';
+    var trendData = [
+      ['5/02', '120건', '-'],
+      ['5/03', '145건', '↑ +25 (+21%)'],
+      ['5/04', '132건', '↓ -13 (-9%)'],
+      ['5/05', '158건', '↑ +26 (+20%)'],
+      ['5/06', '142건', '↓ -16 (-10%)'],
+      ['5/07', '168건', '↑ +26 (+18%)'],
+      ['5/08', '175건', '↑ +7 (피크)']
     ];
-    activities.forEach(t => {
-      children.push(new d.Paragraph({
-        children: [new d.TextRun({ text: '• ' + t, size: 22 })],
-        spacing: { after: 80 }
-      }));
+    trendData.forEach(function(row) {
+      body += '<tr>';
+      row.forEach(function(v) {
+        body += '<td style="padding:8px;border:1px solid #1A237E;text-align:center;font-size:11pt;">' + v + '</td>';
+      });
+      body += '</tr>';
     });
-    children.push(new d.Paragraph({ text: '', spacing: { after: 200 } }));
+    body += '</table>';
+    body += '<p style="text-align:center;font-size:10pt;color:#7B1F2A;font-weight:bold;margin-top:8px;">총 1,040건 처리 · 일평균 148.6건 · 증가 추세</p>';
   }
 
-  // 6. 권고
+  if (selectedSections.has('activity')) {
+    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">5. 주요 활동 내역</h2>';
+    body += '<ul style="font-size:11pt;line-height:1.9;color:#000;">';
+    body += '<li><b>품질 평가 정기 실행</b> - 78% A 등급 달성</li>';
+    body += '<li><b>자동 보완 2회 실행</b> - C 등급 → B 등급 개선</li>';
+    body += '<li><b>신규 매뉴얼 3건 학습</b> 완료 (안전관리 분야)</li>';
+    body += '<li><b>주간 안전 보고서 1건</b> 자동 생성</li>';
+    body += '<li><b>일일 검색·질의응답 175건</b> 처리 (최고치 기록)</li>';
+    body += '</ul>';
+  }
+
   if (selectedSections.has('rec')) {
-    children.push(makeSectionTitle(d, '6. 권고사항'));
-    const recs = [
+    body += '<h2 style="color:#1A237E;font-size:16pt;font-weight:bold;border-bottom:2px solid #1A237E;padding-bottom:6px;margin-top:24px;margin-bottom:12px;">6. 권고사항</h2>';
+    var recs = [
       '⚠️ Who 채널 보완 권장: 미흡 데이터 74개 잔존, 자동 보완 모드 실행 권장',
       '📚 교육·훈련 분야 강화: 데이터 128개로 다른 분야 대비 부족',
       '📈 사용량 증가 대응: 일일 검색량 12% 증가, 시스템 자원 모니터링 필요'
     ];
-    recs.forEach(t => {
-      children.push(new d.Paragraph({
-        children: [new d.TextRun({ text: t, size: 22, bold: true })],
-        spacing: { after: 100 },
-        shading: { type: 'clear', color: 'auto', fill: 'FFF5F5' }
-      }));
+    recs.forEach(function(r) {
+      body += '<p style="background:#fff5f5;border-left:4px solid #7B1F2A;padding:10px 14px;margin:10px 0;font-size:11pt;font-weight:bold;color:#000;">' + r + '</p>';
     });
   }
 
-  // 푸터
-  children.push(new d.Paragraph({
-    children: [new d.TextRun({
-      text: '본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · AX-2026-0508',
-      italics: true, size: 18, color: '888888'
-    })],
-    alignment: d.AlignmentType.CENTER,
-    spacing: { before: 600 },
-    border: { top: { color: 'CCCCCC', space: 1, style: 'single', size: 6 } }
-  }));
+  body += '<hr style="margin-top:30px;border:none;border-top:1px solid #ccc;">';
+  body += '<p style="text-align:center;font-size:9pt;color:#888;font-style:italic;">본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · 시스템 ID: AX-2026-0508</p>';
 
-  const doc = new d.Document({ sections: [{ children: children }] });
-  return await d.Packer.toBlob(doc);
-}
+  var fullHtml =
+    '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+    'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+    'xmlns="http://www.w3.org/TR/REC-html40">' +
+    '<head><meta charset="UTF-8"><title>' + tpl.name + '</title>' +
+    '<style>@page { size: A4; margin: 2cm; } body { font-family: "맑은 고딕", "Malgun Gothic", sans-serif; font-size: 11pt; }</style>' +
+    '</head><body>' + body + '</body></html>';
 
-function makeSectionTitle(d, text) {
-  return new d.Paragraph({
-    children: [new d.TextRun({ text: text, bold: true, size: 32, color: '1A237E' })],
-    spacing: { before: 300, after: 200 },
-    border: { bottom: { color: '1A237E', space: 1, style: 'single', size: 12 } }
+  return window.htmlDocx.asBlob(fullHtml, {
+    orientation: 'portrait',
+    margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
   });
 }
 
-function makeTableCell(d, text, isHeader) {
-  return new d.TableCell({
-    children: [new d.Paragraph({
-      children: [new d.TextRun({
-        text: text,
-        bold: isHeader,
-        size: isHeader ? 22 : 20,
-        color: isHeader ? 'FFFFFF' : '000000'
-      })],
-      alignment: d.AlignmentType.CENTER
-    })],
-    shading: isHeader ? { type: 'clear', color: 'auto', fill: '1A237E' } : undefined
-  });
-}
 
 // ============================================
 // [핵심] 진짜 PPTX 생성 - pptxgenjs
