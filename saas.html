@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 2 v5 - 1·2·3차 보완 순환</title>
+<title>saas.html 화면 2 v6 - 전체 A 등급 달성까지 보완 순환</title>
 <style>
   body {
     font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
@@ -120,20 +120,44 @@
     text-align: center;
   }
 
-  /* [신규 v5] 차수 카운터 - ③ ④ 사이 순환 표시 */
+  /* [v6 강화] 차수 카운터 - 더 크고 명확하게 */
   .iter-counter {
     display: none;
     text-align: center;
     margin: 0 0 24px 0;
-    padding: 14px 20px;
+    padding: 18px 24px;
     background: #1A237E;
     color: #ffffff;
-    border-radius: 999px;
-    font-size: 20px;
+    border-radius: 12px;
+    font-size: 24px;
     font-weight: 900;
     letter-spacing: 1px;
+    border: 4px solid #7B1F2A;
   }
   .iter-counter.show { display: block; }
+
+  /* [v6 신규] 차수 변경 큰 알림 */
+  .iter-alert {
+    display: none;
+    text-align: center;
+    margin: 28px 0;
+    padding: 32px 30px;
+    background: #7B1F2A;
+    color: #ffffff;
+    border-radius: 14px;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.2);
+  }
+  .iter-alert.show { display: block; }
+
+  .iter-alert-sub {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+  }
 
   /* 드롭존 */
   .drop-zone {
@@ -150,26 +174,9 @@
   .drop-zone:hover { background: #f5f7ff; border-color: #7B1F2A; }
   .drop-zone.drag-over { background: #fff5f5; border-color: #7B1F2A; }
 
-  .drop-icon {
-    font-size: 64px;
-    color: #1A237E;
-    margin: 0 0 16px 0;
-    line-height: 1;
-  }
-
-  .drop-main-text {
-    color: #1A237E;
-    font-size: 26px;
-    font-weight: 900;
-    margin: 0 0 10px 0;
-  }
-
-  .drop-sub-text {
-    color: #000000;
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0 0 24px 0;
-  }
+  .drop-icon { font-size: 64px; color: #1A237E; margin: 0 0 16px 0; line-height: 1; }
+  .drop-main-text { color: #1A237E; font-size: 26px; font-weight: 900; margin: 0 0 10px 0; }
+  .drop-sub-text { color: #000000; font-size: 18px; font-weight: 700; margin: 0 0 24px 0; }
 
   .browse-btn {
     background: #1A237E;
@@ -181,7 +188,6 @@
     border-radius: 999px;
     cursor: pointer;
   }
-
   .browse-btn:hover { background: #7B1F2A; }
 
   /* 파일 목록 */
@@ -218,7 +224,6 @@
     font-weight: 700;
     color: #000000;
   }
-
   .file-row:last-child { border-bottom: none; }
 
   .file-name {
@@ -240,7 +245,6 @@
     border-radius: 999px;
     margin-right: 8px;
   }
-
   .file-status.done { background: #1A237E; }
 
   .file-remove {
@@ -268,14 +272,8 @@
     letter-spacing: 1px;
     transition: all 0.2s;
   }
-
   .ax-start-btn:hover:not(:disabled) { background: #1A237E; }
-
-  .ax-start-btn:disabled {
-    background: #cccccc;
-    color: #888888;
-    cursor: not-allowed;
-  }
+  .ax-start-btn:disabled { background: #cccccc; color: #888888; cursor: not-allowed; }
 
   /* 진행 상태 박스 */
   .progress-box {
@@ -287,7 +285,6 @@
     text-align: center;
     display: none;
   }
-
   .progress-box.show { display: block; }
 
   .progress-step-num {
@@ -342,10 +339,21 @@
 
   .eval-title {
     color: #1A237E;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 900;
     text-align: center;
     margin: 0 0 8px 0;
+  }
+
+  .eval-iter-badge {
+    display: inline-block;
+    background: #7B1F2A;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 900;
+    padding: 6px 18px;
+    border-radius: 999px;
+    margin: 0 8px;
   }
 
   .eval-subtitle {
@@ -400,14 +408,13 @@
     color: #000000;
   }
 
-  /* 모두 A 달성 메시지 */
   .eval-all-a {
     text-align: center;
     background: #1A237E;
     color: #ffffff;
-    padding: 14px;
+    padding: 18px;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 900;
     margin: 12px 0 0 0;
     display: none;
@@ -416,12 +423,13 @@
 
   /* 보완 피드백 박스 */
   .feedback-box {
-    border: 3px solid #7B1F2A;
+    border: 4px solid #7B1F2A;
     border-radius: 14px;
     padding: 32px 30px;
     margin: 28px 0;
     background: #fff5f5;
     display: none;
+    box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.15);
   }
   .feedback-box.show { display: block; }
 
@@ -434,10 +442,21 @@
 
   .fb-title {
     color: #7B1F2A;
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 900;
     text-align: center;
     margin: 0 0 10px 0;
+  }
+
+  .fb-iter-badge {
+    display: inline-block;
+    background: #7B1F2A;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 900;
+    padding: 6px 18px;
+    border-radius: 999px;
+    margin: 0 8px;
   }
 
   .fb-message {
@@ -468,10 +487,15 @@
     transition: all 0.2s;
   }
 
-  .fb-btn:hover {
+  .fb-btn:hover:not(:disabled) {
     background: #1A237E;
     color: #ffffff;
     transform: translateY(-3px);
+  }
+
+  .fb-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .fb-btn-icon {
@@ -487,7 +511,7 @@
     color: #000000;
   }
 
-  .fb-btn:hover .fb-btn-desc { color: #ffffff; }
+  .fb-btn:hover:not(:disabled) .fb-btn-desc { color: #ffffff; }
 
   /* 직접 수정 박스 */
   .manual-box {
@@ -553,33 +577,6 @@
 
   .manual-submit:hover { background: #1A237E; }
 
-  /* 강제 진행 안내 박스 */
-  .force-box {
-    border: 3px solid #b8860b;
-    border-radius: 14px;
-    padding: 28px 30px;
-    margin: 28px 0;
-    background: #fffbe6;
-    text-align: center;
-    display: none;
-  }
-  .force-box.show { display: block; }
-
-  .force-icon { font-size: 48px; margin: 0 0 8px 0; line-height: 1; }
-  .force-title {
-    color: #b8860b;
-    font-size: 24px;
-    font-weight: 900;
-    margin: 0 0 12px 0;
-  }
-  .force-msg {
-    color: #000000;
-    font-size: 17px;
-    font-weight: 700;
-    margin: 0;
-    line-height: 1.5;
-  }
-
   /* 완료 박스 */
   .complete-box {
     border: 3px solid #1A237E;
@@ -609,7 +606,6 @@
   }
   .reset-btn:hover { background: #f0f0f0; }
 
-  /* 파일 형식 안내 */
   .file-types-bar {
     max-width: 1200px;
     margin: 0 auto;
@@ -637,7 +633,6 @@
   <h1 class="screen-title">파일 업로드</h1>
   <p class="screen-subtitle">파일을 끌어다 놓으면 AX 시스템이 자동으로 구축됩니다</p>
 
-  <!-- 미니 진행 단계 -->
   <div class="mini-steps">
     <div class="mini-step active" data-step="upload">📁 업로드</div>
     <span class="mini-arrow">→</span>
@@ -654,10 +649,15 @@
     <div class="mini-step" data-step="6">⑥ AX 구축</div>
   </div>
 
-  <!-- [신규 v5] 차수 카운터 -->
+  <!-- 차수 카운터 -->
   <div class="iter-counter" id="iterCounter">🔁 평가 ↔ 보완 1차 진행 중</div>
 
-  <!-- 드롭존 -->
+  <!-- [v6 신규] 차수 변경 큰 알림 -->
+  <div class="iter-alert" id="iterAlert">
+    <div id="iterAlertMain">2차 평가 시작</div>
+    <div class="iter-alert-sub" id="iterAlertSub">전체 A 등급 달성까지 계속됩니다</div>
+  </div>
+
   <div class="drop-zone" id="dropZone">
     <div class="drop-icon">⬆</div>
     <div class="drop-main-text">파일을 여기로 끌어다 놓으세요</div>
@@ -669,7 +669,6 @@
     accept=".pdf,.docx,.xlsx,.txt,.csv,.json,.xml,.zip"
     style="display:none">
 
-  <!-- 파일 목록 -->
   <div class="file-list-box" id="fileListBox">
     <div class="file-list-title" id="fileListTitle">📂 업로드된 파일 (0개)</div>
     <div id="fileList"><div class="empty-msg">아직 선택된 파일이 없습니다</div></div>
@@ -677,7 +676,6 @@
 
   <button class="ax-start-btn" id="axStartBtn" disabled>AX 자동 구축 시작 →</button>
 
-  <!-- 진행 박스 -->
   <div class="progress-box" id="progressBox">
     <div class="progress-step-num" id="progStepNum">①</div>
     <div class="progress-step-name" id="progStepName">압축해제</div>
@@ -687,18 +685,22 @@
     </div>
   </div>
 
-  <!-- 평가 결과 박스 -->
   <div class="eval-box" id="evalBox">
-    <div class="eval-title" id="evalTitle">③ 5W1H 6채널 품질 평가 결과 (1차)</div>
+    <div class="eval-title">
+      ③ 5W1H 6채널 품질 평가 결과
+      <span class="eval-iter-badge" id="evalIterBadge">1차</span>
+    </div>
     <div class="eval-subtitle">정상 = A 등급 / 1채널 오류 = B 등급 / 2채널 오류 = C 등급</div>
     <div class="eval-grid" id="evalGrid"></div>
     <div class="eval-all-a" id="evalAllA">✅ 모든 채널 A 등급 달성! 보완 완료</div>
   </div>
 
-  <!-- 보완 피드백 박스 -->
   <div class="feedback-box" id="feedbackBox">
     <div class="fb-icon">⚠️</div>
-    <div class="fb-title" id="fbTitle">④ 보완 모드 선택 (1차)</div>
+    <div class="fb-title">
+      ④ 보완 모드 선택
+      <span class="fb-iter-badge" id="fbIterBadge">1차</span>
+    </div>
     <div class="fb-message" id="fbMessage">
       B/C 등급 채널이 발견됐습니다.<br>보완 방식을 선택해 주세요.
     </div>
@@ -729,17 +731,6 @@
     </div>
   </div>
 
-  <!-- 강제 진행 안내 박스 -->
-  <div class="force-box" id="forceBox">
-    <div class="force-icon">⏰</div>
-    <div class="force-title">3차 보완 한도 도달</div>
-    <div class="force-msg" id="forceMsg">
-      잔존 미흡 채널이 있으나 3차 보완 한도에 도달하여<br>
-      현재 상태로 ⑤ AI 학습 단계로 진행합니다.
-    </div>
-  </div>
-
-  <!-- 완료 박스 -->
   <div class="complete-box" id="completeBox">
     <div class="complete-icon">🎯</div>
     <div class="complete-title">AX 시스템 구축 완료!</div>
@@ -754,9 +745,6 @@
 </div>
 
 <script>
-// ============================================
-// 상수
-// ============================================
 const STEPS = [
   { num: '①', name: '압축해제', msg: '압축파일을 자동으로 해제합니다' },
   { num: '②', name: '5W1H 6채널 구조화', msg: '비정형 데이터를 6채널로 구조화합니다' },
@@ -777,11 +765,9 @@ const CHANNELS = [
   { key: 'how',   label: 'How',   ko: '어떻게' }
 ];
 
-const MAX_ITERATIONS = 3;
-
-// 차수별 평가 결과 시뮬레이션 (점진적 개선)
+// 차수별 평가 결과 - 점진적 개선, 3차에 100% A 보장
 const EVAL_BY_ITERATION = {
-  1: {  // 1차: B 1개, C 1개
+  1: {
     why:   { grade: 'A', issues: 0 },
     what:  { grade: 'A', issues: 0 },
     when:  { grade: 'B', issues: 1 },
@@ -789,7 +775,7 @@ const EVAL_BY_ITERATION = {
     who:   { grade: 'C', issues: 2 },
     how:   { grade: 'A', issues: 0 }
   },
-  2: {  // 2차: 자동 보완 후 → C 등급은 B로 개선, B는 잔존
+  2: {
     why:   { grade: 'A', issues: 0 },
     what:  { grade: 'A', issues: 0 },
     when:  { grade: 'B', issues: 1 },
@@ -797,7 +783,7 @@ const EVAL_BY_ITERATION = {
     who:   { grade: 'B', issues: 1 },
     how:   { grade: 'A', issues: 0 }
   },
-  3: {  // 3차: 모두 A 달성
+  3: {
     why:   { grade: 'A', issues: 0 },
     what:  { grade: 'A', issues: 0 },
     when:  { grade: 'A', issues: 0 },
@@ -807,9 +793,6 @@ const EVAL_BY_ITERATION = {
   }
 };
 
-// ============================================
-// 변수
-// ============================================
 const dropZone = document.getElementById('dropZone');
 const browseBtn = document.getElementById('browseBtn');
 const fileInput = document.getElementById('fileInput');
@@ -819,28 +802,40 @@ const axStartBtn = document.getElementById('axStartBtn');
 const progressBox = document.getElementById('progressBox');
 const evalBox = document.getElementById('evalBox');
 const evalGrid = document.getElementById('evalGrid');
-const evalTitle = document.getElementById('evalTitle');
+const evalIterBadge = document.getElementById('evalIterBadge');
 const evalAllA = document.getElementById('evalAllA');
 const feedbackBox = document.getElementById('feedbackBox');
-const fbTitle = document.getElementById('fbTitle');
+const fbIterBadge = document.getElementById('fbIterBadge');
 const fbMessage = document.getElementById('fbMessage');
 const manualBox = document.getElementById('manualBox');
 const manualChannels = document.getElementById('manualChannels');
 const manualText = document.getElementById('manualText');
 const manualSubmit = document.getElementById('manualSubmit');
-const forceBox = document.getElementById('forceBox');
 const completeBox = document.getElementById('completeBox');
 const resetBtn = document.getElementById('resetBtn');
 const iterCounter = document.getElementById('iterCounter');
+const iterAlert = document.getElementById('iterAlert');
+const iterAlertMain = document.getElementById('iterAlertMain');
+const iterAlertSub = document.getElementById('iterAlertSub');
 
 let selectedFiles = [];
 let currentIteration = 1;
 let evaluationResult = null;
-let userChoiceResolver = null;  // 사용자 선택 대기용 Promise
+let userChoiceResolver = null;
+let isProcessing = false;  // [v6] 디바운스 플래그
 
 // ============================================
-// 파일 선택
+// [v6] 자동 스크롤 헬퍼
 // ============================================
+function scrollToElement(el) {
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// 파일 처리
 browseBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
 dropZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => handleFiles(e.target.files));
@@ -894,9 +889,6 @@ function hasArchiveFile() {
   return selectedFiles.some(f => ARCHIVE_EXTS.includes(f.name.split('.').pop().toLowerCase()));
 }
 
-// ============================================
-// 단계 표시
-// ============================================
 function setStepState(stepNum, state) {
   const el = document.querySelector('.mini-step[data-step="' + stepNum + '"]');
   if (!el) return;
@@ -932,11 +924,8 @@ function skipStep(stepIdx) {
   setStepState(stepIdx + 1, 'skipped');
 }
 
-// ============================================
-// [v5] 평가 결과 표시
-// ============================================
 function renderEvaluation(result, iteration) {
-  evalTitle.textContent = '③ 5W1H 6채널 품질 평가 결과 (' + iteration + '차)';
+  evalIterBadge.textContent = iteration + '차';
   let html = '';
   CHANNELS.forEach(ch => {
     const r = result[ch.key];
@@ -956,6 +945,7 @@ function renderEvaluation(result, iteration) {
     evalAllA.classList.remove('show');
   }
   evalBox.classList.add('show');
+  scrollToElement(evalBox);  // [v6] 자동 스크롤
 }
 
 function allGradeA(result) {
@@ -975,18 +965,15 @@ function countGrades(result) {
   return { b, c };
 }
 
-// ============================================
-// [v5] 보완 피드백 박스 표시 - 차수별
-// ============================================
 function showFeedbackBox(iteration) {
-  fbTitle.textContent = '④ 보완 모드 선택 (' + iteration + '차)';
+  fbIterBadge.textContent = iteration + '차';
   const counts = countGrades(evaluationResult);
   let msg = (iteration === 1 ? '' : iteration + '차 평가 결과: ');
   msg += 'B 등급 ' + counts.b + '개, C 등급 ' + counts.c + '개 채널이 잔존합니다.<br>';
+  msg += '<strong style="color:#7B1F2A;">전체 A 등급 달성까지 보완을 반복합니다.</strong><br>';
   msg += '보완 방식을 선택해 주세요.';
   fbMessage.innerHTML = msg;
 
-  // 직접 수정 박스 채널 태그 갱신
   const nonA = getNonAChannels(evaluationResult);
   let chHtml = '';
   nonA.forEach(ch => {
@@ -995,34 +982,55 @@ function showFeedbackBox(iteration) {
   });
   manualChannels.innerHTML = chHtml;
 
-  // 입력 박스 초기화
   manualBox.classList.remove('show');
   manualText.value = '';
   manualText.style.borderColor = '#1A237E';
-  document.querySelectorAll('.fb-btn').forEach(b => b.disabled = false);
 
+  // [v6] 안전 지연 - 800ms 후 버튼 활성화
+  document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
   feedbackBox.classList.add('show');
+  scrollToElement(feedbackBox);
+
+  setTimeout(() => {
+    document.querySelectorAll('.fb-btn').forEach(b => b.disabled = false);
+    isProcessing = false;
+  }, 800);
 }
 
 function showIterCounter(iteration) {
-  iterCounter.textContent = '🔁 평가 ↔ 보완 ' + iteration + '차 진행 중 (최대 3차까지)';
+  iterCounter.textContent = '🔁 평가 ↔ 보완 ' + iteration + '차 진행 중';
   iterCounter.classList.add('show');
 }
 
-// ============================================
-// [v5] 사용자 선택 대기 (Promise)
-// ============================================
+// [v6] 차수 변경 큰 알림
+async function showIterAlert(text, sub) {
+  iterAlertMain.textContent = text;
+  iterAlertSub.textContent = sub || '전체 A 등급 달성까지 계속됩니다';
+  iterAlert.classList.add('show');
+  scrollToElement(iterAlert);
+  await wait(1500);
+  iterAlert.classList.remove('show');
+}
+
 function waitForUserChoice() {
   return new Promise(resolve => { userChoiceResolver = resolve; });
 }
 
 document.querySelectorAll('.fb-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    if (isProcessing) return;  // [v6] 디바운스
+    if (btn.disabled) return;
+
     if (btn.dataset.mode === 'manual') {
       manualBox.classList.add('show');
       document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
+      scrollToElement(manualBox);
       return;
     }
+
+    isProcessing = true;
+    document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
+
     if (userChoiceResolver) {
       const r = userChoiceResolver;
       userChoiceResolver = null;
@@ -1037,6 +1045,8 @@ manualSubmit.addEventListener('click', () => {
     manualText.placeholder = '⚠️ 내용을 입력해 주세요';
     return;
   }
+  if (isProcessing) return;
+  isProcessing = true;
   if (userChoiceResolver) {
     const r = userChoiceResolver;
     userChoiceResolver = null;
@@ -1045,17 +1055,19 @@ manualSubmit.addEventListener('click', () => {
 });
 
 // ============================================
-// [v5] 1·2·3차 보완 순환 루프
+// [v6] 보완 순환 루프 - 전체 A 달성까지 무조건 반복
 // ============================================
 async function runFeedbackLoop() {
-  while (currentIteration <= MAX_ITERATIONS) {
+  while (true) {
     showIterCounter(currentIteration);
+    console.log('[보완 루프] ' + currentIteration + '차 진입, 평가:', evaluationResult);
 
     // 모두 A이면 루프 종료
     if (allGradeA(evaluationResult)) {
+      console.log('[보완 루프] 전체 A 달성 → 루프 종료');
       setStepState(4, 'done');
       iterCounter.classList.remove('show');
-      return 'all-a';
+      return;
     }
 
     // ④ 보완 단계 활성화 + 피드백 박스 표시
@@ -1065,6 +1077,7 @@ async function runFeedbackLoop() {
     // 사용자 선택 대기
     const choice = await waitForUserChoice();
     feedbackBox.classList.remove('show');
+    console.log('[보완 루프] ' + currentIteration + '차 사용자 선택:', choice);
 
     // 건너뛰기 → 즉시 종료
     if (choice === 'skip') {
@@ -1074,42 +1087,43 @@ async function runFeedbackLoop() {
       await wait(800);
       setStepState(4, 'done');
       iterCounter.classList.remove('show');
-      return 'skipped';
+      progressBox.classList.remove('show');
+      return;
     }
 
-    // 자동 또는 수동 보완 처리 (1.5초)
+    // 자동/수동 보완 처리 (1.5초)
     const msg = choice === 'auto'
       ? '🤖 AI가 자동으로 보완 중입니다... (' + currentIteration + '차)'
       : '✍️ 직접 수정 내용 반영 중... (' + currentIteration + '차)';
     showProgress(3, msg);
     await wait(1500);
+    progressBox.classList.remove('show');
 
-    // 3차 한도 도달 체크
-    if (currentIteration >= MAX_ITERATIONS) {
-      setStepState(4, 'done');
-      iterCounter.classList.remove('show');
-      return 'max-reached';
-    }
-
-    // 차수 증가 + ③ 재평가
+    // 차수 증가
     currentIteration++;
+
+    // [v6] 다음 차수 큰 알림
+    await showIterAlert(currentIteration + '차 재평가 시작',
+      '전체 A 등급 달성까지 계속됩니다');
+
+    // ③ 재평가 실행
     showProgress(2, currentIteration + '차 재평가 진행 중...');
     setStepState(3, 'active');
     await wait(1500);
     setStepState(3, 'done');
-
-    evaluationResult = JSON.parse(JSON.stringify(EVAL_BY_ITERATION[currentIteration]));
-    renderEvaluation(evaluationResult, currentIteration);
     progressBox.classList.remove('show');
-    await wait(1000);  // 결과 보여주는 시간
+
+    // 평가 결과 갱신 (3차 이후에도 100% A 보장)
+    const evalData = EVAL_BY_ITERATION[currentIteration] || EVAL_BY_ITERATION[3];
+    evaluationResult = JSON.parse(JSON.stringify(evalData));
+    console.log('[보완 루프] ' + currentIteration + '차 평가 결과:', evaluationResult);
+    renderEvaluation(evaluationResult, currentIteration);
+
+    // 결과 충분히 보여주기 (1.8초)
+    await wait(1800);
   }
 }
 
-function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// ============================================
-// AX 자동 구축 시작
-// ============================================
 axStartBtn.addEventListener('click', async () => {
   if (selectedFiles.length === 0) return;
 
@@ -1139,17 +1153,13 @@ axStartBtn.addEventListener('click', async () => {
   evaluationResult = JSON.parse(JSON.stringify(EVAL_BY_ITERATION[1]));
   renderEvaluation(evaluationResult, 1);
   progressBox.classList.remove('show');
-  await wait(1000);
+  await wait(1800);
 
-  // ④ 1·2·3차 보완 순환 루프
-  const loopResult = await runFeedbackLoop();
+  // ④ 보완 순환 루프 (전체 A 달성까지)
+  await runFeedbackLoop();
+
   progressBox.classList.remove('show');
-
-  // 3차 한도 도달 시 강제 진행 안내
-  if (loopResult === 'max-reached' && !allGradeA(evaluationResult)) {
-    forceBox.classList.add('show');
-    await wait(2200);
-  }
+  iterAlert.classList.remove('show');
 
   // ⑤ AI 학습
   await processStep(4);
@@ -1159,12 +1169,10 @@ axStartBtn.addEventListener('click', async () => {
   showCompletion();
 });
 
-// ============================================
-// 완료
-// ============================================
 function showCompletion() {
   progressBox.classList.remove('show');
   iterCounter.classList.remove('show');
+  iterAlert.classList.remove('show');
   document.querySelectorAll('.file-status').forEach(s => {
     s.textContent = '완료';
     s.classList.add('done');
@@ -1172,18 +1180,17 @@ function showCompletion() {
   const finalIter = currentIteration;
   document.getElementById('completeSummary').textContent =
     '파일 ' + selectedFiles.length + '개 처리 · ' +
-    finalIter + '차 보완 후 6단계 자동 완료';
+    finalIter + '차 보완 후 전체 A 등급 달성 · 6단계 완료';
   completeBox.classList.add('show');
+  scrollToElement(completeBox);
 }
 
-// ============================================
-// 리셋
-// ============================================
 resetBtn.addEventListener('click', () => {
   selectedFiles = [];
   evaluationResult = null;
   currentIteration = 1;
   userChoiceResolver = null;
+  isProcessing = false;
   renderFileList();
   updateAXButton();
   ['1', '2', '3', '4', '5', '6'].forEach(n => setStepState(n, ''));
@@ -1192,9 +1199,9 @@ resetBtn.addEventListener('click', () => {
   evalBox.classList.remove('show');
   feedbackBox.classList.remove('show');
   manualBox.classList.remove('show');
-  forceBox.classList.remove('show');
   completeBox.classList.remove('show');
   iterCounter.classList.remove('show');
+  iterAlert.classList.remove('show');
   evalAllA.classList.remove('show');
   manualText.value = '';
   manualText.style.borderColor = '#1A237E';
@@ -1202,6 +1209,7 @@ resetBtn.addEventListener('click', () => {
   document.querySelectorAll('.fb-btn').forEach(b => b.disabled = false);
   dropZone.style.opacity = '1';
   dropZone.style.pointerEvents = 'auto';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>
 
