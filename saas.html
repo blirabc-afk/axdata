@@ -2,24 +2,25 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 6 v2 - 보고서 자동 생성 (저장 위치 선택)</title>
+<title>saas.html 화면 6 v3 - 진짜 PDF/DOCX/PPTX 생성</title>
+
+<!-- 진짜 파일 생성 라이브러리 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
-
   .top-banner { background: #1A237E; color: #ffffff; text-align: center; padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0; }
-
   .report-wrapper { max-width: 1200px; margin: 0 auto 28px auto; border: 3px solid #1A237E; border-radius: 16px; padding: 36px 40px; background: #ffffff; box-sizing: border-box; }
-
   .sys-header { display: flex; justify-content: space-between; align-items: center; background: #f5f7ff; border: 2px solid #1A237E; border-radius: 10px; padding: 12px 20px; margin: 0 0 24px 0; font-size: 14px; font-weight: 700; }
   .sys-header-info { display: flex; gap: 20px; flex-wrap: wrap; }
   .sys-info-label { color: #555; margin-right: 6px; }
   .sys-info-value { color: #1A237E; font-family: 'Courier New', monospace; font-weight: 900; }
-
   .screen-title { color: #1A237E; font-size: 36px; font-weight: 900; text-align: center; margin: 0 0 14px 0; }
   .screen-subtitle { color: #000000; font-size: 18px; font-weight: 700; text-align: center; margin: 0 0 28px 0; }
-
   .section-title { color: #1A237E; font-size: 18px; font-weight: 900; margin: 28px 0 14px 0; padding: 0 0 0 10px; border-left: 5px solid #7B1F2A; }
-
   .template-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
   .template-card { border: 2px solid #cccccc; border-radius: 12px; padding: 20px 14px; text-align: center; background: #ffffff; cursor: pointer; transition: all 0.2s; }
   .template-card:hover { border-color: #1A237E; background: #f5f7ff; transform: translateY(-3px); }
@@ -28,20 +29,16 @@
   .template-name { color: #1A237E; font-size: 15px; font-weight: 900; margin: 0 0 4px 0; }
   .template-desc { color: #555; font-size: 12px; font-weight: 700; }
   .template-card.active .template-name { color: #7B1F2A; }
-
   .options-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .option-card { border: 2px solid #1A237E; border-radius: 12px; padding: 18px 22px; background: #ffffff; }
   .option-title { color: #1A237E; font-size: 15px; font-weight: 900; margin: 0 0 12px 0; }
-
   .period-input-row { display: flex; gap: 10px; align-items: center; }
   .date-input { flex-grow: 1; padding: 10px 14px; border: 2px solid #1A237E; border-radius: 8px; font-size: 14px; font-weight: 700; color: #1A237E; font-family: inherit; }
   .date-input:focus { outline: none; border-color: #7B1F2A; }
-
   .period-quick { display: flex; gap: 6px; margin: 10px 0 0 0; flex-wrap: wrap; }
   .period-quick-btn { background: #ffffff; color: #1A237E; border: 2px solid #1A237E; font-size: 12px; font-weight: 900; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all 0.2s; }
   .period-quick-btn:hover { background: #1A237E; color: #ffffff; }
   .period-quick-btn.active { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; }
-
   .check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .check-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f5f7ff; border-radius: 8px; cursor: pointer; user-select: none; border: 2px solid transparent; transition: all 0.2s; }
   .check-item:hover { border-color: #1A237E; }
@@ -49,7 +46,6 @@
   .check-item-icon { font-size: 16px; }
   .check-item-label { font-size: 13px; font-weight: 900; color: #000000; }
   .check-item.checked .check-item-label { color: #ffffff; }
-
   .format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .format-card { border: 2px solid #1A237E; border-radius: 10px; padding: 14px 10px; text-align: center; background: #ffffff; cursor: pointer; transition: all 0.2s; }
   .format-card:hover { background: #f5f7ff; }
@@ -57,101 +53,25 @@
   .format-icon { font-size: 24px; line-height: 1; margin: 0 0 6px 0; }
   .format-name { font-size: 13px; font-weight: 900; }
 
-  /* [v2 신규] 파일명 + 저장 위치 옵션 */
-  .save-options-card {
-    border: 3px solid #7B1F2A;
-    border-radius: 12px;
-    padding: 22px 24px;
-    background: #fff5f5;
-    margin: 28px 0 16px 0;
-  }
-
-  .save-options-title {
-    color: #7B1F2A; font-size: 16px; font-weight: 900;
-    margin: 0 0 14px 0;
-  }
-
-  .filename-row {
-    display: flex; gap: 10px; align-items: center;
-    margin: 0 0 14px 0;
-  }
-
-  .filename-label {
-    color: #1A237E; font-size: 14px; font-weight: 900;
-    white-space: nowrap;
-  }
-
-  .filename-input {
-    flex-grow: 1;
-    padding: 10px 14px;
-    border: 2px solid #1A237E;
-    border-radius: 8px;
-    font-size: 14px; font-weight: 700;
-    font-family: 'Courier New', monospace;
-    color: #1A237E;
-  }
-
-  .filename-input:focus {
-    outline: none; border-color: #7B1F2A;
-  }
-
-  .filename-ext {
-    color: #555; font-size: 14px; font-weight: 900;
-    font-family: 'Courier New', monospace;
-  }
-
-  .save-method-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .save-method-card {
-    border: 2px solid #cccccc;
-    border-radius: 10px;
-    padding: 14px 16px;
-    background: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
+  .save-options-card { border: 3px solid #7B1F2A; border-radius: 12px; padding: 22px 24px; background: #fff5f5; margin: 28px 0 16px 0; }
+  .save-options-title { color: #7B1F2A; font-size: 16px; font-weight: 900; margin: 0 0 14px 0; }
+  .filename-row { display: flex; gap: 10px; align-items: center; margin: 0 0 14px 0; }
+  .filename-label { color: #1A237E; font-size: 14px; font-weight: 900; white-space: nowrap; }
+  .filename-input { flex-grow: 1; padding: 10px 14px; border: 2px solid #1A237E; border-radius: 8px; font-size: 14px; font-weight: 700; font-family: 'Courier New', monospace; color: #1A237E; }
+  .filename-input:focus { outline: none; border-color: #7B1F2A; }
+  .filename-ext { color: #555; font-size: 14px; font-weight: 900; font-family: 'Courier New', monospace; }
+  .save-method-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .save-method-card { border: 2px solid #cccccc; border-radius: 10px; padding: 14px 16px; background: #ffffff; cursor: pointer; transition: all 0.2s; }
   .save-method-card:hover { border-color: #1A237E; transform: translateY(-2px); }
-
-  .save-method-card.active {
-    border-color: #7B1F2A; background: #fff5f5;
-  }
-
-  .save-method-card.disabled {
-    opacity: 0.6; cursor: not-allowed;
-  }
+  .save-method-card.active { border-color: #7B1F2A; background: #fff5f5; }
+  .save-method-card.disabled { opacity: 0.6; cursor: not-allowed; }
   .save-method-card.disabled:hover { transform: none; }
-
-  .save-method-header {
-    display: flex; align-items: center; gap: 8px;
-    margin: 0 0 6px 0;
-  }
-
+  .save-method-header { display: flex; align-items: center; gap: 8px; margin: 0 0 6px 0; }
   .save-method-icon { font-size: 20px; }
-
-  .save-method-name {
-    color: #1A237E; font-size: 14px; font-weight: 900;
-  }
-
+  .save-method-name { color: #1A237E; font-size: 14px; font-weight: 900; }
   .save-method-card.active .save-method-name { color: #7B1F2A; }
+  .save-method-desc { color: #555; font-size: 12px; font-weight: 700; line-height: 1.4; }
 
-  .save-method-desc {
-    color: #555; font-size: 12px; font-weight: 700;
-    line-height: 1.4;
-  }
-
-  .save-method-badge {
-    display: inline-block;
-    background: #b8860b; color: #ffffff;
-    font-size: 10px; font-weight: 900;
-    padding: 2px 8px; border-radius: 999px;
-    margin-left: 6px;
-  }
-
-  /* 미리보기 */
   .preview-card { border: 2px solid #1A237E; border-radius: 12px; background: #ffffff; padding: 28px; }
   .preview-paper { background: #ffffff; border: 1px solid #cccccc; border-radius: 4px; box-shadow: 0 4px 0 0 rgba(0,0,0,0.06); padding: 36px; max-width: 640px; margin: 0 auto; font-size: 13px; }
   .preview-cover { text-align: center; padding: 30px 0; border-bottom: 3px solid #1A237E; margin: 0 0 24px 0; }
@@ -180,7 +100,6 @@
   .generate-btn { display: block; width: 100%; background: #7B1F2A; color: #ffffff; font-size: 22px; font-weight: 900; padding: 20px; border: none; border-radius: 12px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
   .generate-btn:hover:not(:disabled) { background: #1A237E; transform: translateY(-2px); }
   .generate-btn:disabled { background: #cccccc; cursor: not-allowed; }
-
   .gen-progress { display: none; border: 3px solid #7B1F2A; border-radius: 12px; padding: 24px; background: #ffffff; text-align: center; margin: 16px 0 0 0; }
   .gen-progress.show { display: block; }
   .gen-spinner { display: inline-block; width: 36px; height: 36px; border: 4px solid #f0f0f0; border-top: 4px solid #7B1F2A; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 0 12px 0; }
@@ -201,7 +120,6 @@
   .recent-download { background: #7B1F2A; color: #ffffff; border: none; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 900; cursor: pointer; }
   .recent-download:hover { background: #1A237E; }
 
-  /* 모달 */
   .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
   .modal-backdrop.show { display: flex; }
   .modal-box { background: #ffffff; border: 3px solid #1A237E; border-radius: 16px; padding: 36px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; box-sizing: border-box; text-align: center; }
@@ -218,22 +136,10 @@
   .modal-btn.primary { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; }
   .modal-btn.primary:hover { background: #1A237E; border-color: #1A237E; }
 
-  /* [v2 신규] 토스트 알림 */
-  .toast {
-    position: fixed; bottom: 30px; left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: #1A237E; color: #ffffff;
-    padding: 16px 28px; border-radius: 999px;
-    font-weight: 900; font-size: 16px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    z-index: 2000;
-    transition: transform 0.3s ease;
-    max-width: 90%;
-    display: flex; align-items: center; gap: 10px;
-  }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1A237E; color: #ffffff; padding: 16px 28px; border-radius: 999px; font-weight: 900; font-size: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); z-index: 2000; transition: transform 0.3s ease; max-width: 90%; display: flex; align-items: center; gap: 10px; }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.error { background: #7B1F2A; }
-  .toast .toast-icon { font-size: 20px; }
+  .toast.warn { background: #b8860b; }
 
   .bottom-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 28px 0 0 0; }
   .bottom-btn { background: #ffffff; color: #1A237E; border: 2px solid #1A237E; font-size: 14px; font-weight: 900; padding: 14px 8px; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: center; }
@@ -241,14 +147,26 @@
   .bottom-btn-icon { font-size: 22px; display: block; margin: 0 0 4px 0; }
   .bottom-btn.current { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; cursor: default; }
   .bottom-btn.current:hover { transform: none; }
-
   .file-types-bar { max-width: 1200px; margin: 0 auto; background: #ffffff; border: 2px solid #000000; border-radius: 12px; padding: 18px 40px; text-align: center; box-sizing: border-box; }
   .file-types-bar .label { color: #000000; font-size: 18px; font-weight: 700; }
+
+  .lib-status {
+    display: inline-block;
+    background: #f5f7ff;
+    border: 1px solid #1A237E;
+    color: #1A237E;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-left: 8px;
+  }
+  .lib-status.error { background: #fff5f5; border-color: #7B1F2A; color: #7B1F2A; }
 </style>
 </head>
 <body>
 
-<div class="top-banner">5W1H 6채널 데이터 기반 자동 보고서 생성 - 저장 위치 선택 가능</div>
+<div class="top-banner">5W1H 6채널 데이터 기반 자동 보고서 - 진짜 PDF/DOCX/PPTX 생성</div>
 
 <section class="report-wrapper">
 
@@ -262,25 +180,15 @@
   </div>
 
   <h1 class="screen-title">📑 보고서 자동 생성</h1>
-  <p class="screen-subtitle">학습된 데이터로 보고서를 자동 작성하고 원하는 위치에 저장합니다</p>
+  <p class="screen-subtitle">진짜 PDF · Word · PowerPoint 형식으로 저장됩니다 <span class="lib-status" id="libStatus">라이브러리 확인 중...</span></p>
 
   <div class="section-title">📋 보고서 종류 선택</div>
   <div class="template-grid">
-    <div class="template-card active" data-tpl="daily">
-      <div class="template-icon">📅</div><div class="template-name">일일 보고서</div><div class="template-desc">하루 운영 현황</div>
-    </div>
-    <div class="template-card" data-tpl="weekly">
-      <div class="template-icon">📊</div><div class="template-name">주간 보고서</div><div class="template-desc">7일 종합 분석</div>
-    </div>
-    <div class="template-card" data-tpl="monthly">
-      <div class="template-icon">📈</div><div class="template-name">월간 보고서</div><div class="template-desc">월별 추이 분석</div>
-    </div>
-    <div class="template-card" data-tpl="quarterly">
-      <div class="template-icon">📆</div><div class="template-name">분기 보고서</div><div class="template-desc">분기 종합 평가</div>
-    </div>
-    <div class="template-card" data-tpl="custom">
-      <div class="template-icon">✏️</div><div class="template-name">사용자 정의</div><div class="template-desc">기간 직접 설정</div>
-    </div>
+    <div class="template-card active" data-tpl="daily"><div class="template-icon">📅</div><div class="template-name">일일 보고서</div><div class="template-desc">하루 운영 현황</div></div>
+    <div class="template-card" data-tpl="weekly"><div class="template-icon">📊</div><div class="template-name">주간 보고서</div><div class="template-desc">7일 종합 분석</div></div>
+    <div class="template-card" data-tpl="monthly"><div class="template-icon">📈</div><div class="template-name">월간 보고서</div><div class="template-desc">월별 추이 분석</div></div>
+    <div class="template-card" data-tpl="quarterly"><div class="template-icon">📆</div><div class="template-name">분기 보고서</div><div class="template-desc">분기 종합 평가</div></div>
+    <div class="template-card" data-tpl="custom"><div class="template-icon">✏️</div><div class="template-name">사용자 정의</div><div class="template-desc">기간 직접 설정</div></div>
   </div>
 
   <div class="section-title">⚙️ 옵션 설정</div>
@@ -299,7 +207,6 @@
         <button class="period-quick-btn" data-quick="quarter">이번 분기</button>
       </div>
     </div>
-
     <div class="option-card">
       <div class="option-title">📦 출력 형식</div>
       <div class="format-grid">
@@ -335,36 +242,21 @@
     </div>
   </div>
 
-  <!-- [v2 신규] 저장 옵션 -->
   <div class="save-options-card">
     <div class="save-options-title">💾 저장 옵션</div>
-
     <div class="filename-row">
       <span class="filename-label">파일명:</span>
-      <input type="text" class="filename-input" id="customFileName"
-        placeholder="자동 생성됨" value="">
+      <input type="text" class="filename-input" id="customFileName" placeholder="자동 생성됨" value="">
       <span class="filename-ext" id="fileExt">.pdf</span>
     </div>
-
     <div class="save-method-row">
       <div class="save-method-card active" data-method="picker" id="methodPicker">
-        <div class="save-method-header">
-          <span class="save-method-icon">📁</span>
-          <span class="save-method-name">위치 직접 선택</span>
-        </div>
-        <div class="save-method-desc">
-          파일 다이얼로그를 열어 저장 폴더와 파일명을 직접 지정합니다.
-        </div>
+        <div class="save-method-header"><span class="save-method-icon">📁</span><span class="save-method-name">위치 직접 선택</span></div>
+        <div class="save-method-desc">파일 다이얼로그를 열어 저장 폴더와 파일명을 직접 지정합니다.</div>
       </div>
-
       <div class="save-method-card" data-method="default" id="methodDefault">
-        <div class="save-method-header">
-          <span class="save-method-icon">⚡</span>
-          <span class="save-method-name">빠른 다운로드</span>
-        </div>
-        <div class="save-method-desc">
-          브라우저 기본 다운로드 폴더에 즉시 저장됩니다.
-        </div>
+        <div class="save-method-header"><span class="save-method-icon">⚡</span><span class="save-method-name">빠른 다운로드</span></div>
+        <div class="save-method-desc">브라우저 기본 다운로드 폴더에 즉시 저장됩니다.</div>
       </div>
     </div>
     <div id="browserSupportNote" style="margin-top:10px;font-size:12px;font-weight:700;color:#7B1F2A;display:none;">
@@ -397,10 +289,9 @@
 </section>
 
 <div class="file-types-bar">
-  <span class="label">5종 보고서 템플릿 · 다중 형식 · 위치 직접 선택 저장 · 실시간 미리보기</span>
+  <span class="label">진짜 PDF/Word/PowerPoint 파일 생성 · 위치 선택 저장 · 실시간 미리보기</span>
 </div>
 
-<!-- 완료 모달 -->
 <div class="modal-backdrop" id="modal">
   <div class="modal-box">
     <div class="modal-icon">🎯</div>
@@ -415,22 +306,21 @@
   </div>
 </div>
 
-<!-- 토스트 -->
-<div class="toast" id="toast"><span class="toast-icon">✅</span><span id="toastText">저장 완료</span></div>
+<div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastText">저장 완료</span></div>
 
 <script>
 const TEMPLATES = {
-  'daily':     { name: '일일 보고서',   period: '하루',   kpiPrefix: '오늘' },
-  'weekly':    { name: '주간 보고서',   period: '7일',    kpiPrefix: '주간' },
-  'monthly':   { name: '월간 보고서',   period: '30일',   kpiPrefix: '월간' },
-  'quarterly': { name: '분기 보고서',   period: '90일',   kpiPrefix: '분기' },
-  'custom':    { name: '사용자 정의 보고서', period: '사용자 지정', kpiPrefix: '기간' }
+  'daily':     { name: '일일 보고서', period: '하루' },
+  'weekly':    { name: '주간 보고서', period: '7일' },
+  'monthly':   { name: '월간 보고서', period: '30일' },
+  'quarterly': { name: '분기 보고서', period: '90일' },
+  'custom':    { name: '사용자 정의 보고서', period: '사용자 지정' }
 };
 
 const FORMAT_INFO = {
-  'pdf':  { name: 'PDF', ext: '.pdf', icon: '📄', mime: 'text/html' },
-  'docx': { name: 'Word', ext: '.docx', icon: '📝', mime: 'text/html' },
-  'pptx': { name: 'PowerPoint', ext: '.pptx', icon: '📊', mime: 'text/html' }
+  'pdf':  { name: 'PDF', ext: '.pdf', icon: '📄', mime: 'application/pdf' },
+  'docx': { name: 'Word', ext: '.docx', icon: '📝', mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+  'pptx': { name: 'PowerPoint', ext: '.pptx', icon: '📊', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }
 };
 
 const CHANNELS = [
@@ -452,11 +342,9 @@ const CHANNEL_GRADES = {
 };
 
 const RECENT_REPORTS = [
-  { icon: '📄', title: '주간 안전 운영 보고서', period: '4/29 ~ 5/05', format: 'PDF', status: '완료', time: '5/06 09:10', ext: '.pdf' },
-  { icon: '📝', title: '4월 월간 품질 보고서', period: '4/01 ~ 4/30', format: 'DOCX', status: '완료', time: '5/01 14:25', ext: '.docx' },
-  { icon: '📊', title: '1분기 종합 보고서', period: '1/01 ~ 3/31', format: 'PPTX', status: '완료', time: '4/02 16:48', ext: '.pptx' },
-  { icon: '📄', title: '3월 일일 보고서 (5/8)', period: '5/08 (오늘)', format: 'PDF', status: '완료', time: '5/08 08:30', ext: '.pdf' },
-  { icon: '📄', title: '협력사 점검 결과 보고', period: '4/15 ~ 4/18', format: 'PDF', status: '완료', time: '4/19 11:20', ext: '.pdf' }
+  { icon: '📄', title: '주간 안전 운영 보고서', period: '4/29 ~ 5/05', format: 'PDF', status: '완료', time: '5/06 09:10' },
+  { icon: '📝', title: '4월 월간 품질 보고서', period: '4/01 ~ 4/30', format: 'DOCX', status: '완료', time: '5/01 14:25' },
+  { icon: '📊', title: '1분기 종합 보고서', period: '1/01 ~ 3/31', format: 'PPTX', status: '완료', time: '4/02 16:48' }
 ];
 
 let selectedTemplate = 'daily';
@@ -467,9 +355,7 @@ let selectedSections = new Set(['summary', 'kpi', 'channel', 'trend', 'activity'
 let dateFrom = '';
 let dateTo = '';
 
-// File System Access API 지원 확인
 const supportsFilePicker = 'showSaveFilePicker' in window;
-
 if (!supportsFilePicker) {
   document.getElementById('browserSupportNote').style.display = 'block';
   document.getElementById('methodPicker').classList.add('disabled');
@@ -478,7 +364,27 @@ if (!supportsFilePicker) {
   selectedSaveMethod = 'default';
 }
 
-// 오늘 날짜
+// 라이브러리 로드 확인
+function checkLibraries() {
+  const status = document.getElementById('libStatus');
+  const ok = [];
+  const missing = [];
+
+  if (window.jspdf && window.jspdf.jsPDF) ok.push('PDF'); else missing.push('PDF');
+  if (window.html2canvas) ok.push('html2canvas'); else missing.push('html2canvas');
+  if (window.PptxGenJS) ok.push('PPTX'); else missing.push('PPTX');
+  if (window.docx) ok.push('DOCX'); else missing.push('DOCX');
+
+  if (missing.length === 0) {
+    status.textContent = '✅ 모든 라이브러리 로드 완료';
+    status.classList.remove('error');
+  } else {
+    status.textContent = '⚠️ 미로드: ' + missing.join(', ');
+    status.classList.add('error');
+  }
+}
+window.addEventListener('load', () => setTimeout(checkLibraries, 500));
+
 function setTodayDates() {
   const today = new Date();
   document.getElementById('todayDate').textContent = '📅 ' + formatDate(today);
@@ -501,7 +407,6 @@ function formatPeriod() {
   return dateFrom && dateTo ? dateFrom + ' ~ ' + dateTo : '기간 미설정';
 }
 
-// 자동 파일명 생성
 function generateAutoFileName() {
   const tpl = TEMPLATES[selectedTemplate];
   const dateStr = dateTo ? dateTo.replace(/-/g, '') : formatDate(new Date()).replace(/-/g, '');
@@ -514,7 +419,6 @@ function getFinalFileName() {
   return baseName + FORMAT_INFO[selectedFormat].ext;
 }
 
-// 템플릿 선택
 document.querySelectorAll('.template-card').forEach(card => {
   card.addEventListener('click', () => {
     document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
@@ -534,7 +438,6 @@ document.querySelectorAll('.template-card').forEach(card => {
   });
 });
 
-// 빠른 기간
 document.querySelectorAll('.period-quick-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.period-quick-btn').forEach(b => b.classList.remove('active'));
@@ -560,7 +463,6 @@ document.querySelectorAll('.period-quick-btn').forEach(btn => {
 document.getElementById('dateFrom').addEventListener('change', e => { dateFrom = e.target.value; renderPreview(); });
 document.getElementById('dateTo').addEventListener('change', e => { dateTo = e.target.value; renderPreview(); });
 
-// 형식 선택
 document.querySelectorAll('.format-card').forEach(card => {
   card.addEventListener('click', () => {
     document.querySelectorAll('.format-card').forEach(c => c.classList.remove('active'));
@@ -570,7 +472,6 @@ document.querySelectorAll('.format-card').forEach(card => {
   });
 });
 
-// 저장 방식 선택
 document.querySelectorAll('.save-method-card').forEach(card => {
   card.addEventListener('click', () => {
     if (card.classList.contains('disabled')) return;
@@ -580,7 +481,6 @@ document.querySelectorAll('.save-method-card').forEach(card => {
   });
 });
 
-// 카테고리/섹션 체크
 document.querySelectorAll('#categoryChecks .check-item').forEach(item => {
   item.addEventListener('click', () => {
     item.classList.toggle('checked');
@@ -606,20 +506,16 @@ function renderPreview() {
   html += '<div class="preview-stamp">AX-2026-0508 자동 생성</div>';
   html += '<h1 class="preview-title">' + tpl.name + '</h1>';
   html += '<div class="preview-period">대상 기간: ' + formatPeriod() + '</div>';
-  html += '<div class="preview-meta">';
-  html += '<span>📅 ' + formatDate(new Date()) + ' 발행</span>';
-  html += '<span>👤 AX-00000 작성</span>';
-  html += '<span>📦 ' + FORMAT_INFO[selectedFormat].name + '</span>';
-  html += '</div></div>';
+  html += '<div class="preview-meta"><span>📅 ' + formatDate(new Date()) + ' 발행</span><span>👤 AX-00000</span><span>📦 ' + FORMAT_INFO[selectedFormat].name + '</span></div>';
+  html += '</div>';
 
   if (selectedSections.has('summary')) {
     html += '<div class="preview-section"><div class="preview-section-title">1. 요약</div>';
-    html += '<p style="font-size:12px;line-height:1.7;color:#000;">본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. 총 <strong>1,248개</strong> 데이터를 학습했으며, A 등급 비율이 <strong>78%</strong>로 안정적인 운영 상태를 보입니다. 6채널 중 <strong>Who(누가)</strong> 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.</p>';
+    html += '<p style="font-size:12px;line-height:1.7;color:#000;">본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황 종합 분석입니다. 총 <strong>1,248개</strong> 데이터 학습, A 등급 비율 <strong>78%</strong>로 안정적 운영. <strong>Who(누가)</strong> 채널 미흡 사항 개선 권장.</p>';
     html += '</div>';
   }
-
   if (selectedSections.has('kpi')) {
-    html += '<div class="preview-section"><div class="preview-section-title">2. 핵심 지표 (KPI)</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">2. 핵심 지표</div>';
     html += '<div class="preview-kpi">';
     html += '<div class="preview-kpi-card"><div class="preview-kpi-value">1,248</div><div class="preview-kpi-label">총 데이터</div></div>';
     html += '<div class="preview-kpi-card"><div class="preview-kpi-value">78%</div><div class="preview-kpi-label">A 등급</div></div>';
@@ -627,9 +523,8 @@ function renderPreview() {
     html += '<div class="preview-kpi-card"><div class="preview-kpi-value">28명</div><div class="preview-kpi-label">사용자</div></div>';
     html += '</div></div>';
   }
-
   if (selectedSections.has('channel')) {
-    html += '<div class="preview-section"><div class="preview-section-title">3. 5W1H 6채널 품질 분석</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">3. 5W1H 6채널 분석</div>';
     CHANNELS.forEach(ch => {
       const g = CHANNEL_GRADES[ch.key];
       const aPct = (g.a/g.total)*100, bPct = (g.b/g.total)*100, cPct = (g.c/g.total)*100;
@@ -644,9 +539,8 @@ function renderPreview() {
     });
     html += '</div>';
   }
-
   if (selectedSections.has('trend')) {
-    html += '<div class="preview-section"><div class="preview-section-title">4. 처리 추이 분석</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">4. 처리 추이</div>';
     html += '<svg viewBox="0 0 600 140" style="width:100%;height:140px;">';
     html += '<line x1="0" y1="20" x2="600" y2="20" stroke="#f0f0f0"/><line x1="0" y1="60" x2="600" y2="60" stroke="#f0f0f0"/><line x1="0" y1="100" x2="600" y2="100" stroke="#f0f0f0"/>';
     html += '<polyline points="40,100 130,80 220,90 310,68 400,82 490,62 580,55" fill="none" stroke="#7B1F2A" stroke-width="2.5"/>';
@@ -655,30 +549,25 @@ function renderPreview() {
       const ys=[100,80,90,68,82,62,55];
       html += '<circle cx="'+x+'" cy="'+ys[i]+'" r="3" fill="#7B1F2A"/>';
     });
-    html += '</svg>';
-    html += '<p style="font-size:11px;color:#555;text-align:center;margin:4px 0 0 0;">기간 내 일일 처리량 추이</p></div>';
+    html += '</svg></div>';
   }
-
   if (selectedSections.has('activity')) {
-    html += '<div class="preview-section"><div class="preview-section-title">5. 주요 활동 내역</div>';
+    html += '<div class="preview-section"><div class="preview-section-title">5. 주요 활동</div>';
     html += '<ul class="preview-list">';
-    html += '<li>품질 평가 정기 실행 - <strong>78% A 등급 달성</strong></li>';
-    html += '<li>자동 보완 2회 실행 - C 등급 → B 등급 개선</li>';
-    html += '<li>신규 매뉴얼 3건 학습 완료 (안전관리 분야)</li>';
+    html += '<li>품질 평가 정기 실행 - 78% A 등급</li>';
+    html += '<li>자동 보완 2회 실행 - C → B 개선</li>';
+    html += '<li>신규 매뉴얼 3건 학습 완료</li>';
     html += '<li>주간 안전 보고서 1건 자동 생성</li>';
-    html += '<li>일일 검색·질의응답 175건 처리 (최고치 기록)</li>';
+    html += '<li>일일 검색·질의응답 175건 처리</li>';
     html += '</ul></div>';
   }
-
   if (selectedSections.has('rec')) {
     html += '<div class="preview-section"><div class="preview-section-title">6. 권고사항</div>';
-    html += '<div class="preview-rec">⚠️ <strong>Who 채널 보완 권장</strong>: 미흡 데이터 74개 잔존</div>';
-    html += '<div class="preview-rec">📚 <strong>교육·훈련 분야 강화</strong>: 데이터 128개로 부족</div>';
-    html += '<div class="preview-rec">📈 <strong>사용량 증가 대응</strong>: 일일 검색량 12% 증가</div>';
-    html += '</div>';
+    html += '<div class="preview-rec">⚠️ Who 채널 보완 권장: 미흡 74개</div>';
+    html += '<div class="preview-rec">📚 교육·훈련 강화: 데이터 128개</div>';
+    html += '<div class="preview-rec">📈 사용량 증가 대응: 12% 증가</div></div>';
   }
-
-  html += '<div class="preview-foot">본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · 시스템 ID: AX-2026-0508</div>';
+  html += '<div class="preview-foot">본 보고서는 AX 시스템 자동 생성 · AX-2026-0508</div>';
   document.getElementById('previewPaper').innerHTML = html;
 }
 
@@ -688,7 +577,7 @@ function renderRecentTable() {
   RECENT_REPORTS.forEach((r, idx) => {
     html += '<div class="recent-row">';
     html += '<div class="recent-icon">' + r.icon + '</div>';
-    html += '<div class="recent-title">' + r.title + '<div style="color:#888;font-size:11px;font-weight:700;margin-top:2px;">' + r.time + ' 생성</div></div>';
+    html += '<div class="recent-title">' + r.title + '<div style="color:#888;font-size:11px;font-weight:700;margin-top:2px;">' + r.time + '</div></div>';
     html += '<div class="recent-period">' + r.period + '</div>';
     html += '<div><span class="recent-format">' + r.format + '</span></div>';
     html += '<div class="recent-status">✓ ' + r.status + '</div>';
@@ -697,140 +586,523 @@ function renderRecentTable() {
   });
   el.innerHTML = html;
   el.querySelectorAll('.recent-download').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', () => {
       const r = RECENT_REPORTS[btn.dataset.idx];
-      await downloadReport(r.title.replace(/[ \/]/g, '_') + r.ext, FORMAT_INFO[r.format.toLowerCase()] || FORMAT_INFO['pdf'], 'recent');
+      showToast('과거 보고서는 데모이므로 새로 생성해 주세요', 'warn');
     });
   });
 }
 
 // ============================================
-// 보고서 콘텐츠 생성 (HTML)
+// [핵심] 진짜 PDF 생성 - jsPDF + html2canvas
 // ============================================
-function generateReportContent() {
-  const tpl = TEMPLATES[selectedTemplate];
-  const previewHtml = document.getElementById('previewPaper').innerHTML;
-  const styles = `
-    body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 40px; background: #fff; color: #000; }
-    .preview-paper { max-width: 800px; margin: 0 auto; padding: 40px; }
-    .preview-cover { text-align: center; padding: 30px 0; border-bottom: 3px solid #1A237E; margin-bottom: 24px; }
-    .preview-stamp { display: inline-block; background: #1A237E; color: #fff; font-size: 13px; font-weight: 900; padding: 5px 16px; border-radius: 999px; margin-bottom: 14px; }
-    .preview-title { color: #1A237E; font-size: 32px; font-weight: 900; margin: 0 0 10px 0; }
-    .preview-period { color: #000; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .preview-meta { color: #555; font-size: 13px; font-weight: 700; display: flex; justify-content: center; gap: 16px; }
-    .preview-section { margin: 0 0 24px 0; }
-    .preview-section-title { color: #1A237E; font-size: 18px; font-weight: 900; padding-bottom: 8px; border-bottom: 2px solid #1A237E; margin-bottom: 12px; }
-    .preview-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .preview-kpi-card { border: 1px solid #1A237E; border-radius: 8px; padding: 12px 8px; text-align: center; background: #f5f7ff; }
-    .preview-kpi-value { color: #1A237E; font-size: 22px; font-weight: 900; line-height: 1; }
-    .preview-kpi-label { color: #000; font-size: 12px; font-weight: 700; margin-top: 6px; }
-    .preview-channel { display: grid; grid-template-columns: 70px 1fr 60px; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 700; }
-    .preview-channel-label { color: #1A237E; font-weight: 900; }
-    .preview-channel-bar { height: 16px; background: #f0f0f0; border-radius: 4px; overflow: hidden; display: flex; }
-    .preview-channel-bar .seg-a { background: #1A237E; height: 100%; }
-    .preview-channel-bar .seg-b { background: #b8860b; height: 100%; }
-    .preview-channel-bar .seg-c { background: #7B1F2A; height: 100%; }
-    .preview-channel-num { color: #1A237E; font-weight: 900; text-align: right; }
-    .preview-list { font-size: 13px; line-height: 1.8; color: #000; padding-left: 20px; }
-    .preview-list li { margin-bottom: 6px; }
-    .preview-rec { background: #fff5f5; border-left: 4px solid #7B1F2A; padding: 12px 16px; margin: 10px 0; font-size: 13px; font-weight: 700; color: #000; }
-    .preview-foot { text-align: center; padding-top: 18px; margin-top: 30px; border-top: 1px solid #ccc; color: #888; font-size: 12px; font-weight: 700; }
-    @media print { body { padding: 0; } .preview-paper { box-shadow: none; border: none; } }
-  `;
+async function generatePDFBlob() {
+  const { jsPDF } = window.jspdf;
+  const previewEl = document.getElementById('previewPaper');
 
-  return `<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>${tpl.name} - ${formatPeriod()}</title>
-<style>${styles}</style>
-</head>
-<body>
-<div class="preview-paper">${previewHtml}</div>
-<script>
-// 자동으로 인쇄 다이얼로그 안내 (선택)
-console.log('보고서: ${tpl.name}');
-console.log('기간: ${formatPeriod()}');
-console.log('💡 PDF로 저장하시려면 Ctrl+P (Cmd+P) → 대상: PDF로 저장');
-<\/script>
-</body>
-</html>`;
+  const canvas = await html2canvas(previewEl, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+    logging: false
+  });
+
+  const imgData = canvas.toDataURL('image/png');
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pdfWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  heightLeft -= pdfHeight;
+
+  while (heightLeft >= 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfHeight;
+  }
+
+  return pdf.output('blob');
 }
 
 // ============================================
-// 다운로드 - 위치 직접 선택 (File System Access API)
+// [핵심] 진짜 DOCX 생성 - docx 라이브러리
 // ============================================
+async function generateDOCXBlob() {
+  const d = window.docx;
+  const tpl = TEMPLATES[selectedTemplate];
+
+  const children = [];
+
+  // 제목
+  children.push(new d.Paragraph({
+    children: [new d.TextRun({ text: tpl.name, bold: true, size: 56, color: '1A237E' })],
+    alignment: d.AlignmentType.CENTER,
+    spacing: { after: 200 }
+  }));
+
+  children.push(new d.Paragraph({
+    children: [new d.TextRun({ text: '대상 기간: ' + formatPeriod(), size: 24, color: '000000' })],
+    alignment: d.AlignmentType.CENTER,
+    spacing: { after: 100 }
+  }));
+
+  children.push(new d.Paragraph({
+    children: [
+      new d.TextRun({ text: 'AX-2026-0508 ', color: '555555', size: 20 }),
+      new d.TextRun({ text: '· ', color: '888888', size: 20 }),
+      new d.TextRun({ text: '작성자: AX-00000 ', color: '555555', size: 20 }),
+      new d.TextRun({ text: '· ', color: '888888', size: 20 }),
+      new d.TextRun({ text: '발행: ' + formatDate(new Date()), color: '555555', size: 20 })
+    ],
+    alignment: d.AlignmentType.CENTER,
+    spacing: { after: 400 },
+    border: { bottom: { color: '1A237E', space: 1, style: 'single', size: 12 } }
+  }));
+
+  // 1. 요약
+  if (selectedSections.has('summary')) {
+    children.push(makeSectionTitle(d, '1. 요약'));
+    children.push(new d.Paragraph({
+      children: [new d.TextRun({
+        text: '본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다. 총 1,248개 데이터를 학습했으며, A 등급 비율이 78%로 안정적인 운영 상태를 보입니다. 6채널 중 Who(누가) 채널의 미흡 사항이 가장 높아 향후 개선이 권장됩니다.',
+        size: 22, color: '000000'
+      })],
+      spacing: { after: 300 }
+    }));
+  }
+
+  // 2. KPI
+  if (selectedSections.has('kpi')) {
+    children.push(makeSectionTitle(d, '2. 핵심 지표 (KPI)'));
+    const kpiTable = new d.Table({
+      width: { size: 100, type: d.WidthType.PERCENTAGE },
+      rows: [
+        new d.TableRow({
+          children: ['총 데이터', 'A 등급', '평균 응답', '사용자'].map(t =>
+            makeTableCell(d, t, true)
+          )
+        }),
+        new d.TableRow({
+          children: ['1,248개', '78%', '0.82초', '28명'].map(t =>
+            makeTableCell(d, t, false)
+          )
+        })
+      ]
+    });
+    children.push(kpiTable);
+    children.push(new d.Paragraph({ text: '', spacing: { after: 300 } }));
+  }
+
+  // 3. 6채널
+  if (selectedSections.has('channel')) {
+    children.push(makeSectionTitle(d, '3. 5W1H 6채널 품질 분석'));
+    const headerRow = new d.TableRow({
+      children: ['채널', '의미', 'A 등급', 'B 등급', 'C 등급', '합계', '정상률'].map(t =>
+        makeTableCell(d, t, true)
+      )
+    });
+    const dataRows = CHANNELS.map(ch => {
+      const g = CHANNEL_GRADES[ch.key];
+      const pct = ((g.a / g.total) * 100).toFixed(1) + '%';
+      return new d.TableRow({
+        children: [
+          makeTableCell(d, ch.label, false),
+          makeTableCell(d, ch.ko, false),
+          makeTableCell(d, String(g.a), false),
+          makeTableCell(d, String(g.b), false),
+          makeTableCell(d, String(g.c), false),
+          makeTableCell(d, String(g.total), false),
+          makeTableCell(d, pct, false)
+        ]
+      });
+    });
+    children.push(new d.Table({
+      width: { size: 100, type: d.WidthType.PERCENTAGE },
+      rows: [headerRow, ...dataRows]
+    }));
+    children.push(new d.Paragraph({ text: '', spacing: { after: 300 } }));
+  }
+
+  // 4. 추이
+  if (selectedSections.has('trend')) {
+    children.push(makeSectionTitle(d, '4. 처리 추이 분석'));
+    const trendData = ['5/02: 120건', '5/03: 145건', '5/04: 132건', '5/05: 158건', '5/06: 142건', '5/07: 168건', '5/08: 175건'];
+    trendData.forEach(t => {
+      children.push(new d.Paragraph({
+        children: [new d.TextRun({ text: '• ' + t, size: 22 })],
+        spacing: { after: 60 }
+      }));
+    });
+    children.push(new d.Paragraph({
+      children: [new d.TextRun({ text: '총 1,040건 처리, 일평균 148.6건', size: 22, bold: true, color: '7B1F2A' })],
+      spacing: { after: 300 }
+    }));
+  }
+
+  // 5. 활동
+  if (selectedSections.has('activity')) {
+    children.push(makeSectionTitle(d, '5. 주요 활동 내역'));
+    const activities = [
+      '품질 평가 정기 실행 - 78% A 등급 달성',
+      '자동 보완 2회 실행 - C 등급 → B 등급 개선',
+      '신규 매뉴얼 3건 학습 완료 (안전관리 분야)',
+      '주간 안전 보고서 1건 자동 생성',
+      '일일 검색·질의응답 175건 처리 (최고치)'
+    ];
+    activities.forEach(t => {
+      children.push(new d.Paragraph({
+        children: [new d.TextRun({ text: '• ' + t, size: 22 })],
+        spacing: { after: 80 }
+      }));
+    });
+    children.push(new d.Paragraph({ text: '', spacing: { after: 200 } }));
+  }
+
+  // 6. 권고
+  if (selectedSections.has('rec')) {
+    children.push(makeSectionTitle(d, '6. 권고사항'));
+    const recs = [
+      '⚠️ Who 채널 보완 권장: 미흡 데이터 74개 잔존, 자동 보완 모드 실행 권장',
+      '📚 교육·훈련 분야 강화: 데이터 128개로 다른 분야 대비 부족',
+      '📈 사용량 증가 대응: 일일 검색량 12% 증가, 시스템 자원 모니터링 필요'
+    ];
+    recs.forEach(t => {
+      children.push(new d.Paragraph({
+        children: [new d.TextRun({ text: t, size: 22, bold: true })],
+        spacing: { after: 100 },
+        shading: { type: 'clear', color: 'auto', fill: 'FFF5F5' }
+      }));
+    });
+  }
+
+  // 푸터
+  children.push(new d.Paragraph({
+    children: [new d.TextRun({
+      text: '본 보고서는 AX 시스템에 의해 자동 생성되었습니다 · AX-2026-0508',
+      italics: true, size: 18, color: '888888'
+    })],
+    alignment: d.AlignmentType.CENTER,
+    spacing: { before: 600 },
+    border: { top: { color: 'CCCCCC', space: 1, style: 'single', size: 6 } }
+  }));
+
+  const doc = new d.Document({ sections: [{ children: children }] });
+  return await d.Packer.toBlob(doc);
+}
+
+function makeSectionTitle(d, text) {
+  return new d.Paragraph({
+    children: [new d.TextRun({ text: text, bold: true, size: 32, color: '1A237E' })],
+    spacing: { before: 300, after: 200 },
+    border: { bottom: { color: '1A237E', space: 1, style: 'single', size: 12 } }
+  });
+}
+
+function makeTableCell(d, text, isHeader) {
+  return new d.TableCell({
+    children: [new d.Paragraph({
+      children: [new d.TextRun({
+        text: text,
+        bold: isHeader,
+        size: isHeader ? 22 : 20,
+        color: isHeader ? 'FFFFFF' : '000000'
+      })],
+      alignment: d.AlignmentType.CENTER
+    })],
+    shading: isHeader ? { type: 'clear', color: 'auto', fill: '1A237E' } : undefined
+  });
+}
+
+// ============================================
+// [핵심] 진짜 PPTX 생성 - pptxgenjs
+// ============================================
+async function generatePPTXBlob() {
+  const pres = new PptxGenJS();
+  pres.layout = 'LAYOUT_WIDE'; // 13.333 x 7.5 inches
+  const tpl = TEMPLATES[selectedTemplate];
+
+  // 슬라이드 1: 표지
+  let slide = pres.addSlide();
+  slide.background = { color: 'FFFFFF' };
+  slide.addText('AX-2026-0508 자동 생성', {
+    x: 5.17, y: 1.5, w: 3, h: 0.4,
+    fontSize: 14, bold: true, color: 'FFFFFF', align: 'center',
+    fill: { color: '1A237E' }
+  });
+  slide.addText(tpl.name, {
+    x: 0.5, y: 2.5, w: 12.33, h: 1.5,
+    fontSize: 60, bold: true, color: '1A237E', align: 'center',
+    fontFace: '맑은 고딕'
+  });
+  slide.addText('대상 기간: ' + formatPeriod(), {
+    x: 0.5, y: 4.2, w: 12.33, h: 0.6,
+    fontSize: 24, color: '000000', align: 'center', bold: true
+  });
+  slide.addText('📅 ' + formatDate(new Date()) + '   ·   👤 AX-00000   ·   📦 PowerPoint', {
+    x: 0.5, y: 5.0, w: 12.33, h: 0.5,
+    fontSize: 16, color: '555555', align: 'center'
+  });
+  slide.addShape(pres.ShapeType.line, {
+    x: 4, y: 5.8, w: 5.33, h: 0,
+    line: { color: '1A237E', width: 3 }
+  });
+  slide.addText('빅데이터기술연구원㈜', {
+    x: 0.5, y: 6.0, w: 12.33, h: 0.4,
+    fontSize: 14, color: '7B1F2A', align: 'center', bold: true
+  });
+
+  // 슬라이드 2: 요약
+  if (selectedSections.has('summary')) {
+    slide = pres.addSlide();
+    addSlideHeader(pres, slide, '1. 요약');
+    slide.addText('본 보고서는 ' + tpl.period + ' 동안의 AX 시스템 운영 현황을 종합 분석한 결과입니다.\n\n' +
+      '• 총 1,248개 데이터 학습 완료\n' +
+      '• A 등급 비율 78% (안정적 운영)\n' +
+      '• 6채널 중 Who(누가) 채널 미흡 사항 개선 권장\n' +
+      '• 자동 보완 2회 실행으로 C → B 등급 개선', {
+      x: 0.7, y: 1.5, w: 12, h: 5,
+      fontSize: 22, color: '000000', valign: 'top', lineSpacingMultiple: 1.5
+    });
+  }
+
+  // 슬라이드 3: KPI
+  if (selectedSections.has('kpi')) {
+    slide = pres.addSlide();
+    addSlideHeader(pres, slide, '2. 핵심 지표 (KPI)');
+    const kpis = [
+      { label: '총 데이터', value: '1,248', unit: '개' },
+      { label: 'A 등급', value: '78', unit: '%' },
+      { label: '평균 응답', value: '0.82', unit: '초' },
+      { label: '사용자', value: '28', unit: '명' }
+    ];
+    kpis.forEach((k, i) => {
+      const x = 0.5 + i * 3.13;
+      slide.addShape(pres.ShapeType.roundRect, {
+        x: x, y: 2.5, w: 2.83, h: 3,
+        fill: { color: 'F5F7FF' },
+        line: { color: '1A237E', width: 3 },
+        rectRadius: 0.1
+      });
+      slide.addText(k.label, {
+        x: x, y: 2.7, w: 2.83, h: 0.5,
+        fontSize: 18, color: '000000', align: 'center', bold: true
+      });
+      slide.addText(k.value, {
+        x: x, y: 3.3, w: 2.83, h: 1.5,
+        fontSize: 60, color: '1A237E', align: 'center', bold: true
+      });
+      slide.addText(k.unit, {
+        x: x, y: 4.7, w: 2.83, h: 0.5,
+        fontSize: 24, color: '7B1F2A', align: 'center', bold: true
+      });
+    });
+  }
+
+  // 슬라이드 4: 6채널
+  if (selectedSections.has('channel')) {
+    slide = pres.addSlide();
+    addSlideHeader(pres, slide, '3. 5W1H 6채널 품질 분석');
+
+    const tableHeaders = [['채널', '의미', 'A 등급', 'B 등급', 'C 등급', '합계', '정상률']];
+    const tableData = CHANNELS.map(ch => {
+      const g = CHANNEL_GRADES[ch.key];
+      const pct = ((g.a / g.total) * 100).toFixed(1) + '%';
+      return [ch.label, ch.ko, String(g.a), String(g.b), String(g.c), String(g.total), pct];
+    });
+
+    const allRows = tableHeaders.concat(tableData).map((row, idx) =>
+      row.map(cell => ({
+        text: cell,
+        options: idx === 0
+          ? { bold: true, color: 'FFFFFF', fill: { color: '1A237E' }, align: 'center', fontSize: 14 }
+          : { color: '000000', align: 'center', fontSize: 13 }
+      }))
+    );
+
+    slide.addTable(allRows, {
+      x: 0.5, y: 1.5, w: 12.33, h: 4.5,
+      border: { type: 'solid', color: '1A237E', pt: 1 },
+      fontFace: '맑은 고딕'
+    });
+  }
+
+  // 슬라이드 5: 추이
+  if (selectedSections.has('trend')) {
+    slide = pres.addSlide();
+    addSlideHeader(pres, slide, '4. 처리 추이 분석');
+    slide.addChart(pres.ChartType.line, [{
+      name: '일별 처리량',
+      labels: ['5/02', '5/03', '5/04', '5/05', '5/06', '5/07', '5/08'],
+      values: [120, 145, 132, 158, 142, 168, 175]
+    }], {
+      x: 0.5, y: 1.5, w: 12.33, h: 5,
+      chartColors: ['7B1F2A'],
+      lineSize: 3,
+      lineDataSymbolSize: 10,
+      catAxisLabelFontSize: 14,
+      valAxisLabelFontSize: 14,
+      showLegend: false,
+      showTitle: true,
+      title: '최근 7일 처리량 추이',
+      titleFontSize: 18,
+      titleColor: '1A237E'
+    });
+  }
+
+  // 슬라이드 6: 활동
+  if (selectedSections.has('activity')) {
+    slide = pres.addSlide();
+    addSlideHeader(pres, slide, '5. 주요 활동 내역');
+    const activities = [
+      '✅ 품질 평가 정기 실행 - 78% A 등급 달성',
+      '🤖 자동 보완 2회 실행 - C 등급 → B 등급 개선',
+      '📚 신규 매뉴얼 3건 학습 완료 (안전관리 분야)',
+      '📑 주간 안전 보고서 1건 자동 생성',
+      '🔍 일일 검색·질의응답 175건 처리 (최고치)'
+    ];
+    activities.forEach((act, i) => {
+      slide.addShape(pres.ShapeType.roundRect, {
+        x: 0.5, y: 1.5 + i * 1, w: 12.33, h: 0.8,
+        fill: { color: 'F5F7FF' },
+        line: { color: '1A237E', width: 1 },
+        rectRadius: 0.05
+      });
+      slide.addText(act, {
+        x: 0.7, y: 1.5 + i * 1, w: 12, h: 0.8,
+        fontSize: 18, color: '000000', valign: 'middle', bold: true
+      });
+    });
+  }
+
+  // 슬라이드 7: 권고
+  if (selectedSections.has('rec')) {
+    slide = pres.addSlide();
+    addSlideHeader(pres, slide, '6. 권고사항');
+    const recs = [
+      { icon: '⚠️', title: 'Who 채널 보완 권장', desc: '미흡 데이터 74개 잔존, 자동 보완 모드 실행 권장' },
+      { icon: '📚', title: '교육·훈련 분야 강화', desc: '데이터 128개로 다른 분야 대비 부족' },
+      { icon: '📈', title: '사용량 증가 대응', desc: '일일 검색량 12% 증가, 시스템 자원 모니터링 필요' }
+    ];
+    recs.forEach((r, i) => {
+      slide.addShape(pres.ShapeType.roundRect, {
+        x: 0.5, y: 1.5 + i * 1.6, w: 12.33, h: 1.4,
+        fill: { color: 'FFF5F5' },
+        line: { color: '7B1F2A', width: 4 },
+        rectRadius: 0.1
+      });
+      slide.addText(r.icon + ' ' + r.title, {
+        x: 0.7, y: 1.6 + i * 1.6, w: 12, h: 0.5,
+        fontSize: 22, color: '7B1F2A', bold: true
+      });
+      slide.addText(r.desc, {
+        x: 0.7, y: 2.2 + i * 1.6, w: 12, h: 0.5,
+        fontSize: 16, color: '000000'
+      });
+    });
+  }
+
+  return await pres.write({ outputType: 'blob' });
+}
+
+function addSlideHeader(pres, slide, title) {
+  slide.background = { color: 'FFFFFF' };
+  slide.addShape(pres.ShapeType.rect, {
+    x: 0, y: 0, w: 13.33, h: 0.8,
+    fill: { color: '1A237E' }
+  });
+  slide.addText(title, {
+    x: 0.5, y: 0.1, w: 10, h: 0.6,
+    fontSize: 24, color: 'FFFFFF', bold: true, valign: 'middle'
+  });
+  slide.addText('AX-2026-0508', {
+    x: 10.5, y: 0.1, w: 2.5, h: 0.6,
+    fontSize: 12, color: 'FFFFFF', align: 'right', valign: 'middle'
+  });
+}
+
+// ============================================
+// 통합 다운로드
+// ============================================
+async function generateBlob() {
+  if (selectedFormat === 'pdf') return await generatePDFBlob();
+  if (selectedFormat === 'docx') return await generateDOCXBlob();
+  if (selectedFormat === 'pptx') return await generatePPTXBlob();
+  throw new Error('지원하지 않는 형식');
+}
+
 async function downloadWithPicker(fileName, fmt) {
   if (!supportsFilePicker) {
     showToast('이 브라우저는 위치 선택을 지원하지 않습니다', 'error');
-    return downloadDefault(fileName, fmt);
+    return await downloadDefault(fileName, fmt);
   }
 
-  const content = generateReportContent();
-  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+  showToast('📦 파일 생성 중...', '');
 
   try {
+    const blob = await generateBlob();
+
     const handle = await window.showSaveFilePicker({
       suggestedName: fileName,
-      types: [
-        { description: '보고서 (HTML 형식 - 브라우저에서 인쇄 → PDF 가능)',
-          accept: { 'text/html': ['.html', '.htm', fmt.ext] } }
-      ]
+      types: [{
+        description: fmt.name + ' 파일',
+        accept: { [fmt.mime]: [fmt.ext] }
+      }]
     });
     const writable = await handle.createWritable();
     await writable.write(blob);
     await writable.close();
-
     showToast('✅ 저장 완료: ' + handle.name);
     return { saved: true, name: handle.name };
   } catch (e) {
     if (e.name === 'AbortError') {
-      showToast('저장이 취소되었습니다', 'error');
+      showToast('저장이 취소되었습니다', 'warn');
       return { cancelled: true };
     }
     console.error('저장 오류:', e);
-    showToast('⚠️ 저장 중 오류: ' + e.message, 'error');
+    showToast('⚠️ 오류: ' + e.message, 'error');
     return { error: true };
   }
 }
 
-// 기본 다운로드 폴더로 저장
-function downloadDefault(fileName, fmt) {
-  const content = generateReportContent();
-  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  showToast('✅ 다운로드 폴더에 저장: ' + fileName);
-  return { saved: true, name: fileName };
-}
+async function downloadDefault(fileName, fmt) {
+  showToast('📦 파일 생성 중...', '');
 
-// 통합 다운로드 함수
-async function downloadReport(fileName, fmt, source) {
-  if (selectedSaveMethod === 'picker' && supportsFilePicker) {
-    return await downloadWithPicker(fileName, fmt);
+  try {
+    const blob = await generateBlob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('✅ 다운로드 완료: ' + fileName);
+    return { saved: true, name: fileName };
+  } catch (e) {
+    console.error('생성 오류:', e);
+    showToast('⚠️ 오류: ' + e.message, 'error');
+    return { error: true };
   }
-  return downloadDefault(fileName, fmt);
 }
 
-// 토스트
 function showToast(message, type) {
   const toast = document.getElementById('toast');
   document.getElementById('toastText').textContent = message;
-  toast.classList.toggle('error', type === 'error');
+  toast.classList.remove('error', 'warn');
+  if (type === 'error') toast.classList.add('error');
+  else if (type === 'warn') toast.classList.add('warn');
   toast.classList.add('show');
   clearTimeout(window._toastTimer);
   window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
-// ============================================
-// 보고서 생성
-// ============================================
 const generateBtn = document.getElementById('generateBtn');
 const genProgress = document.getElementById('genProgress');
 const genText = document.getElementById('genText');
@@ -854,7 +1126,7 @@ generateBtn.addEventListener('click', async () => {
     { text: '6채널 분석 중...', sub: 'Why·What·When·Where·Who·How 통계' },
     { text: '차트 생성 중...', sub: '시각화 자료 생성' },
     { text: '보고서 작성 중...', sub: FORMAT_INFO[selectedFormat].name + ' 형식으로 변환' },
-    { text: '검증 및 마무리...', sub: '최종 품질 점검' }
+    { text: '최종 검증...', sub: '품질 점검 완료' }
   ];
 
   for (const s of stages) {
@@ -873,48 +1145,34 @@ function showCompletionModal() {
   const tpl = TEMPLATES[selectedTemplate];
   const fmt = FORMAT_INFO[selectedFormat];
   const fileName = getFinalFileName();
-  const fileSize = (Math.random() * 3 + 1.5).toFixed(1) + ' MB';
 
   document.getElementById('modalMsg').innerHTML =
-    tpl.name + '이(가) 성공적으로 생성되었습니다.<br>저장 방식을 선택하세요.';
+    tpl.name + '이(가) ' + fmt.name + ' 형식으로 생성됐습니다.<br>저장 방식을 선택하세요.';
 
   document.getElementById('modalInfo').innerHTML =
     '<div class="modal-info-row"><span class="modal-info-label">파일명</span><span class="modal-info-value">' + fileName + '</span></div>' +
-    '<div class="modal-info-row"><span class="modal-info-label">형식</span><span class="modal-info-value">' + fmt.name + '</span></div>' +
-    '<div class="modal-info-row"><span class="modal-info-label">파일 크기</span><span class="modal-info-value">' + fileSize + '</span></div>' +
+    '<div class="modal-info-row"><span class="modal-info-label">형식</span><span class="modal-info-value">' + fmt.name + ' (진짜 ' + fmt.ext + ')</span></div>' +
     '<div class="modal-info-row"><span class="modal-info-label">대상 기간</span><span class="modal-info-value">' + formatPeriod() + '</span></div>' +
     '<div class="modal-info-row"><span class="modal-info-label">포함 섹션</span><span class="modal-info-value">' + selectedSections.size + '개</span></div>';
 
-  // 미리보기
   document.getElementById('modalPreview').onclick = () => {
     document.getElementById('modal').classList.remove('show');
     document.getElementById('previewPaper').scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  // 위치 선택 저장
   const savePickerBtn = document.getElementById('modalSavePicker');
   savePickerBtn.disabled = !supportsFilePicker;
   savePickerBtn.style.opacity = supportsFilePicker ? '1' : '0.5';
-  savePickerBtn.style.cursor = supportsFilePicker ? 'pointer' : 'not-allowed';
   savePickerBtn.onclick = async () => {
-    if (!supportsFilePicker) {
-      showToast('이 브라우저는 위치 선택을 지원하지 않습니다 (Chrome/Edge 사용)', 'error');
-      return;
-    }
+    document.getElementById('modal').classList.remove('show');
     const result = await downloadWithPicker(fileName, fmt);
-    if (result && result.saved) {
-      addToRecent(tpl, fmt, result.name);
-      document.getElementById('modal').classList.remove('show');
-    }
+    if (result && result.saved) addToRecent(tpl, fmt, result.name);
   };
 
-  // 빠른 다운로드
-  document.getElementById('modalSaveDefault').onclick = () => {
-    const result = downloadDefault(fileName, fmt);
-    if (result && result.saved) {
-      addToRecent(tpl, fmt, fileName);
-      document.getElementById('modal').classList.remove('show');
-    }
+  document.getElementById('modalSaveDefault').onclick = async () => {
+    document.getElementById('modal').classList.remove('show');
+    const result = await downloadDefault(fileName, fmt);
+    if (result && result.saved) addToRecent(tpl, fmt, fileName);
   };
 
   document.getElementById('modal').classList.add('show');
@@ -927,8 +1185,7 @@ function addToRecent(tpl, fmt, fileName) {
     period: formatPeriod(),
     format: fmt.name.toUpperCase(),
     status: '완료',
-    time: '방금',
-    ext: fmt.ext
+    time: '방금'
   };
   RECENT_REPORTS.unshift(newReport);
   if (RECENT_REPORTS.length > 6) RECENT_REPORTS.pop();
@@ -941,16 +1198,14 @@ document.getElementById('modal').addEventListener('click', e => {
   }
 });
 
-// 하단
 document.querySelectorAll('.bottom-btn[data-nav]').forEach(btn => {
   btn.addEventListener('click', () => {
     const nav = btn.dataset.nav;
     const labels = { 'search': '🔍 검색', 'qa': '💬 AI 질의응답', 'dashboard': '📊 대시보드' };
-    alert(labels[nav] + ' 화면으로 이동합니다.\n\n(해당 화면 제작 후 연결됩니다)');
+    alert(labels[nav] + ' 화면으로 이동합니다.');
   });
 });
 
-// 초기화
 setTodayDates();
 document.getElementById('customFileName').placeholder = generateAutoFileName();
 renderRecentTable();
