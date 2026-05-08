@@ -2,1153 +2,1007 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>saas.html 화면 2 v8 - AX 시스템 구축 시각화</title>
+<title>saas.html 화면 3 - 검색 (5W1H 6채널 통합)</title>
 <style>
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; margin: 0; padding: 40px 20px; background: #ffffff; }
 
-  .top-banner { background: #1A237E; color: #ffffff; text-align: center; padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0; }
-
-  .upload-wrapper { max-width: 1200px; margin: 0 auto 28px auto; border: 3px solid #1A237E; border-radius: 16px; padding: 44px 40px; background: #ffffff; box-sizing: border-box; }
-
-  .screen-title { color: #1A237E; font-size: 36px; font-weight: 900; text-align: center; margin: 0 0 14px 0; }
-  .screen-subtitle { color: #000000; font-size: 20px; font-weight: 700; text-align: center; margin: 0 0 30px 0; }
-
-  .mini-steps { display: flex; justify-content: space-between; align-items: center; margin: 0 0 32px 0; padding: 16px 20px; background: #f5f5f5; border-radius: 12px; gap: 4px; }
-  .mini-step { background: #ffffff; color: #000000; border: 2px solid #cccccc; font-size: 15px; font-weight: 700; padding: 10px 14px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; transition: all 0.3s; position: relative; }
-  .mini-step.active { background: #7B1F2A; color: #ffffff; border-color: #7B1F2A; transform: scale(1.08); box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.2); }
-  .mini-step.done { background: #1A237E; color: #ffffff; border-color: #1A237E; }
-  .mini-step.done::after { content: '✓'; position: absolute; top: -8px; right: -8px; background: #1A237E; color: #ffffff; width: 22px; height: 22px; border-radius: 50%; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; }
-  .mini-step.skipped { background: #e0e0e0; color: #888888; border-color: #cccccc; text-decoration: line-through; }
-  .mini-arrow { color: #000000; font-size: 18px; font-weight: 900; flex-grow: 1; text-align: center; }
-
-  .iter-counter { display: none; text-align: center; margin: 0 0 24px 0; padding: 18px 24px; background: #1A237E; color: #ffffff; border-radius: 12px; font-size: 24px; font-weight: 900; letter-spacing: 1px; border: 4px solid #7B1F2A; }
-  .iter-counter.show { display: block; }
-
-  .iter-alert { display: none; text-align: center; margin: 28px 0; padding: 32px 30px; background: #7B1F2A; color: #ffffff; border-radius: 14px; font-size: 32px; font-weight: 900; letter-spacing: 2px; box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.2); }
-  .iter-alert.show { display: block; }
-  .iter-alert-sub { font-size: 18px; font-weight: 700; margin: 10px 0 0 0; opacity: 0.9; }
-
-  .drop-zone { border: 3px dashed #1A237E; border-radius: 14px; padding: 56px 30px; text-align: center; background: #ffffff; margin: 0 0 28px 0; cursor: pointer; transition: all 0.2s; }
-  .drop-zone:hover { background: #f5f7ff; border-color: #7B1F2A; }
-  .drop-zone.drag-over { background: #fff5f5; border-color: #7B1F2A; }
-  .drop-icon { font-size: 64px; color: #1A237E; margin: 0 0 16px 0; line-height: 1; }
-  .drop-main-text { color: #1A237E; font-size: 26px; font-weight: 900; margin: 0 0 10px 0; }
-  .drop-sub-text { color: #000000; font-size: 18px; font-weight: 700; margin: 0 0 24px 0; }
-  .browse-btn { background: #1A237E; color: #ffffff; font-size: 18px; font-weight: 700; padding: 14px 36px; border: none; border-radius: 999px; cursor: pointer; }
-  .browse-btn:hover { background: #7B1F2A; }
-
-  .file-list-box { border: 2px solid #000000; border-radius: 12px; padding: 20px 24px; margin: 0 0 28px 0; background: #ffffff; min-height: 100px; }
-  .file-list-title { color: #1A237E; font-size: 20px; font-weight: 900; margin: 0 0 14px 0; }
-  .empty-msg { color: #888; font-size: 16px; text-align: center; padding: 20px 0; }
-  .file-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e0e0e0; font-size: 17px; font-weight: 700; color: #000000; }
-  .file-row:last-child { border-bottom: none; }
-  .file-name { flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 16px; }
-  .file-size { margin: 0 16px; white-space: nowrap; }
-  .file-status { background: #7B1F2A; color: #ffffff; font-size: 14px; font-weight: 700; padding: 4px 12px; border-radius: 999px; margin-right: 8px; }
-  .file-status.done { background: #1A237E; }
-  .file-remove { background: none; border: none; color: #7B1F2A; font-size: 20px; font-weight: 900; cursor: pointer; padding: 0 6px; }
-
-  .ax-start-btn { display: block; width: 100%; background: #7B1F2A; color: #ffffff; font-size: 26px; font-weight: 900; padding: 22px 40px; border: none; border-radius: 12px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
-  .ax-start-btn:hover:not(:disabled) { background: #1A237E; }
-  .ax-start-btn:disabled { background: #cccccc; color: #888888; cursor: not-allowed; }
-
-  .progress-box { border: 3px solid #7B1F2A; border-radius: 14px; padding: 32px 30px; margin: 28px 0; background: #ffffff; text-align: center; display: none; }
-  .progress-box.show { display: block; }
-  .progress-step-num { color: #7B1F2A; font-size: 48px; font-weight: 900; margin: 0 0 10px 0; line-height: 1; }
-  .progress-step-name { color: #1A237E; font-size: 30px; font-weight: 900; margin: 0 0 14px 0; }
-  .progress-message { color: #000000; font-size: 20px; font-weight: 700; margin: 0 0 20px 0; }
-  .progress-bar-bg { width: 100%; height: 18px; background: #f0f0f0; border-radius: 999px; overflow: hidden; border: 1px solid #cccccc; }
-  .progress-bar-fill { height: 100%; background: #7B1F2A; border-radius: 999px; width: 0%; transition: width 1.4s linear; }
-
-  .eval-box { border: 3px solid #1A237E; border-radius: 14px; padding: 28px 30px; margin: 28px 0; background: #ffffff; display: none; }
-  .eval-box.show { display: block; }
-  .eval-title { color: #1A237E; font-size: 28px; font-weight: 900; text-align: center; margin: 0 0 8px 0; }
-  .eval-iter-badge { display: inline-block; background: #7B1F2A; color: #ffffff; font-size: 22px; font-weight: 900; padding: 6px 18px; border-radius: 999px; margin: 0 8px; }
-  .eval-subtitle { color: #000000; font-size: 16px; font-weight: 700; text-align: center; margin: 0 0 22px 0; }
-  .eval-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin: 0 0 18px 0; }
-  .eval-card { border: 2px solid #cccccc; border-radius: 10px; padding: 16px 8px; text-align: center; background: #ffffff; transition: all 0.3s; }
-  .eval-card.grade-a { border-color: #1A237E; background: #f5f7ff; }
-  .eval-card.grade-b { border-color: #b8860b; background: #fffbe6; }
-  .eval-card.grade-c { border-color: #7B1F2A; background: #fff5f5; }
-  .eval-channel { font-size: 14px; font-weight: 700; color: #000000; margin: 0 0 6px 0; }
-  .eval-grade { font-size: 32px; font-weight: 900; margin: 0 0 4px 0; line-height: 1; }
-  .eval-card.grade-a .eval-grade { color: #1A237E; }
-  .eval-card.grade-b .eval-grade { color: #b8860b; }
-  .eval-card.grade-c .eval-grade { color: #7B1F2A; }
-  .eval-detail { font-size: 12px; font-weight: 700; color: #000000; }
-  .eval-all-a { text-align: center; background: #1A237E; color: #ffffff; padding: 18px; border-radius: 10px; font-size: 22px; font-weight: 900; margin: 12px 0 0 0; display: none; }
-  .eval-all-a.show { display: block; }
-
-  .feedback-box { border: 4px solid #7B1F2A; border-radius: 14px; padding: 32px 30px; margin: 28px 0; background: #fff5f5; display: none; box-shadow: 0 0 0 6px rgba(123, 31, 42, 0.15); }
-  .feedback-box.show { display: block; }
-  .fb-icon { font-size: 48px; text-align: center; margin: 0 0 8px 0; line-height: 1; }
-  .fb-title { color: #7B1F2A; font-size: 30px; font-weight: 900; text-align: center; margin: 0 0 10px 0; }
-  .fb-iter-badge { display: inline-block; background: #7B1F2A; color: #ffffff; font-size: 22px; font-weight: 900; padding: 6px 18px; border-radius: 999px; margin: 0 8px; }
-  .fb-message { color: #000000; font-size: 18px; font-weight: 700; text-align: center; margin: 0 0 24px 0; line-height: 1.5; }
-  .fb-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .fb-btn { border: 2px solid #1A237E; background: #ffffff; color: #1A237E; font-size: 18px; font-weight: 900; padding: 22px 14px; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.2s; }
-  .fb-btn:hover:not(:disabled) { background: #1A237E; color: #ffffff; transform: translateY(-3px); }
-  .fb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .fb-btn-icon { font-size: 32px; display: block; margin: 0 0 8px 0; }
-  .fb-btn-desc { font-size: 13px; font-weight: 700; margin: 6px 0 0 0; color: #000000; }
-  .fb-btn:hover:not(:disabled) .fb-btn-desc { color: #ffffff; }
-
-  .manual-box { border: 3px solid #1A237E; border-radius: 14px; padding: 28px 30px; margin: 20px 0 0 0; background: #ffffff; display: none; }
-  .manual-box.show { display: block; }
-  .manual-title { color: #1A237E; font-size: 22px; font-weight: 900; margin: 0 0 14px 0; }
-  .manual-channels { display: flex; gap: 10px; margin: 0 0 14px 0; flex-wrap: wrap; }
-  .manual-channel-tag { background: #fff5f5; color: #7B1F2A; border: 2px solid #7B1F2A; font-size: 15px; font-weight: 900; padding: 8px 16px; border-radius: 999px; }
-  .manual-textarea { width: 100%; min-height: 110px; border: 2px solid #1A237E; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 700; color: #000000; box-sizing: border-box; resize: vertical; font-family: inherit; }
-  .manual-submit { margin: 16px 0 0 0; background: #7B1F2A; color: #ffffff; font-size: 18px; font-weight: 900; padding: 14px 36px; border: none; border-radius: 999px; cursor: pointer; width: 100%; }
-  .manual-submit:hover { background: #1A237E; }
-
-  /* AI 학습 박스 (v7) */
-  .learning-box { border: 3px solid #1A237E; border-radius: 14px; padding: 32px 30px; margin: 28px 0; background: #ffffff; display: none; }
-  .learning-box.show { display: block; }
-  .lb-title { color: #1A237E; font-size: 28px; font-weight: 900; text-align: center; margin: 0 0 8px 0; }
-  .lb-subtitle { color: #000000; font-size: 16px; font-weight: 700; text-align: center; margin: 0 0 24px 0; }
-  .lb-progress-wrap { margin: 0 0 28px 0; }
-  .lb-progress-label { color: #000000; font-size: 18px; font-weight: 900; margin: 0 0 8px 0; display: flex; justify-content: space-between; }
-  .lb-progress-num { color: #7B1F2A; font-size: 24px; }
-  .lb-progress-bg { width: 100%; height: 24px; background: #f0f0f0; border-radius: 999px; overflow: hidden; border: 2px solid #cccccc; }
-  .lb-progress-fill { height: 100%; background: #7B1F2A; border-radius: 999px; width: 0%; transition: width 0.6s ease; }
-  .lb-substeps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 0 0 28px 0; }
-  .lb-substep { border: 2px solid #cccccc; border-radius: 10px; padding: 14px 12px; background: #ffffff; transition: all 0.3s; }
-  .lb-substep.active { border-color: #7B1F2A; background: #fff5f5; box-shadow: 0 0 0 3px rgba(123, 31, 42, 0.15); }
-  .lb-substep.done { border-color: #1A237E; background: #f5f7ff; }
-  .lb-substep-num { display: inline-block; background: #cccccc; color: #ffffff; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-size: 14px; font-weight: 900; margin-right: 6px; }
-  .lb-substep.active .lb-substep-num { background: #7B1F2A; }
-  .lb-substep.done .lb-substep-num { background: #1A237E; }
-  .lb-substep-name { color: #000000; font-size: 14px; font-weight: 900; }
-  .lb-substep-status { color: #888; font-size: 12px; font-weight: 700; margin: 6px 0 8px 0; }
-  .lb-substep.active .lb-substep-status { color: #7B1F2A; }
-  .lb-substep.done .lb-substep-status { color: #1A237E; }
-  .lb-substep-bar { width: 100%; height: 6px; background: #f0f0f0; border-radius: 999px; overflow: hidden; }
-  .lb-substep-fill { height: 100%; background: #7B1F2A; border-radius: 999px; width: 0%; transition: width 0.6s ease; }
-  .lb-substep.done .lb-substep-fill { background: #1A237E; }
-  .lb-section-title { color: #1A237E; font-size: 18px; font-weight: 900; margin: 0 0 12px 0; padding: 0 0 0 8px; border-left: 4px solid #7B1F2A; }
-  .lb-channels { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 0 0 28px 0; }
-  .lb-channel { border: 2px solid #cccccc; border-radius: 10px; padding: 14px 8px; text-align: center; background: #ffffff; transition: all 0.3s; }
-  .lb-channel.active { border-color: #7B1F2A; background: #fff5f5; transform: scale(1.05); }
-  .lb-channel.done { border-color: #1A237E; background: #f5f7ff; }
-  .lb-ch-label { color: #000000; font-size: 14px; font-weight: 900; margin: 0 0 6px 0; }
-  .lb-ch-icon { font-size: 28px; line-height: 1; margin: 0 0 4px 0; }
-  .lb-ch-status { color: #888; font-size: 11px; font-weight: 700; }
-  .lb-channel.active .lb-ch-status { color: #7B1F2A; }
-  .lb-channel.done .lb-ch-status { color: #1A237E; }
-  .lb-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 28px 0; }
-  .lb-stat { border: 2px solid #1A237E; border-radius: 10px; padding: 14px 12px; text-align: center; background: #f5f7ff; }
-  .lb-stat-label { color: #000000; font-size: 13px; font-weight: 700; margin: 0 0 6px 0; }
-  .lb-stat-value { color: #1A237E; font-size: 24px; font-weight: 900; line-height: 1; }
-  .lb-stat-unit { color: #1A237E; font-size: 14px; font-weight: 700; margin-left: 2px; }
-  .lb-log { border: 2px solid #000000; border-radius: 10px; padding: 16px 20px; background: #ffffff; }
-  .lb-log-title { color: #1A237E; font-size: 16px; font-weight: 900; margin: 0 0 10px 0; }
-  .lb-log-content { max-height: 180px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; font-weight: 700; color: #000000; line-height: 1.7; }
-  .lb-log-line { padding: 2px 0; }
-  .lb-log-time { color: #888; margin-right: 8px; }
-  .lb-log-line.start { color: #7B1F2A; }
-  .lb-log-line.done { color: #1A237E; }
-
-  /* ============================================
-     [v8 신규] AX 시스템 구축 박스
-     ============================================ */
-  .ax-build-box { border: 3px solid #1A237E; border-radius: 14px; padding: 32px 30px; margin: 28px 0; background: #ffffff; display: none; }
-  .ax-build-box.show { display: block; }
-
-  .ax-modules {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin: 0 0 28px 0;
+  .top-banner {
+    background: #1A237E; color: #ffffff; text-align: center;
+    padding: 14px 20px; font-size: 18px; font-weight: 700; margin: 0 0 36px 0;
   }
 
-  .ax-module {
-    border: 2px solid #cccccc;
-    border-radius: 12px;
-    padding: 20px 16px;
-    text-align: center;
-    background: #ffffff;
-    transition: all 0.3s;
+  .search-wrapper {
+    max-width: 1200px; margin: 0 auto 28px auto;
+    border: 3px solid #1A237E; border-radius: 16px;
+    padding: 40px; background: #ffffff; box-sizing: border-box;
   }
 
-  .ax-module.active {
-    border-color: #7B1F2A;
-    background: #fff5f5;
-    transform: scale(1.03);
-    box-shadow: 0 0 0 3px rgba(123, 31, 42, 0.15);
+  /* 시스템 정보 헤더 */
+  .sys-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #f5f7ff; border: 2px solid #1A237E;
+    border-radius: 10px; padding: 12px 20px; margin: 0 0 24px 0;
+    font-size: 14px; font-weight: 700; color: #000000;
   }
 
-  .ax-module.done {
-    border-color: #1A237E;
-    background: #f5f7ff;
+  .sys-header-info {
+    display: flex; gap: 20px; flex-wrap: wrap;
   }
 
-  .ax-module-icon { font-size: 40px; line-height: 1; margin: 0 0 10px 0; }
-  .ax-module-name { color: #000000; font-size: 17px; font-weight: 900; margin: 0 0 6px 0; }
-  .ax-module-desc { color: #555; font-size: 13px; font-weight: 700; margin: 0 0 10px 0; }
-  .ax-module-status { color: #888; font-size: 13px; font-weight: 700; }
-  .ax-module.active .ax-module-status { color: #7B1F2A; }
-  .ax-module.done .ax-module-status { color: #1A237E; }
-
-  /* 시스템 자원 정보 */
-  .ax-resources {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin: 0 0 28px 0;
-  }
-
-  .ax-resource {
-    border: 2px solid #1A237E;
-    border-radius: 10px;
-    padding: 16px 20px;
-    background: #f5f7ff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .ax-resource-label {
+  .sys-info-item {
     color: #000000;
-    font-size: 15px;
-    font-weight: 700;
   }
 
-  .ax-resource-value {
-    color: #1A237E;
-    font-size: 18px;
-    font-weight: 900;
-    font-family: 'Courier New', monospace;
+  .sys-info-label {
+    color: #555; margin-right: 6px;
   }
 
-  .ax-resource-value.pending {
-    color: #888;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: inherit;
-    font-style: italic;
+  .sys-info-value {
+    color: #1A237E; font-family: 'Courier New', monospace; font-weight: 900;
   }
 
-  /* ============================================
-     [v8 신규] 완료 화면 액션 버튼 4개
-     ============================================ */
-  .complete-box { border: 3px solid #1A237E; background: #1A237E; color: #ffffff; border-radius: 14px; padding: 36px 30px; margin: 28px 0; text-align: center; display: none; }
-  .complete-box.show { display: block; }
-  .complete-icon { font-size: 56px; margin: 0 0 12px 0; line-height: 1; }
-  .complete-title { font-size: 32px; font-weight: 900; margin: 0 0 14px 0; }
-  .complete-summary { font-size: 20px; font-weight: 700; margin: 0 0 22px 0; }
-
-  .complete-info {
-    background: rgba(255,255,255,0.12);
-    border: 2px solid rgba(255,255,255,0.4);
-    border-radius: 10px;
-    padding: 14px 20px;
-    margin: 0 0 22px 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    text-align: left;
-    font-size: 15px;
-    font-weight: 700;
+  .screen-title {
+    color: #1A237E; font-size: 36px; font-weight: 900;
+    text-align: center; margin: 0 0 14px 0;
   }
 
-  .complete-info-row {
-    display: flex;
-    justify-content: space-between;
+  .screen-subtitle {
+    color: #000000; font-size: 20px; font-weight: 700;
+    text-align: center; margin: 0 0 30px 0;
   }
 
-  .complete-info-label { opacity: 0.85; }
-  .complete-info-value { font-family: 'Courier New', monospace; font-weight: 900; }
-
-  .complete-actions {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin: 0 0 22px 0;
+  /* 검색 입력 */
+  .search-input-wrap {
+    display: flex; gap: 12px; margin: 0 0 22px 0;
   }
 
-  .action-btn {
-    background: #ffffff;
-    color: #1A237E;
-    font-size: 16px;
-    font-weight: 900;
-    padding: 18px 10px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
+  .search-input {
+    flex-grow: 1; padding: 18px 24px;
+    border: 3px solid #1A237E; border-radius: 12px;
+    font-size: 20px; font-weight: 700; color: #000000;
+    box-sizing: border-box; font-family: inherit;
+  }
+
+  .search-input:focus {
+    outline: none; border-color: #7B1F2A;
+    box-shadow: 0 0 0 4px rgba(123, 31, 42, 0.15);
+  }
+
+  .search-btn {
+    background: #7B1F2A; color: #ffffff;
+    font-size: 20px; font-weight: 900;
+    padding: 18px 36px; border: none; border-radius: 12px;
+    cursor: pointer; white-space: nowrap;
     transition: all 0.2s;
   }
 
-  .action-btn:hover { background: #f0f0f0; transform: translateY(-2px); }
+  .search-btn:hover { background: #1A237E; transform: translateY(-2px); }
 
-  .action-icon { font-size: 28px; display: block; margin: 0 0 6px 0; }
+  /* 빠른 검색 예시 */
+  .quick-search {
+    margin: 0 0 24px 0;
+  }
 
-  .reset-btn { background: rgba(255,255,255,0.2); color: #ffffff; font-size: 16px; font-weight: 900; padding: 12px 32px; border: 2px solid #ffffff; border-radius: 999px; cursor: pointer; }
-  .reset-btn:hover { background: #ffffff; color: #1A237E; }
+  .quick-search-label {
+    color: #555; font-size: 14px; font-weight: 700; margin-right: 10px;
+  }
 
-  .file-types-bar { max-width: 1200px; margin: 0 auto; background: #ffffff; border: 2px solid #000000; border-radius: 12px; padding: 18px 40px; text-align: center; box-sizing: border-box; }
-  .file-types-bar .label { color: #000000; font-size: 18px; font-weight: 700; }
+  .quick-search-tag {
+    display: inline-block;
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 14px; font-weight: 700;
+    padding: 6px 14px; border-radius: 999px;
+    margin: 0 6px 6px 0; cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quick-search-tag:hover {
+    background: #1A237E; color: #ffffff;
+  }
+
+  /* 채널 필터 */
+  .filter-section {
+    background: #f5f5f5; border-radius: 12px;
+    padding: 18px 20px; margin: 0 0 24px 0;
+  }
+
+  .filter-title {
+    color: #1A237E; font-size: 16px; font-weight: 900;
+    margin: 0 0 12px 0;
+    padding: 0 0 0 8px;
+    border-left: 4px solid #7B1F2A;
+  }
+
+  .filter-row {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+
+  .filter-group {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+
+  .filter-chip {
+    display: inline-flex; align-items: center;
+    gap: 6px; padding: 8px 14px;
+    background: #ffffff; border: 2px solid #1A237E;
+    border-radius: 999px;
+    font-size: 14px; font-weight: 700; color: #1A237E;
+    cursor: pointer; user-select: none;
+    transition: all 0.2s;
+  }
+
+  .filter-chip.active {
+    background: #1A237E; color: #ffffff;
+  }
+
+  .filter-chip:hover { transform: translateY(-2px); }
+
+  .filter-divider {
+    width: 1px; height: 28px;
+    background: #cccccc; margin: 0 6px;
+  }
+
+  .filter-label {
+    color: #000000; font-size: 14px; font-weight: 900;
+    margin-right: 4px;
+  }
+
+  .sort-select {
+    padding: 8px 14px; border: 2px solid #1A237E;
+    border-radius: 999px; background: #ffffff;
+    font-size: 14px; font-weight: 700; color: #1A237E;
+    cursor: pointer; font-family: inherit;
+  }
+
+  /* 결과 헤더 */
+  .results-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin: 0 0 16px 0;
+    padding: 0 0 12px 0;
+    border-bottom: 2px solid #1A237E;
+  }
+
+  .results-count {
+    color: #1A237E; font-size: 18px; font-weight: 900;
+  }
+
+  .results-count strong {
+    color: #7B1F2A; font-size: 22px;
+  }
+
+  .results-time {
+    color: #555; font-size: 13px; font-weight: 700;
+  }
+
+  /* 로딩 */
+  .loading {
+    text-align: center; padding: 40px 20px;
+    color: #1A237E; font-size: 18px; font-weight: 900;
+    display: none;
+  }
+
+  .loading.show { display: block; }
+
+  .loading-spinner {
+    display: inline-block; width: 40px; height: 40px;
+    border: 4px solid #f0f0f0;
+    border-top: 4px solid #7B1F2A;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin: 0 0 12px 0;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* 결과 카드 */
+  .results-list {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  .result-card {
+    border: 2px solid #cccccc; border-radius: 12px;
+    padding: 20px 24px; background: #ffffff;
+    cursor: pointer; transition: all 0.2s;
+  }
+
+  .result-card:hover {
+    border-color: #1A237E; background: #f5f7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 0 rgba(26, 35, 126, 0.15);
+  }
+
+  .result-top {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; margin: 0 0 12px 0;
+    gap: 16px;
+  }
+
+  .result-title {
+    color: #1A237E; font-size: 20px; font-weight: 900;
+    margin: 0; flex-grow: 1;
+  }
+
+  .result-grade {
+    background: #1A237E; color: #ffffff;
+    font-size: 14px; font-weight: 900;
+    padding: 4px 12px; border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .result-grade.b { background: #b8860b; }
+  .result-grade.c { background: #7B1F2A; }
+
+  .result-channels {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px 16px; margin: 0 0 12px 0;
+  }
+
+  .result-channel {
+    font-size: 14px; color: #000000;
+    padding: 6px 0; line-height: 1.4;
+  }
+
+  .result-channel-label {
+    display: inline-block; width: 56px;
+    color: #7B1F2A; font-weight: 900;
+    margin-right: 6px;
+  }
+
+  .result-meta {
+    display: flex; justify-content: space-between;
+    align-items: center; padding: 10px 0 0 0;
+    border-top: 1px solid #e0e0e0;
+    font-size: 13px; font-weight: 700; color: #555;
+  }
+
+  .result-source {
+    color: #1A237E; font-family: 'Courier New', monospace;
+  }
+
+  .result-relevance {
+    color: #7B1F2A;
+  }
+
+  /* 결과 없음 */
+  .no-results {
+    text-align: center; padding: 60px 20px;
+    color: #555; font-size: 18px; font-weight: 700;
+    display: none;
+  }
+  .no-results.show { display: block; }
+
+  .no-results-icon {
+    font-size: 64px; line-height: 1; margin: 0 0 12px 0;
+  }
+
+  /* 상세 모달 */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-backdrop.show {
+    display: flex;
+  }
+
+  .modal-box {
+    background: #ffffff;
+    border: 3px solid #1A237E;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 800px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  .modal-header {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 16px;
+    margin: 0 0 20px 0;
+  }
+
+  .modal-title {
+    color: #1A237E; font-size: 26px; font-weight: 900;
+    margin: 0; flex-grow: 1;
+  }
+
+  .modal-close {
+    background: #ffffff; color: #7B1F2A;
+    border: 2px solid #7B1F2A;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    font-size: 18px; font-weight: 900;
+    cursor: pointer; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover {
+    background: #7B1F2A; color: #ffffff;
+  }
+
+  .modal-info-bar {
+    display: flex; gap: 12px;
+    margin: 0 0 20px 0;
+    padding: 12px 16px;
+    background: #f5f7ff;
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+
+  .modal-info-item {
+    font-size: 14px; font-weight: 700; color: #000000;
+  }
+
+  .modal-info-item strong {
+    color: #1A237E;
+  }
+
+  .modal-channels {
+    display: grid; gap: 14px;
+    margin: 0 0 20px 0;
+  }
+
+  .modal-channel {
+    border: 2px solid #1A237E;
+    border-radius: 10px;
+    padding: 14px 18px;
+    background: #ffffff;
+  }
+
+  .modal-channel-header {
+    color: #7B1F2A; font-size: 16px; font-weight: 900;
+    margin: 0 0 8px 0;
+  }
+
+  .modal-channel-content {
+    color: #000000; font-size: 16px; font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .modal-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding: 16px 0 0 0;
+    border-top: 2px solid #1A237E;
+  }
+
+  .modal-btn {
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 15px; font-weight: 900;
+    padding: 10px 22px; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s;
+  }
+
+  .modal-btn:hover {
+    background: #1A237E; color: #ffffff;
+  }
+
+  .modal-btn.primary {
+    background: #7B1F2A; color: #ffffff;
+    border-color: #7B1F2A;
+  }
+
+  .modal-btn.primary:hover {
+    background: #1A237E; border-color: #1A237E;
+  }
+
+  /* 하단 액션 - 다른 화면으로 */
+  .bottom-actions {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin: 28px 0 0 0;
+  }
+
+  .bottom-btn {
+    background: #ffffff; color: #1A237E;
+    border: 2px solid #1A237E;
+    font-size: 14px; font-weight: 900;
+    padding: 14px 8px; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center;
+  }
+
+  .bottom-btn:hover {
+    background: #1A237E; color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  .bottom-btn-icon {
+    font-size: 22px; display: block; margin: 0 0 4px 0;
+  }
+
+  .bottom-btn.current {
+    background: #7B1F2A; color: #ffffff;
+    border-color: #7B1F2A; cursor: default;
+  }
+
+  .bottom-btn.current:hover { transform: none; }
+
+  .file-types-bar {
+    max-width: 1200px; margin: 0 auto;
+    background: #ffffff; border: 2px solid #000000;
+    border-radius: 12px; padding: 18px 40px;
+    text-align: center; box-sizing: border-box;
+  }
+
+  .file-types-bar .label {
+    color: #000000; font-size: 18px; font-weight: 700;
+  }
 </style>
 </head>
 <body>
 
-<div class="top-banner">파일 · 폴더 · ZIP 모두 자동 처리</div>
+<div class="top-banner">5W1H 6채널 통합 검색 시스템</div>
 
-<section class="upload-wrapper">
+<section class="search-wrapper">
 
-  <h1 class="screen-title">파일 업로드</h1>
-  <p class="screen-subtitle">파일을 끌어다 놓으면 AX 시스템이 자동으로 구축됩니다</p>
-
-  <div class="mini-steps">
-    <div class="mini-step active" data-step="upload">📁 업로드</div>
-    <span class="mini-arrow">→</span>
-    <div class="mini-step" data-step="1">① 압축해제</div>
-    <span class="mini-arrow">→</span>
-    <div class="mini-step" data-step="2">② 구조화</div>
-    <span class="mini-arrow">→</span>
-    <div class="mini-step" data-step="3">③ 평가</div>
-    <span class="mini-arrow">→</span>
-    <div class="mini-step" data-step="4">④ 보완</div>
-    <span class="mini-arrow">→</span>
-    <div class="mini-step" data-step="5">⑤ AI 학습</div>
-    <span class="mini-arrow">→</span>
-    <div class="mini-step" data-step="6">⑥ AX 구축</div>
-  </div>
-
-  <div class="iter-counter" id="iterCounter">🔁 평가 ↔ 보완 1차 진행 중</div>
-
-  <div class="iter-alert" id="iterAlert">
-    <div id="iterAlertMain">2차 평가 시작</div>
-    <div class="iter-alert-sub" id="iterAlertSub">전체 A 등급 달성까지 계속됩니다</div>
-  </div>
-
-  <div class="drop-zone" id="dropZone">
-    <div class="drop-icon">⬆</div>
-    <div class="drop-main-text">파일을 여기로 끌어다 놓으세요</div>
-    <div class="drop-sub-text">또는 아래 버튼으로 선택하세요</div>
-    <button class="browse-btn" id="browseBtn" type="button">파일 선택</button>
-  </div>
-
-  <input type="file" id="fileInput" multiple accept=".pdf,.docx,.xlsx,.txt,.csv,.json,.xml,.zip" style="display:none">
-
-  <div class="file-list-box" id="fileListBox">
-    <div class="file-list-title" id="fileListTitle">📂 업로드된 파일 (0개)</div>
-    <div id="fileList"><div class="empty-msg">아직 선택된 파일이 없습니다</div></div>
-  </div>
-
-  <button class="ax-start-btn" id="axStartBtn" disabled>AX 자동 구축 시작 →</button>
-
-  <div class="progress-box" id="progressBox">
-    <div class="progress-step-num" id="progStepNum">①</div>
-    <div class="progress-step-name" id="progStepName">압축해제</div>
-    <div class="progress-message" id="progMessage">압축파일 자동 해제 중...</div>
-    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progBarFill"></div></div>
-  </div>
-
-  <div class="eval-box" id="evalBox">
-    <div class="eval-title">③ 5W1H 6채널 품질 평가 결과 <span class="eval-iter-badge" id="evalIterBadge">1차</span></div>
-    <div class="eval-subtitle">정상 = A 등급 / 1채널 오류 = B 등급 / 2채널 오류 = C 등급</div>
-    <div class="eval-grid" id="evalGrid"></div>
-    <div class="eval-all-a" id="evalAllA">✅ 모든 채널 A 등급 달성! 보완 완료</div>
-  </div>
-
-  <div class="feedback-box" id="feedbackBox">
-    <div class="fb-icon">⚠️</div>
-    <div class="fb-title">④ 보완 모드 선택 <span class="fb-iter-badge" id="fbIterBadge">1차</span></div>
-    <div class="fb-message" id="fbMessage">B/C 등급 채널이 발견됐습니다.<br>보완 방식을 선택해 주세요.</div>
-    <div class="fb-buttons">
-      <button class="fb-btn" data-mode="auto"><span class="fb-btn-icon">🤖</span>자동 보완<div class="fb-btn-desc">AI가 알아서 보완</div></button>
-      <button class="fb-btn" data-mode="manual"><span class="fb-btn-icon">✍️</span>직접 수정<div class="fb-btn-desc">사용자가 직접 입력</div></button>
-      <button class="fb-btn" data-mode="skip"><span class="fb-btn-icon">⏭️</span>이대로 진행<div class="fb-btn-desc">보완 없이 다음 단계</div></button>
+  <!-- 시스템 정보 헤더 -->
+  <div class="sys-header">
+    <div class="sys-header-info">
+      <span class="sys-info-item">
+        <span class="sys-info-label">시스템 ID</span>
+        <span class="sys-info-value">AX-2026-0508</span>
+      </span>
+      <span class="sys-info-item">
+        <span class="sys-info-label">사용자</span>
+        <span class="sys-info-value">AX-00000</span>
+      </span>
+      <span class="sys-info-item">
+        <span class="sys-info-label">학습 인덱스</span>
+        <span class="sys-info-value">활성</span>
+      </span>
     </div>
-    <div class="manual-box" id="manualBox">
-      <div class="manual-title">✍️ 직접 수정할 채널 입력</div>
-      <div class="manual-channels" id="manualChannels"></div>
-      <textarea class="manual-textarea" id="manualText" placeholder="보완할 내용을 직접 입력하세요. (예: 일자·담당자·장소 등 추가 정보)"></textarea>
-      <button class="manual-submit" id="manualSubmit">수정 완료 → 재평가</button>
+    <div class="sys-info-item">
+      <span class="sys-info-label">총 데이터</span>
+      <span class="sys-info-value">1,248개</span>
     </div>
   </div>
 
-  <!-- AI 학습 박스 -->
-  <div class="learning-box" id="learningBox">
-    <div class="lb-title">⑤ AI 학습 진행 중</div>
-    <div class="lb-subtitle">5W1H 6채널 데이터를 AI 엔진에 학습시킵니다</div>
-    <div class="lb-progress-wrap">
-      <div class="lb-progress-label"><span>전체 진행률</span><span class="lb-progress-num" id="lbProgressNum">0%</span></div>
-      <div class="lb-progress-bg"><div class="lb-progress-fill" id="lbProgressFill"></div></div>
-    </div>
-    <div class="lb-section-title">📊 학습 단계</div>
-    <div class="lb-substeps" id="lbSubsteps"></div>
-    <div class="lb-section-title">🔗 5W1H 6채널 학습 상태</div>
-    <div class="lb-channels" id="lbChannels"></div>
-    <div class="lb-section-title">📈 학습 통계</div>
-    <div class="lb-stats">
-      <div class="lb-stat"><div class="lb-stat-label">처리 항목</div><div class="lb-stat-value"><span id="lbStatItems">0</span><span class="lb-stat-unit">개</span></div></div>
-      <div class="lb-stat"><div class="lb-stat-label">생성 의미 벡터</div><div class="lb-stat-value"><span id="lbStatVectors">0</span><span class="lb-stat-unit">개</span></div></div>
-      <div class="lb-stat"><div class="lb-stat-label">검색 인덱스</div><div class="lb-stat-value"><span id="lbStatIndex">0</span><span class="lb-stat-unit">MB</span></div></div>
-      <div class="lb-stat"><div class="lb-stat-label">처리 속도</div><div class="lb-stat-value"><span id="lbStatSpeed">0</span><span class="lb-stat-unit">항목/초</span></div></div>
-    </div>
-    <div class="lb-log">
-      <div class="lb-log-title">📋 학습 진행 로그</div>
-      <div class="lb-log-content" id="lbLogContent"></div>
-    </div>
+  <h1 class="screen-title">🔍 검색</h1>
+  <p class="screen-subtitle">5W1H 6채널을 통합 검색합니다 - 자연어로 입력하세요</p>
+
+  <!-- 검색 입력 -->
+  <div class="search-input-wrap">
+    <input type="text" class="search-input" id="searchInput"
+      placeholder="검색어를 입력하세요 (예: 화재 대피, 품질 점검, 안전 수칙)" autofocus>
+    <button class="search-btn" id="searchBtn">🔍 검색</button>
   </div>
 
-  <!-- ============================================
-       [v8 신규] AX 시스템 구축 박스
-       ============================================ -->
-  <div class="ax-build-box" id="axBuildBox">
-    <div class="lb-title">⑥ AX 시스템 구축 진행 중</div>
-    <div class="lb-subtitle">학습된 데이터로 6개 AX 자동화 모듈을 구축합니다</div>
+  <!-- 빠른 검색 예시 -->
+  <div class="quick-search">
+    <span class="quick-search-label">빠른 검색:</span>
+    <span class="quick-search-tag" data-q="화재 대피">화재 대피</span>
+    <span class="quick-search-tag" data-q="품질 점검">품질 점검</span>
+    <span class="quick-search-tag" data-q="안전 수칙">안전 수칙</span>
+    <span class="quick-search-tag" data-q="설비 점검">설비 점검</span>
+    <span class="quick-search-tag" data-q="응급 대응">응급 대응</span>
+    <span class="quick-search-tag" data-q="작업 절차">작업 절차</span>
+  </div>
 
-    <div class="lb-progress-wrap">
-      <div class="lb-progress-label"><span>전체 구축률</span><span class="lb-progress-num" id="axProgressNum">0%</span></div>
-      <div class="lb-progress-bg"><div class="lb-progress-fill" id="axProgressFill"></div></div>
-    </div>
-
-    <div class="lb-section-title">🏗️ 6개 AX 시스템 모듈</div>
-    <div class="ax-modules" id="axModules"></div>
-
-    <div class="lb-section-title">🔐 시스템 자원 정보</div>
-    <div class="ax-resources" id="axResources">
-      <div class="ax-resource">
-        <span class="ax-resource-label">시스템 ID</span>
-        <span class="ax-resource-value pending" id="axResId">배정 대기 중</span>
+  <!-- 필터 -->
+  <div class="filter-section">
+    <div class="filter-title">🎯 검색 필터</div>
+    <div class="filter-row">
+      <span class="filter-label">채널:</span>
+      <div class="filter-group" id="channelFilters">
+        <!-- 6채널 필터 동적 생성 -->
       </div>
-      <div class="ax-resource">
-        <span class="ax-resource-label">사용자 코드</span>
-        <span class="ax-resource-value pending" id="axResUser">배정 대기 중</span>
+      <div class="filter-divider"></div>
+      <span class="filter-label">등급:</span>
+      <div class="filter-group" id="gradeFilters">
+        <span class="filter-chip active" data-grade="all">전체</span>
+        <span class="filter-chip" data-grade="A">A 등급</span>
+        <span class="filter-chip" data-grade="B">B 등급</span>
+        <span class="filter-chip" data-grade="C">C 등급</span>
       </div>
-      <div class="ax-resource">
-        <span class="ax-resource-label">저장소 위치</span>
-        <span class="ax-resource-value pending" id="axResStorage">활성화 대기 중</span>
-      </div>
-      <div class="ax-resource">
-        <span class="ax-resource-label">접속 경로</span>
-        <span class="ax-resource-value pending" id="axResUrl">활성화 대기 중</span>
-      </div>
-    </div>
-
-    <div class="lb-log">
-      <div class="lb-log-title">📋 구축 진행 로그</div>
-      <div class="lb-log-content" id="axLogContent"></div>
+      <div class="filter-divider"></div>
+      <span class="filter-label">정렬:</span>
+      <select class="sort-select" id="sortSelect">
+        <option value="relevance">관련도순</option>
+        <option value="date">최신순</option>
+        <option value="grade">등급순</option>
+      </select>
     </div>
   </div>
 
-  <!-- 완료 박스 (v8 강화: 시스템 정보 + 4개 액션 버튼) -->
-  <div class="complete-box" id="completeBox">
-    <div class="complete-icon">🎯</div>
-    <div class="complete-title">AX 시스템 구축 완료!</div>
-    <div class="complete-summary" id="completeSummary">파일 0개 처리 · 6단계 자동 완료</div>
-
-    <div class="complete-info" id="completeInfo">
-      <div class="complete-info-row"><span class="complete-info-label">시스템 ID</span><span class="complete-info-value" id="finalSysId">-</span></div>
-      <div class="complete-info-row"><span class="complete-info-label">사용자 코드</span><span class="complete-info-value" id="finalUserCode">-</span></div>
-      <div class="complete-info-row"><span class="complete-info-label">저장소</span><span class="complete-info-value" id="finalStorage">-</span></div>
-      <div class="complete-info-row"><span class="complete-info-label">접속 경로</span><span class="complete-info-value" id="finalUrl">-</span></div>
+  <!-- 결과 헤더 -->
+  <div class="results-header">
+    <div class="results-count" id="resultsCount">
+      검색어를 입력하거나 빠른 검색을 선택하세요
     </div>
+    <div class="results-time" id="resultsTime"></div>
+  </div>
 
-    <div class="complete-actions">
-      <button class="action-btn" data-action="search">
-        <span class="action-icon">🔍</span>
-        검색하기
-      </button>
-      <button class="action-btn" data-action="qa">
-        <span class="action-icon">💬</span>
-        AI 질의응답
-      </button>
-      <button class="action-btn" data-action="dashboard">
-        <span class="action-icon">📊</span>
-        대시보드
-      </button>
-      <button class="action-btn" data-action="report">
-        <span class="action-icon">📑</span>
-        보고서
-      </button>
-    </div>
+  <!-- 로딩 -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <div>검색 중입니다...</div>
+  </div>
 
-    <button class="reset-btn" id="resetBtn">새 작업 시작</button>
+  <!-- 결과 없음 -->
+  <div class="no-results" id="noResults">
+    <div class="no-results-icon">🔎</div>
+    <div>일치하는 결과가 없습니다</div>
+    <div style="font-size:14px; margin-top:8px; color:#888;">다른 검색어나 필터를 시도해 보세요</div>
+  </div>
+
+  <!-- 결과 리스트 -->
+  <div class="results-list" id="resultsList"></div>
+
+  <!-- 하단 화면 이동 버튼 -->
+  <div class="bottom-actions">
+    <button class="bottom-btn current">
+      <span class="bottom-btn-icon">🔍</span>
+      검색 (현재)
+    </button>
+    <button class="bottom-btn" data-nav="qa">
+      <span class="bottom-btn-icon">💬</span>
+      AI 질의응답
+    </button>
+    <button class="bottom-btn" data-nav="dashboard">
+      <span class="bottom-btn-icon">📊</span>
+      대시보드
+    </button>
+    <button class="bottom-btn" data-nav="report">
+      <span class="bottom-btn-icon">📑</span>
+      보고서
+    </button>
   </div>
 
 </section>
 
 <div class="file-types-bar">
-  <span class="label">PDF · DOCX · XLSX · TXT · CSV · JSON · XML · ZIP 모두 지원 (혼합 · 중첩 가능)</span>
+  <span class="label">5W1H 6채널 통합 검색 · 자연어 입력 · 채널별 필터 · 등급별 정렬</span>
+</div>
+
+<!-- 상세 모달 -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+
+    <div class="modal-info-bar">
+      <span class="modal-info-item">📂 출처: <strong id="modalSource"></strong></span>
+      <span class="modal-info-item">📅 등록: <strong id="modalDate"></strong></span>
+      <span class="modal-info-item">🏷 등급: <strong id="modalGrade"></strong></span>
+      <span class="modal-info-item">⭐ 관련도: <strong id="modalRelevance"></strong></span>
+    </div>
+
+    <div class="modal-channels" id="modalChannels"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" id="modalAskAI">💬 AI에게 질문하기</button>
+      <button class="modal-btn primary" id="modalCloseBtn">확인</button>
+    </div>
+  </div>
 </div>
 
 <script>
-const STEPS = [
-  { num: '①', name: '압축해제', msg: '압축파일을 자동으로 해제합니다' },
-  { num: '②', name: '5W1H 6채널 구조화', msg: '비정형 데이터를 6채널로 구조화합니다' },
-  { num: '③', name: '품질 평가', msg: '5W1H 6채널 등급을 평가합니다' },
-  { num: '④', name: '보완', msg: '미흡 채널을 보완합니다' },
-  { num: '⑤', name: 'AI 학습', msg: '학습 인덱스를 생성합니다' },
-  { num: '⑥', name: 'AX 시스템 구축', msg: 'AX 자동화 시스템을 구축합니다' }
-];
-
-const ARCHIVE_EXTS = ['zip', 'tar', 'gz', 'rar', '7z', 'tgz'];
-
 const CHANNELS = [
-  { key: 'why',   label: 'Why',   ko: '왜' },
-  { key: 'what',  label: 'What',  ko: '무엇' },
-  { key: 'when',  label: 'When',  ko: '언제' },
-  { key: 'where', label: 'Where', ko: '어디' },
-  { key: 'who',   label: 'Who',   ko: '누가' },
-  { key: 'how',   label: 'How',   ko: '어떻게' }
+  { key: 'why',   label: 'Why',   ko: '왜 (목적/이유)' },
+  { key: 'what',  label: 'What',  ko: '무엇 (대상/내용)' },
+  { key: 'when',  label: 'When',  ko: '언제 (시점/기간)' },
+  { key: 'where', label: 'Where', ko: '어디 (장소/위치)' },
+  { key: 'who',   label: 'Who',   ko: '누가 (담당/대상자)' },
+  { key: 'how',   label: 'How',   ko: '어떻게 (방법/절차)' }
 ];
 
-const LEARNING_SUBSTEPS = [
-  { name: '데이터 정제', icon: '🧹', duration: 1500 },
-  { name: '의미 분석', icon: '🔍', duration: 2000 },
-  { name: '검색 인덱스 구축', icon: '📚', duration: 1800 },
-  { name: '질의응답 학습', icon: '💬', duration: 2200 },
-  { name: '학습 검증', icon: '✓',  duration: 1200 }
+// 샘플 데이터 (재난안전·제조공정·품질관리 혼합)
+const SAMPLE_DATA = [
+  {
+    id: 'doc-001',
+    title: '화재 발생시 대피 경로 안내',
+    why: '비상 상황 발생시 인명 보호',
+    what: '제조동 대피 경로 매뉴얼',
+    when: '화재 감지 즉시',
+    where: '제조동 1층/2층 전 구역',
+    who: '안전관리책임자, 작업자 전원',
+    how: '비상등 경로 따라 옥외 집결지 이동',
+    grade: 'A',
+    source: '안전관리매뉴얼_v3.pdf',
+    date: '2026-04-15',
+    relevance: 96,
+    keywords: ['화재', '대피', '비상', '안전', '경로']
+  },
+  {
+    id: 'doc-002',
+    title: '제조 공정 품질 점검 절차',
+    why: '제품 품질 표준 유지',
+    what: '공정 단계별 품질 점검 항목',
+    when: '매 작업 시작 및 종료 시',
+    where: '제조 라인 1~3호기',
+    who: '품질관리팀 조장',
+    how: '점검표 기반 항목별 측정 후 기록',
+    grade: 'A',
+    source: '품질관리지침_v2.docx',
+    date: '2026-04-08',
+    relevance: 94,
+    keywords: ['품질', '점검', '공정', '관리', '측정']
+  },
+  {
+    id: 'doc-003',
+    title: '작업장 안전 수칙',
+    why: '작업 중 사고 예방',
+    what: '필수 안전 수칙 12항목',
+    when: '모든 작업 시간',
+    where: '전 작업장',
+    who: '전 작업자',
+    how: '교육 이수 후 현장 게시판 부착·준수',
+    grade: 'A',
+    source: '안전수칙고시_v1.pdf',
+    date: '2026-03-22',
+    relevance: 91,
+    keywords: ['안전', '수칙', '작업', '예방']
+  },
+  {
+    id: 'doc-004',
+    title: '화학물질 취급 절차',
+    why: '화학물질 누출·오염 방지',
+    what: '인화성·독성 화학물질 취급 매뉴얼',
+    when: '화학물질 입출고 및 사용 시',
+    where: '화학물질 저장고 및 작업장',
+    who: '안전교육 이수자만 가능',
+    how: '보호구 착용 후 지정된 절차 따라 취급',
+    grade: 'B',
+    source: '화학물질매뉴얼.pdf',
+    date: '2026-03-15',
+    relevance: 88,
+    keywords: ['화학', '취급', '안전', '보호']
+  },
+  {
+    id: 'doc-005',
+    title: '응급 상황 대응 매뉴얼',
+    why: '응급 상황 시 신속 대응',
+    what: '의료 응급·재난 응급 대응 절차',
+    when: '응급 상황 발생 즉시',
+    where: '전 사업장 및 인근 지역',
+    who: '응급처치 자격자, 안전관리자',
+    how: '119 신고 → 응급처치 → 후송 협조',
+    grade: 'A',
+    source: '응급대응매뉴얼.pdf',
+    date: '2026-03-01',
+    relevance: 89,
+    keywords: ['응급', '대응', '재난', '의료']
+  },
+  {
+    id: 'doc-006',
+    title: '설비 정기 점검 일지',
+    why: '설비 고장 사전 예방',
+    what: '주요 설비 점검 항목 및 결과',
+    when: '매주 월요일 / 매월 1일',
+    where: '제조 1~3호기, 보일러실',
+    who: '설비관리팀 김민수 과장',
+    how: '체크리스트 점검 후 일지 작성·보고',
+    grade: 'A',
+    source: '설비점검일지_2026Q1.xlsx',
+    date: '2026-02-28',
+    relevance: 85,
+    keywords: ['설비', '점검', '예방', '관리']
+  },
+  {
+    id: 'doc-007',
+    title: '비상 대응 훈련 결과',
+    why: '비상 대응 역량 평가 및 향상',
+    what: '연 2회 정기 대응 훈련 결과 보고',
+    when: '2026년 상반기 (4월 진행)',
+    where: '본사 사업장 전체',
+    who: '전 임직원 참여',
+    how: '시나리오 기반 실전 훈련 진행',
+    grade: 'B',
+    source: '훈련결과보고서.docx',
+    date: '2026-04-22',
+    relevance: 82,
+    keywords: ['훈련', '비상', '대응', '평가']
+  },
+  {
+    id: 'doc-008',
+    title: '안전 교육 이수 현황',
+    why: '법정 의무 안전교육 이행',
+    what: '신규 입사자·기존 직원 안전교육 현황',
+    when: '분기별 갱신',
+    where: '본사·지사 전체',
+    who: '인사팀 + 안전관리팀 공동 관리',
+    how: '온라인 LMS 시스템 + 오프라인 실습',
+    grade: 'B',
+    source: '교육이수현황_2026Q1.xlsx',
+    date: '2026-03-31',
+    relevance: 79,
+    keywords: ['교육', '이수', '안전', '인사']
+  },
+  {
+    id: 'doc-009',
+    title: '품질 부적합 사례 분석',
+    why: '재발 방지 및 품질 향상',
+    what: '2026년 1분기 부적합 사례 12건',
+    when: '2026년 1월~3월',
+    where: '제조 라인 2호기 집중 발생',
+    who: '품질팀 + 생산팀 협업',
+    how: '근본원인 분석(RCA) 후 시정조치',
+    grade: 'C',
+    source: '부적합분석_2026Q1.docx',
+    date: '2026-04-05',
+    relevance: 76,
+    keywords: ['품질', '부적합', '분석', '시정']
+  },
+  {
+    id: 'doc-010',
+    title: '협력사 안전 점검 결과',
+    why: '협력사 안전 관리 수준 점검',
+    what: '주요 협력사 12개사 안전 점검',
+    when: '2026년 4월',
+    where: '협력사 사업장',
+    who: '본사 안전팀',
+    how: '체크리스트 기반 현장 실사',
+    grade: 'A',
+    source: '협력사점검_2026Apr.pdf',
+    date: '2026-04-18',
+    relevance: 84,
+    keywords: ['협력사', '점검', '안전', '실사']
+  }
 ];
 
-// [v8] AX 시스템 6모듈
-const AX_MODULES = [
-  { key: 'storage',   icon: '🗄️', name: '저장소 시스템',     desc: '안전 보관소 구축' },
-  { key: 'search',    icon: '🔍', name: '검색 엔진',          desc: '빠른 검색 구조' },
-  { key: 'chatbot',   icon: '💬', name: 'AI 질의응답',        desc: '대화형 인터페이스' },
-  { key: 'dashboard', icon: '📊', name: '품질 관리 대시보드', desc: '실시간 모니터링' },
-  { key: 'report',    icon: '📑', name: '보고서 자동 생성',   desc: '정기 보고 시스템' },
-  { key: 'analytics', icon: '📈', name: '통계 분석',          desc: '누적 통계 시각화' }
-];
+// 상태
+let activeChannelFilters = new Set(); // 빈 set = 전체 채널
+let activeGradeFilter = 'all';
+let activeSort = 'relevance';
+let lastResults = [];
 
-const EVAL_BY_ITERATION = {
-  1: { why:{grade:'A',issues:0}, what:{grade:'A',issues:0}, when:{grade:'B',issues:1}, where:{grade:'A',issues:0}, who:{grade:'C',issues:2}, how:{grade:'A',issues:0} },
-  2: { why:{grade:'A',issues:0}, what:{grade:'A',issues:0}, when:{grade:'B',issues:1}, where:{grade:'A',issues:0}, who:{grade:'B',issues:1}, how:{grade:'A',issues:0} },
-  3: { why:{grade:'A',issues:0}, what:{grade:'A',issues:0}, when:{grade:'A',issues:0}, where:{grade:'A',issues:0}, who:{grade:'A',issues:0}, how:{grade:'A',issues:0} }
-};
+// DOM
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const channelFiltersEl = document.getElementById('channelFilters');
+const gradeFiltersEl = document.getElementById('gradeFilters');
+const sortSelect = document.getElementById('sortSelect');
+const resultsCount = document.getElementById('resultsCount');
+const resultsTime = document.getElementById('resultsTime');
+const loading = document.getElementById('loading');
+const noResults = document.getElementById('noResults');
+const resultsList = document.getElementById('resultsList');
 
-// 시스템 자원 정보 (구축 시 부여)
-function genSystemId() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return 'AX-' + yyyy + '-' + mm + dd;
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalSource = document.getElementById('modalSource');
+const modalDate = document.getElementById('modalDate');
+const modalGrade = document.getElementById('modalGrade');
+const modalRelevance = document.getElementById('modalRelevance');
+const modalChannels = document.getElementById('modalChannels');
+const modalClose = document.getElementById('modalClose');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+const modalAskAI = document.getElementById('modalAskAI');
+
+// 채널 필터 초기화
+function initChannelFilters() {
+  let html = '<span class="filter-chip active" data-channel="all">전체</span>';
+  CHANNELS.forEach(ch => {
+    html += '<span class="filter-chip" data-channel="' + ch.key + '">' + ch.label + '</span>';
+  });
+  channelFiltersEl.innerHTML = html;
+
+  channelFiltersEl.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const ch = chip.dataset.channel;
+      if (ch === 'all') {
+        activeChannelFilters.clear();
+        channelFiltersEl.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      } else {
+        channelFiltersEl.querySelector('[data-channel="all"]').classList.remove('active');
+        if (activeChannelFilters.has(ch)) {
+          activeChannelFilters.delete(ch);
+          chip.classList.remove('active');
+        } else {
+          activeChannelFilters.add(ch);
+          chip.classList.add('active');
+        }
+        if (activeChannelFilters.size === 0) {
+          channelFiltersEl.querySelector('[data-channel="all"]').classList.add('active');
+        }
+      }
+      if (lastResults.length > 0) doSearch();
+    });
+  });
 }
 
-const SYSTEM_INFO = {
-  id: genSystemId(),
-  user: 'AX-00000',
-  storage: '안전 보관소 (활성)',
-  url: 'axdata.co.kr/dashboard'
-};
-
-// DOM 참조
-const dropZone = document.getElementById('dropZone');
-const browseBtn = document.getElementById('browseBtn');
-const fileInput = document.getElementById('fileInput');
-const fileList = document.getElementById('fileList');
-const fileListTitle = document.getElementById('fileListTitle');
-const axStartBtn = document.getElementById('axStartBtn');
-const progressBox = document.getElementById('progressBox');
-const evalBox = document.getElementById('evalBox');
-const evalGrid = document.getElementById('evalGrid');
-const evalIterBadge = document.getElementById('evalIterBadge');
-const evalAllA = document.getElementById('evalAllA');
-const feedbackBox = document.getElementById('feedbackBox');
-const fbIterBadge = document.getElementById('fbIterBadge');
-const fbMessage = document.getElementById('fbMessage');
-const manualBox = document.getElementById('manualBox');
-const manualChannels = document.getElementById('manualChannels');
-const manualText = document.getElementById('manualText');
-const manualSubmit = document.getElementById('manualSubmit');
-const completeBox = document.getElementById('completeBox');
-const resetBtn = document.getElementById('resetBtn');
-const iterCounter = document.getElementById('iterCounter');
-const iterAlert = document.getElementById('iterAlert');
-const iterAlertMain = document.getElementById('iterAlertMain');
-const iterAlertSub = document.getElementById('iterAlertSub');
-const learningBox = document.getElementById('learningBox');
-const lbProgressNum = document.getElementById('lbProgressNum');
-const lbProgressFill = document.getElementById('lbProgressFill');
-const lbSubsteps = document.getElementById('lbSubsteps');
-const lbChannels = document.getElementById('lbChannels');
-const lbStatItems = document.getElementById('lbStatItems');
-const lbStatVectors = document.getElementById('lbStatVectors');
-const lbStatIndex = document.getElementById('lbStatIndex');
-const lbStatSpeed = document.getElementById('lbStatSpeed');
-const lbLogContent = document.getElementById('lbLogContent');
-
-// [v8] AX 박스 요소
-const axBuildBox = document.getElementById('axBuildBox');
-const axProgressNum = document.getElementById('axProgressNum');
-const axProgressFill = document.getElementById('axProgressFill');
-const axModulesEl = document.getElementById('axModules');
-const axResId = document.getElementById('axResId');
-const axResUser = document.getElementById('axResUser');
-const axResStorage = document.getElementById('axResStorage');
-const axResUrl = document.getElementById('axResUrl');
-const axLogContent = document.getElementById('axLogContent');
-
-let selectedFiles = [];
-let currentIteration = 1;
-let evaluationResult = null;
-let userChoiceResolver = null;
-let isProcessing = false;
-
-function scrollToElement(el) { setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 200); }
-function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-browseBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
-dropZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => handleFiles(e.target.files));
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  handleFiles(e.dataTransfer.files);
+// 등급 필터
+gradeFiltersEl.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    gradeFiltersEl.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeGradeFilter = chip.dataset.grade;
+    if (lastResults.length > 0) doSearch();
+  });
 });
 
-function handleFiles(files) {
-  for (let i = 0; i < files.length; i++) selectedFiles.push(files[i]);
-  renderFileList();
-  updateAXButton();
-}
+// 정렬
+sortSelect.addEventListener('change', () => {
+  activeSort = sortSelect.value;
+  if (lastResults.length > 0) doSearch();
+});
 
-function renderFileList() {
-  if (selectedFiles.length === 0) {
-    fileListTitle.textContent = '📂 업로드된 파일 (0개)';
-    fileList.innerHTML = '<div class="empty-msg">아직 선택된 파일이 없습니다</div>';
+// 빠른 검색
+document.querySelectorAll('.quick-search-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    searchInput.value = tag.dataset.q;
+    doSearch();
+  });
+});
+
+// 검색 실행
+searchBtn.addEventListener('click', doSearch);
+searchInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+async function doSearch() {
+  const query = searchInput.value.trim();
+
+  // 결과 초기화
+  resultsList.innerHTML = '';
+  noResults.classList.remove('show');
+  loading.classList.add('show');
+  resultsCount.textContent = '검색 중...';
+  resultsTime.textContent = '';
+
+  // 검색 시뮬레이션 (0.6초)
+  const startTime = Date.now();
+  await new Promise(r => setTimeout(r, 600));
+
+  // 필터링
+  let results = SAMPLE_DATA.slice();
+
+  if (query.length > 0) {
+    const q = query.toLowerCase();
+    results = results.filter(r => {
+      // 제목, 키워드, 모든 채널 텍스트에서 검색
+      const allText = (r.title + ' ' + r.keywords.join(' ') + ' ' +
+        CHANNELS.map(c => r[c.key]).join(' ')).toLowerCase();
+      return allText.includes(q);
+    });
+  }
+
+  // 채널 필터 (적용된 채널 중 하나라도 매치되어야 통과)
+  if (activeChannelFilters.size > 0 && query.length > 0) {
+    const q = query.toLowerCase();
+    results = results.filter(r => {
+      return Array.from(activeChannelFilters).some(ch => {
+        return r[ch].toLowerCase().includes(q);
+      });
+    });
+  }
+
+  // 등급 필터
+  if (activeGradeFilter !== 'all') {
+    results = results.filter(r => r.grade === activeGradeFilter);
+  }
+
+  // 정렬
+  if (activeSort === 'relevance') {
+    results.sort((a, b) => b.relevance - a.relevance);
+  } else if (activeSort === 'date') {
+    results.sort((a, b) => b.date.localeCompare(a.date));
+  } else if (activeSort === 'grade') {
+    const order = { 'A': 0, 'B': 1, 'C': 2 };
+    results.sort((a, b) => order[a.grade] - order[b.grade]);
+  }
+
+  const elapsed = Date.now() - startTime;
+
+  loading.classList.remove('show');
+  lastResults = results;
+
+  if (results.length === 0) {
+    resultsCount.textContent = '검색 결과 없음';
+    resultsTime.textContent = '';
+    noResults.classList.add('show');
     return;
   }
-  fileListTitle.textContent = '📂 업로드된 파일 (' + selectedFiles.length + '개)';
+
+  resultsCount.innerHTML = '<strong>' + results.length + '건</strong> 검색됨';
+  resultsTime.textContent = '검색 소요 ' + (elapsed / 1000).toFixed(2) + '초';
+
+  renderResults(results, query);
+}
+
+function renderResults(results, query) {
   let html = '';
-  selectedFiles.forEach((file, idx) => {
-    const sizeStr = file.size > 1024 * 1024 ? (file.size / 1024 / 1024).toFixed(1) + ' MB' : (file.size / 1024).toFixed(1) + ' KB';
-    html += '<div class="file-row">';
-    html += '<span class="file-name">' + file.name + '</span>';
-    html += '<span class="file-size">' + sizeStr + '</span>';
-    html += '<span class="file-status">대기</span>';
-    html += '<button class="file-remove" onclick="removeFile(' + idx + ')" title="제거">✕</button>';
+  results.forEach(r => {
+    const gradeClass = r.grade === 'B' ? ' b' : (r.grade === 'C' ? ' c' : '');
+    html += '<div class="result-card" data-id="' + r.id + '">';
+    html += '<div class="result-top">';
+    html += '<h3 class="result-title">' + highlightText(r.title, query) + '</h3>';
+    html += '<span class="result-grade' + gradeClass + '">' + r.grade + ' 등급</span>';
+    html += '</div>';
+    html += '<div class="result-channels">';
+    CHANNELS.forEach(ch => {
+      html += '<div class="result-channel">';
+      html += '<span class="result-channel-label">' + ch.label + '</span>';
+      html += highlightText(r[ch.key], query);
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="result-meta">';
+    html += '<span class="result-source">📂 ' + r.source + '</span>';
+    html += '<span>📅 ' + r.date + '</span>';
+    html += '<span class="result-relevance">⭐ 관련도 ' + r.relevance + '%</span>';
+    html += '</div>';
     html += '</div>';
   });
-  fileList.innerHTML = html;
-}
+  resultsList.innerHTML = html;
 
-function removeFile(idx) {
-  selectedFiles.splice(idx, 1);
-  renderFileList();
-  updateAXButton();
-}
-
-function updateAXButton() { axStartBtn.disabled = selectedFiles.length === 0; }
-function hasArchiveFile() { return selectedFiles.some(f => ARCHIVE_EXTS.includes(f.name.split('.').pop().toLowerCase())); }
-
-function setStepState(stepNum, state) {
-  const el = document.querySelector('.mini-step[data-step="' + stepNum + '"]');
-  if (!el) return;
-  el.classList.remove('active', 'done', 'skipped');
-  if (state) el.classList.add(state);
-}
-
-function showProgress(stepIdx, customMsg) {
-  const step = STEPS[stepIdx];
-  document.getElementById('progStepNum').textContent = step.num;
-  document.getElementById('progStepName').textContent = step.name;
-  document.getElementById('progMessage').textContent = customMsg || step.msg;
-  const fill = document.getElementById('progBarFill');
-  fill.style.width = '0%';
-  setTimeout(() => { fill.style.width = '100%'; }, 50);
-  progressBox.classList.add('show');
-  document.querySelectorAll('.file-status').forEach(s => { s.textContent = '처리 중'; });
-}
-
-function processStep(stepIdx, customMsg) {
-  return new Promise(resolve => {
-    const stepNum = stepIdx + 1;
-    setStepState(stepNum, 'active');
-    showProgress(stepIdx, customMsg);
-    setTimeout(() => { setStepState(stepNum, 'done'); resolve(); }, 1500);
+  // 카드 클릭 이벤트
+  resultsList.querySelectorAll('.result-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.id;
+      const item = SAMPLE_DATA.find(d => d.id === id);
+      if (item) showDetailModal(item);
+    });
   });
 }
 
-function skipStep(stepIdx) { setStepState(stepIdx + 1, 'skipped'); }
-
-function renderEvaluation(result, iteration) {
-  evalIterBadge.textContent = iteration + '차';
-  let html = '';
-  CHANNELS.forEach(ch => {
-    const r = result[ch.key];
-    const cls = 'grade-' + r.grade.toLowerCase();
-    const detail = r.grade === 'A' ? '정상' : r.issues + '개 미흡';
-    html += '<div class="eval-card ' + cls + '">';
-    html += '<div class="eval-channel">' + ch.label + ' (' + ch.ko + ')</div>';
-    html += '<div class="eval-grade">' + r.grade + '</div>';
-    html += '<div class="eval-detail">' + detail + '</div>';
-    html += '</div>';
-  });
-  evalGrid.innerHTML = html;
-  if (allGradeA(result)) evalAllA.classList.add('show');
-  else evalAllA.classList.remove('show');
-  evalBox.classList.add('show');
-  scrollToElement(evalBox);
+function highlightText(text, query) {
+  if (!query || query.length === 0) return escapeHtml(text);
+  const escaped = escapeHtml(text);
+  const escapedQuery = escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(' + escapedQuery + ')', 'gi');
+  return escaped.replace(re, '<mark style="background:#fff3a0;color:#7B1F2A;font-weight:900;padding:1px 3px;border-radius:3px;">$1</mark>');
 }
 
-function allGradeA(result) { return CHANNELS.every(ch => result[ch.key].grade === 'A'); }
-function getNonAChannels(result) { return CHANNELS.filter(ch => result[ch.key].grade !== 'A'); }
-function countGrades(result) {
-  let b = 0, c = 0;
-  CHANNELS.forEach(ch => {
-    if (result[ch.key].grade === 'B') b++;
-    else if (result[ch.key].grade === 'C') c++;
-  });
-  return { b, c };
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function showFeedbackBox(iteration) {
-  fbIterBadge.textContent = iteration + '차';
-  const counts = countGrades(evaluationResult);
-  let msg = (iteration === 1 ? '' : iteration + '차 평가 결과: ');
-  msg += 'B 등급 ' + counts.b + '개, C 등급 ' + counts.c + '개 채널이 잔존합니다.<br>';
-  msg += '<strong style="color:#7B1F2A;">전체 A 등급 달성까지 보완을 반복합니다.</strong><br>';
-  msg += '보완 방식을 선택해 주세요.';
-  fbMessage.innerHTML = msg;
-
-  const nonA = getNonAChannels(evaluationResult);
-  let chHtml = '';
-  nonA.forEach(ch => {
-    chHtml += '<span class="manual-channel-tag">' + ch.label + ' (' + evaluationResult[ch.key].grade + ')</span>';
-  });
-  manualChannels.innerHTML = chHtml;
-  manualBox.classList.remove('show');
-  manualText.value = '';
-  manualText.style.borderColor = '#1A237E';
-
-  document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
-  feedbackBox.classList.add('show');
-  scrollToElement(feedbackBox);
-
-  setTimeout(() => {
-    document.querySelectorAll('.fb-btn').forEach(b => b.disabled = false);
-    isProcessing = false;
-  }, 800);
-}
-
-function showIterCounter(iteration) {
-  iterCounter.textContent = '🔁 평가 ↔ 보완 ' + iteration + '차 진행 중';
-  iterCounter.classList.add('show');
-}
-
-async function showIterAlert(text, sub) {
-  iterAlertMain.textContent = text;
-  iterAlertSub.textContent = sub || '전체 A 등급 달성까지 계속됩니다';
-  iterAlert.classList.add('show');
-  scrollToElement(iterAlert);
-  await wait(1500);
-  iterAlert.classList.remove('show');
-}
-
-function waitForUserChoice() { return new Promise(resolve => { userChoiceResolver = resolve; }); }
-
-document.querySelectorAll('.fb-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (isProcessing) return;
-    if (btn.disabled) return;
-    if (btn.dataset.mode === 'manual') {
-      manualBox.classList.add('show');
-      document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
-      scrollToElement(manualBox);
-      return;
-    }
-    isProcessing = true;
-    document.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
-    if (userChoiceResolver) {
-      const r = userChoiceResolver;
-      userChoiceResolver = null;
-      r(btn.dataset.mode);
-    }
-  });
-});
-
-manualSubmit.addEventListener('click', () => {
-  if (manualText.value.trim().length === 0) {
-    manualText.style.borderColor = '#7B1F2A';
-    manualText.placeholder = '⚠️ 내용을 입력해 주세요';
-    return;
-  }
-  if (isProcessing) return;
-  isProcessing = true;
-  if (userChoiceResolver) {
-    const r = userChoiceResolver;
-    userChoiceResolver = null;
-    r('manual');
-  }
-});
-
-async function runFeedbackLoop() {
-  while (true) {
-    showIterCounter(currentIteration);
-    if (allGradeA(evaluationResult)) {
-      setStepState(4, 'done');
-      iterCounter.classList.remove('show');
-      return;
-    }
-    setStepState(4, 'active');
-    showFeedbackBox(currentIteration);
-    const choice = await waitForUserChoice();
-    feedbackBox.classList.remove('show');
-
-    if (choice === 'skip') {
-      showProgress(3, '보완 없이 다음 단계로 진행합니다');
-      document.getElementById('progStepName').textContent = '보완 (건너뜀)';
-      document.getElementById('progBarFill').style.width = '100%';
-      await wait(800);
-      setStepState(4, 'done');
-      iterCounter.classList.remove('show');
-      progressBox.classList.remove('show');
-      return;
-    }
-
-    const msg = choice === 'auto' ? '🤖 AI가 자동으로 보완 중입니다... (' + currentIteration + '차)' : '✍️ 직접 수정 내용 반영 중... (' + currentIteration + '차)';
-    showProgress(3, msg);
-    await wait(1500);
-    progressBox.classList.remove('show');
-
-    currentIteration++;
-    await showIterAlert(currentIteration + '차 재평가 시작', '전체 A 등급 달성까지 계속됩니다');
-
-    showProgress(2, currentIteration + '차 재평가 진행 중...');
-    setStepState(3, 'active');
-    await wait(1500);
-    setStepState(3, 'done');
-    progressBox.classList.remove('show');
-
-    const evalData = EVAL_BY_ITERATION[currentIteration] || EVAL_BY_ITERATION[3];
-    evaluationResult = JSON.parse(JSON.stringify(evalData));
-    renderEvaluation(evaluationResult, currentIteration);
-    await wait(1800);
-  }
-}
-
-// AI 학습 시각화 (v7)
-function initLearningBox() {
-  let stepHtml = '';
-  LEARNING_SUBSTEPS.forEach((sub, idx) => {
-    stepHtml += '<div class="lb-substep" data-sub="' + idx + '">';
-    stepHtml += '<div><span class="lb-substep-num">' + (idx + 1) + '</span>';
-    stepHtml += '<span class="lb-substep-name">' + sub.icon + ' ' + sub.name + '</span></div>';
-    stepHtml += '<div class="lb-substep-status">대기</div>';
-    stepHtml += '<div class="lb-substep-bar"><div class="lb-substep-fill"></div></div>';
-    stepHtml += '</div>';
-  });
-  lbSubsteps.innerHTML = stepHtml;
+// 상세 모달
+function showDetailModal(item) {
+  modalTitle.textContent = item.title;
+  modalSource.textContent = item.source;
+  modalDate.textContent = item.date;
+  modalGrade.textContent = item.grade + ' 등급';
+  modalRelevance.textContent = item.relevance + '%';
 
   let chHtml = '';
   CHANNELS.forEach(ch => {
-    chHtml += '<div class="lb-channel" data-ch="' + ch.key + '">';
-    chHtml += '<div class="lb-ch-label">' + ch.label + ' (' + ch.ko + ')</div>';
-    chHtml += '<div class="lb-ch-icon">⏳</div>';
-    chHtml += '<div class="lb-ch-status">대기</div>';
+    chHtml += '<div class="modal-channel">';
+    chHtml += '<div class="modal-channel-header">' + ch.label + ' (' + ch.ko + ')</div>';
+    chHtml += '<div class="modal-channel-content">' + escapeHtml(item[ch.key]) + '</div>';
     chHtml += '</div>';
   });
-  lbChannels.innerHTML = chHtml;
+  modalChannels.innerHTML = chHtml;
 
-  lbStatItems.textContent = '0';
-  lbStatVectors.textContent = '0';
-  lbStatIndex.textContent = '0';
-  lbStatSpeed.textContent = '0';
-  lbProgressNum.textContent = '0%';
-  lbProgressFill.style.width = '0%';
-  lbLogContent.innerHTML = '';
+  modal.classList.add('show');
 }
 
-function getTimeStr() {
-  const d = new Date();
-  return d.toTimeString().substring(0, 8);
-}
+modalClose.addEventListener('click', () => modal.classList.remove('show'));
+modalCloseBtn.addEventListener('click', () => modal.classList.remove('show'));
+modal.addEventListener('click', e => {
+  if (e.target === modal) modal.classList.remove('show');
+});
 
-function addLog(targetEl, text, type) {
-  const cls = type ? ' ' + type : '';
-  const html = '<div class="lb-log-line' + cls + '">';
-  const inner = '<span class="lb-log-time">[' + getTimeStr() + ']</span>' + text;
-  targetEl.insertAdjacentHTML('beforeend', html + inner + '</div>');
-  targetEl.scrollTop = targetEl.scrollHeight;
-}
+modalAskAI.addEventListener('click', () => {
+  alert('💬 AI 질의응답 화면으로 이동합니다.\n\n선택한 항목 기준으로 추가 질문 가능합니다.\n\n(질의응답 화면 제작 후 연결됩니다)');
+});
 
-function setSubstepState(idx, state, statusText) {
-  const el = lbSubsteps.querySelector('[data-sub="' + idx + '"]');
-  if (!el) return;
-  el.classList.remove('active', 'done');
-  if (state) el.classList.add(state);
-  if (statusText) el.querySelector('.lb-substep-status').textContent = statusText;
-  const fill = el.querySelector('.lb-substep-fill');
-  if (state === 'active') {
-    fill.style.width = '0%';
-    setTimeout(() => { fill.style.width = '100%'; }, 50);
-  } else if (state === 'done') {
-    fill.style.width = '100%';
-  }
-}
-
-function setChannelState(key, state, iconText) {
-  const el = lbChannels.querySelector('[data-ch="' + key + '"]');
-  if (!el) return;
-  el.classList.remove('active', 'done');
-  if (state) el.classList.add(state);
-  if (iconText) el.querySelector('.lb-ch-icon').textContent = iconText;
-  const status = el.querySelector('.lb-ch-status');
-  if (state === 'active') status.textContent = '학습 중';
-  else if (state === 'done') status.textContent = '완료';
-  else status.textContent = '대기';
-}
-
-async function processSubstep(idx) {
-  const sub = LEARNING_SUBSTEPS[idx];
-  setSubstepState(idx, 'active', '진행 중');
-  addLog(lbLogContent, '▶ ' + sub.icon + ' ' + sub.name + ' 시작', 'start');
-
-  const perChannelMs = sub.duration / 6;
-  for (let i = 0; i < CHANNELS.length; i++) {
-    const ch = CHANNELS[i];
-    setChannelState(ch.key, 'active', '🔄');
-    addLog(lbLogContent, '  ↳ ' + ch.label + ' (' + ch.ko + ') ' + sub.name + ' 처리 중');
-    await wait(perChannelMs);
-    setChannelState(ch.key, 'done', '✓');
-
-    const baseItems = 200 + idx * 50;
-    const baseVectors = 1200 + idx * 300;
-    const baseIndex = 5 + idx * 5;
-    const baseSpeed = 380 + idx * 20;
-    const ratio = (i + 1) / CHANNELS.length;
-
-    lbStatItems.textContent = Math.round(baseItems + 1048 * ratio).toLocaleString();
-    lbStatVectors.textContent = Math.round(baseVectors + 6288 * ratio).toLocaleString();
-    lbStatIndex.textContent = Math.round(baseIndex + 27 * ratio).toString();
-    lbStatSpeed.textContent = Math.round(baseSpeed + 70 * ratio).toString();
-  }
-
-  setSubstepState(idx, 'done', '완료');
-  addLog(lbLogContent, '✓ ' + sub.icon + ' ' + sub.name + ' 완료', 'done');
-
-  const totalProgress = Math.round(((idx + 1) / LEARNING_SUBSTEPS.length) * 100);
-  lbProgressNum.textContent = totalProgress + '%';
-  lbProgressFill.style.width = totalProgress + '%';
-
-  if (idx < LEARNING_SUBSTEPS.length - 1) {
-    await wait(400);
-    CHANNELS.forEach(ch => setChannelState(ch.key, '', '⏳'));
-  }
-}
-
-async function runAILearning() {
-  setStepState(5, 'active');
-  initLearningBox();
-  learningBox.classList.add('show');
-  scrollToElement(learningBox);
-  await wait(500);
-  addLog(lbLogContent, '🚀 AI 학습 시작 - 파일 ' + selectedFiles.length + '개, 5W1H 6채널 데이터');
-  for (let i = 0; i < LEARNING_SUBSTEPS.length; i++) {
-    await processSubstep(i);
-  }
-  addLog(lbLogContent, '🎯 AI 학습 완료 - 모든 채널 학습 인덱스 생성', 'done');
-  setStepState(5, 'done');
-  await wait(1500);
-}
-
-// ============================================
-// [v8 신규] AX 시스템 구축 시각화
-// ============================================
-function initAXBuildBox() {
-  let html = '';
-  AX_MODULES.forEach(mod => {
-    html += '<div class="ax-module" data-mod="' + mod.key + '">';
-    html += '<div class="ax-module-icon">' + mod.icon + '</div>';
-    html += '<div class="ax-module-name">' + mod.name + '</div>';
-    html += '<div class="ax-module-desc">' + mod.desc + '</div>';
-    html += '<div class="ax-module-status">⏳ 대기</div>';
-    html += '</div>';
-  });
-  axModulesEl.innerHTML = html;
-
-  // 자원 정보 초기화
-  axResId.textContent = '배정 대기 중';
-  axResId.classList.add('pending');
-  axResUser.textContent = '배정 대기 중';
-  axResUser.classList.add('pending');
-  axResStorage.textContent = '활성화 대기 중';
-  axResStorage.classList.add('pending');
-  axResUrl.textContent = '활성화 대기 중';
-  axResUrl.classList.add('pending');
-
-  axProgressNum.textContent = '0%';
-  axProgressFill.style.width = '0%';
-  axLogContent.innerHTML = '';
-}
-
-function setAXModuleState(key, state, statusText) {
-  const el = axModulesEl.querySelector('[data-mod="' + key + '"]');
-  if (!el) return;
-  el.classList.remove('active', 'done');
-  if (state) el.classList.add(state);
-  const status = el.querySelector('.ax-module-status');
-  if (statusText) status.textContent = statusText;
-  else if (state === 'active') status.textContent = '🔄 구축 중';
-  else if (state === 'done') status.textContent = '✓ 완료';
-  else status.textContent = '⏳ 대기';
-}
-
-function revealResource(target, value) {
-  target.classList.remove('pending');
-  target.textContent = value;
-}
-
-async function processAXModule(idx) {
-  const mod = AX_MODULES[idx];
-  setAXModuleState(mod.key, 'active');
-  addLog(axLogContent, '▶ ' + mod.icon + ' ' + mod.name + ' 구축 시작', 'start');
-  await wait(1000);
-  setAXModuleState(mod.key, 'done');
-  addLog(axLogContent, '✓ ' + mod.icon + ' ' + mod.name + ' 구축 완료', 'done');
-
-  // 시스템 자원 정보 점진 부여
-  if (idx === 0) {
-    revealResource(axResId, SYSTEM_INFO.id);
-    addLog(axLogContent, '  🔑 시스템 ID 부여: ' + SYSTEM_INFO.id);
-  } else if (idx === 1) {
-    revealResource(axResUser, SYSTEM_INFO.user);
-    addLog(axLogContent, '  🔑 사용자 코드 부여: ' + SYSTEM_INFO.user);
-  } else if (idx === 2) {
-    revealResource(axResStorage, SYSTEM_INFO.storage);
-    addLog(axLogContent, '  🔑 저장소 활성화 완료');
-  } else if (idx === 3) {
-    revealResource(axResUrl, SYSTEM_INFO.url);
-    addLog(axLogContent, '  🔑 접속 경로 활성화 완료');
-  }
-
-  const totalProgress = Math.round(((idx + 1) / AX_MODULES.length) * 100);
-  axProgressNum.textContent = totalProgress + '%';
-  axProgressFill.style.width = totalProgress + '%';
-}
-
-async function runAXBuild() {
-  setStepState(6, 'active');
-  initAXBuildBox();
-  axBuildBox.classList.add('show');
-  scrollToElement(axBuildBox);
-  await wait(500);
-  addLog(axLogContent, '🚀 AX 시스템 구축 시작 - 6개 자동화 모듈 생성');
-
-  for (let i = 0; i < AX_MODULES.length; i++) {
-    await processAXModule(i);
-  }
-
-  addLog(axLogContent, '🎯 AX 시스템 구축 완료 - 6개 모듈 활성화', 'done');
-  setStepState(6, 'done');
-  await wait(1200);
-}
-
-// 액션 버튼 핸들러
-document.querySelectorAll('.action-btn').forEach(btn => {
+// 하단 화면 이동
+document.querySelectorAll('.bottom-btn[data-nav]').forEach(btn => {
   btn.addEventListener('click', () => {
-    const action = btn.dataset.action;
+    const nav = btn.dataset.nav;
     const labels = {
-      'search': '🔍 검색하기',
       'qa': '💬 AI 질의응답',
       'dashboard': '📊 대시보드',
       'report': '📑 보고서'
     };
-    alert(labels[action] + ' 화면으로 이동합니다.\n\n시스템 ID: ' + SYSTEM_INFO.id +
-      '\n사용자: ' + SYSTEM_INFO.user +
-      '\n\n(해당 화면 제작 후 연결됩니다)');
+    alert(labels[nav] + ' 화면으로 이동합니다.\n\n(해당 화면 제작 후 연결됩니다)');
   });
 });
 
-// AX 시작
-axStartBtn.addEventListener('click', async () => {
-  if (selectedFiles.length === 0) return;
-  axStartBtn.disabled = true;
-  dropZone.style.opacity = '0.5';
-  dropZone.style.pointerEvents = 'none';
-  setStepState('upload', 'done');
-
-  if (hasArchiveFile()) {
-    await processStep(0);
-  } else {
-    skipStep(0);
-    document.getElementById('progStepNum').textContent = '①';
-    document.getElementById('progStepName').textContent = '압축해제 (건너뜀)';
-    document.getElementById('progMessage').textContent = '압축파일이 없어 다음 단계로 진행합니다';
-    progressBox.classList.add('show');
-    document.getElementById('progBarFill').style.width = '100%';
-    await wait(800);
-  }
-
-  await processStep(1);
-
-  await processStep(2);
-  evaluationResult = JSON.parse(JSON.stringify(EVAL_BY_ITERATION[1]));
-  renderEvaluation(evaluationResult, 1);
-  progressBox.classList.remove('show');
-  await wait(1800);
-
-  await runFeedbackLoop();
-  progressBox.classList.remove('show');
-  iterAlert.classList.remove('show');
-
-  // ⑤ AI 학습
-  await runAILearning();
-
-  // ⑥ AX 구축 (시각화)
-  await runAXBuild();
-
-  showCompletion();
-});
-
-function showCompletion() {
-  progressBox.classList.remove('show');
-  iterCounter.classList.remove('show');
-  iterAlert.classList.remove('show');
-  document.querySelectorAll('.file-status').forEach(s => {
-    s.textContent = '완료';
-    s.classList.add('done');
-  });
-  const finalIter = currentIteration;
-  document.getElementById('completeSummary').textContent =
-    '파일 ' + selectedFiles.length + '개 처리 · ' + finalIter + '차 보완 후 전체 A 등급 달성 · 6단계 완료';
-
-  // 최종 시스템 정보
-  document.getElementById('finalSysId').textContent = SYSTEM_INFO.id;
-  document.getElementById('finalUserCode').textContent = SYSTEM_INFO.user;
-  document.getElementById('finalStorage').textContent = SYSTEM_INFO.storage;
-  document.getElementById('finalUrl').textContent = SYSTEM_INFO.url;
-
-  completeBox.classList.add('show');
-  scrollToElement(completeBox);
-}
-
-resetBtn.addEventListener('click', () => {
-  selectedFiles = [];
-  evaluationResult = null;
-  currentIteration = 1;
-  userChoiceResolver = null;
-  isProcessing = false;
-  renderFileList();
-  updateAXButton();
-  ['1', '2', '3', '4', '5', '6'].forEach(n => setStepState(n, ''));
-  setStepState('upload', 'active');
-  progressBox.classList.remove('show');
-  evalBox.classList.remove('show');
-  feedbackBox.classList.remove('show');
-  manualBox.classList.remove('show');
-  learningBox.classList.remove('show');
-  axBuildBox.classList.remove('show');
-  completeBox.classList.remove('show');
-  iterCounter.classList.remove('show');
-  iterAlert.classList.remove('show');
-  evalAllA.classList.remove('show');
-  manualText.value = '';
-  manualText.style.borderColor = '#1A237E';
-  manualText.placeholder = '보완할 내용을 직접 입력하세요. (예: 일자·담당자·장소 등 추가 정보)';
-  document.querySelectorAll('.fb-btn').forEach(b => b.disabled = false);
-  dropZone.style.opacity = '1';
-  dropZone.style.pointerEvents = 'auto';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+// 초기화
+initChannelFilters();
 </script>
 
 </body>
