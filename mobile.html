@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>axdata · 스마트폰</title>
+<!-- PWA: 홈 화면 추가 + 오프라인 지원 -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1A237E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AX 모바일">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="description" content="5W1H 6채널 기반 AX 자동화 시스템">
 <style>
   * { box-sizing: border-box; }
@@ -344,5 +351,20 @@ window.addEventListener('message', function(e) {
 navigateTo('hero');
 </script>
 
+
+<script>
+// PWA Service Worker 등록 - 오프라인 지원 + 홈 화면 앱 설치
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(function(reg) {
+        console.log('[PWA] Service Worker 등록 성공:', reg.scope);
+      })
+      .catch(function(err) {
+        console.log('[PWA] Service Worker 등록 실패:', err);
+      });
+  });
+}
+</script>
 </body>
 </html>
